@@ -3,24 +3,38 @@
 #include <vector>
 #include <libhat/scanner.hpp>
 
-struct Signature {
+#include "Signatures.h"
+
+template <typename SigType>
+class Signature {
 public:
 	std::string name;
-	std::string pattern;
-	uintptr_t address;
+	SigType signature;
+	int16_t offset = 0;
 
-	Signature(std::string name, std::string pattern) {
+	constexpr Signature(std::string name, SigType signature, int16_t offset) {
 		this->name = name;
-		this->pattern = pattern;
+		this->signature = signature;
+		this->offset = offset;
+	}
+
+	uintptr_t getAddress() {
+		hat::scan_result result = hat::find_pattern(this->signature, ".text");
+
+		std::byte* address;
+
+		if (offset == 0) {
+			address = result.get();
+		}
+		else {
+			address = result.rel(offset);
+		}
+
+		return address;
 	}
 };
 
 class SignatureManager {
-private:
-	std::vector<Signature*> signatures;
 public:
 	SignatureManager();
-
-	Signature* getSignatureByName(std::string name);
-	void addSignature(const char pattern) {}
 };

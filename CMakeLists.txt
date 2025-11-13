@@ -2,13 +2,8 @@
 project(Loom)
 set(CMAKE_CXX_STANDARD_REQUIRED 20)
 
-# Check if building on Windows
-if(NOT WIN32)
-    message(FATAL_ERROR "This project can only be built on Windows")
-endif()
-
 # Check if building on x64 Windows
-if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
     message(FATAL_ERROR "This project requires 64-bit Windows (x64)")
 endif()
 
@@ -17,6 +12,9 @@ if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
+
+# Fun
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 # Add source to this project's executable.
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h)

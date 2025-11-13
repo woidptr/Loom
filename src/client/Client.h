@@ -6,10 +6,8 @@
 
 class Client {
 private:
-	SignatureManager* signatureManager;
-	std::vector<Hook*> hooks;
+	static std::vector<Hook*> hooks;
 public:
-	Client();
-
-	void initHooks();
+	static void construct();
+	static void destruct();
 };

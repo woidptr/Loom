@@ -8,10 +8,14 @@ Hook::Hook(std::string name, uintptr_t address) {
 	this->address = address;
 }
 
+Hook::~Hook() {
+	// MH_DisableHook((void*)address);
+}
+
 void Hook::hook(void* callback, void** original) {
 	MH_CreateHook((void*)this->address, callback, original);
 
-	if (MH_EnableHook((void*)this->address) != MH_OK) {
+	if (MH_EnableHook((void*)this->address) == MH_OK) {
 		Logger::info(std::format("Successfully initialized hook {} on {}", this->name, this->address));
 	}
 }
