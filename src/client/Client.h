@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 
-#include "../core/SignatureManager.h"
 #include "hooks/Hook.h"
 
 class Client {

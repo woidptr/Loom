@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../../core/Signatures.h"
 
 class Hook {
 public:
