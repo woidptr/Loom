@@ -18,6 +18,7 @@ void init(HMODULE hModule) {
 
 void cleanup() {
     Client::destruct();
+    Logger::shutdown();
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {

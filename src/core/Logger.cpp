@@ -1,7 +1,6 @@
 #include "Logger.h"
 #include <Windows.h>
 #include <print>
-#include <format>
 #include <iostream>
 #include <filesystem>
 #include <fmt/printf.h>
@@ -13,14 +12,26 @@ std::queue<std::string> Logger::logQueue;
 std::thread Logger::worker;
 
 void Logger::init() {
-//#ifndef NDEBUG
+#ifndef NDEBUG
 	AllocConsole();
 	SetConsoleTitleA("Loom");
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-//#endif
+#endif
 
 	running = true;
 	worker = std::thread(processLogs);
+}
+
+void Logger::shutdown() {
+#ifndef NDEBUG
+	FreeConsole();
+#endif
+
+	if (worker.joinable()) {
+		worker.join();
+	}
+
+	running = false;
 }
 
 void Logger::processLogs() {
@@ -36,9 +47,9 @@ void Logger::processLogs() {
 			logQueue.pop();
 			lock.unlock();
 
-//#ifndef NDEBUG
+#ifndef NDEBUG
 			fmt::print("{}\n", msg);
-//#endif
+#endif
 
 			lock.lock();
 		}

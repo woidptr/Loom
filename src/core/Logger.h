@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <format>
 #include <atomic>
 #include <mutex>
 #include <thread>
@@ -18,6 +19,7 @@ private:
 	static void processLogs();
 public:
 	static void init();
+	static void shutdown();
 
 	static void debug(std::string msg);
 	static void info(std::string msg);

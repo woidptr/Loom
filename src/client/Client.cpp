@@ -1,31 +1,27 @@
 #include "Client.h"
 #include <MinHook.h>
-#include "hooks/render/DirectXHook.h"
 #include "../core/Logger.h"
 #include <format>
 
-#include "hooks/render/SetupAndRenderHook.h"
+#include "hooks/input/WndProcHook.h"
 
-std::vector<Hook*> Client::hooks;
+WndProcHook* Client::wndProcHook = nullptr;
+SetupAndRenderHook* Client::setupAndRenderHook = nullptr;
 
 void Client::construct() {
 	MH_Initialize();
 
-	hooks.push_back(new SetupAndRenderHook());
+	Client::wndProcHook = new WndProcHook();
+	Client::setupAndRenderHook = new SetupAndRenderHook();
+
+	// ToggleSprint* toggleSprint = new ToggleSprint();
+
+	// Client::setupAndRenderHook->registerCallback(&toggleSprint->tickCallback);
+
+	// hooks.push_back(new SetupAndRenderHook());
+	// hooks.push_back(new WndProcHook());
 }
 
 void Client::destruct() {
 	MH_Uninitialize();
 }
-
-//void Client::test() {
-//	DirectXHook dx = DirectXHook();
-//	if (dx.getDirectXVersion() == DirectXVersion::D3D12) {
-//		Logger::debug("DirectX version 12 is found");
-//	}
-//	else {
-//		Logger::debug("Somegthing else if found");
-//	}
-//
-//	Logger::debug(std::format("Present address: {}", dx.address));
-//}

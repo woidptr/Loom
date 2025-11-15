@@ -1,9 +1,11 @@
 #pragma once
 #include "../Hook.h"
 
-class SetupAndRenderHook : public Hook {
-public:
-	SetupAndRenderHook();
+#include "../../../sdk/render/MinecraftUIRenderContext.h"
 
-	// static void callback(void* a1, void* a2);
+class SetupAndRenderHook : public Hook<void, void*, MinecraftUIRenderContext*> {
+public:
+	SetupAndRenderHook() : Hook(Signatures::ScreenView::setupAndRender.getName(), Signatures::ScreenView::setupAndRender.getAddress()) {
+		this->hook();
+	}
 };

@@ -7,9 +7,7 @@
 void Tessellator::begin(int a1, int maxVertices) {
 	using _func = void(*)(Tessellator*, int, int);
 
-	uintptr_t address = Signatures::Tessellator::begin_.getAddress();
-
-	_func func = reinterpret_cast<_func>(address);
+	_func func = reinterpret_cast<_func>(Signatures::Tessellator::begin.getAddress());
 
 	return func(this, a1, maxVertices);
 }
