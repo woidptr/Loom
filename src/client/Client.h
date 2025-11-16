@@ -4,6 +4,7 @@
 // hooks
 #include "hooks/Hook.h"
 #include "hooks/input/WndProcHook.h"
+#include "hooks/client/LevelTickHook.h"
 #include "hooks/render/SetupAndRenderHook.h"
 
 // modules
@@ -12,7 +13,8 @@
 
 class Client {
 private:
-	static WndProcHook* wndProcHook;
+	// static WndProcHook* wndProcHook;
+	static LevelTickHook* levelTickHook;
 	static SetupAndRenderHook* setupAndRenderHook;
 public:
 	static void construct();

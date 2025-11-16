@@ -4,7 +4,6 @@
 class Module {
 private:
 	std::string name;
-	SetupAndRenderHook* setupAndRenderHook = nullptr;
 public:
 	Module(std::string name){
 		this->name = name;

@@ -20,6 +20,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
+target_include_directories(${PROJECT_NAME} PRIVATE src)
+
 include(FetchContent)
 
 FetchContent_Declare(

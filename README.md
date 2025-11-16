@@ -1,3 +1,3 @@
 # Loom
 
-My playground with modding Minecraft Bedrock Edition
+A playground for testing Minecraft Bedrock Edition native modding

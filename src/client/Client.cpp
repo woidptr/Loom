@@ -5,16 +5,18 @@
 
 #include "hooks/input/WndProcHook.h"
 
-WndProcHook* Client::wndProcHook = nullptr;
+// WndProcHook* Client::wndProcHook = nullptr;
+LevelTickHook* Client::levelTickHook = nullptr;
 SetupAndRenderHook* Client::setupAndRenderHook = nullptr;
 
 void Client::construct() {
 	MH_Initialize();
 
-	Client::wndProcHook = new WndProcHook();
+	// Client::wndProcHook = new WndProcHook();
+	Client::levelTickHook = new LevelTickHook();
 	Client::setupAndRenderHook = new SetupAndRenderHook();
 
-	// ToggleSprint* toggleSprint = new ToggleSprint();
+	ToggleSprint* toggleSprint = new ToggleSprint(Client::levelTickHook, Client::setupAndRenderHook);
 
 	// Client::setupAndRenderHook->registerCallback(&toggleSprint->tickCallback);
 
