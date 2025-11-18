@@ -1,5 +1,5 @@
 #include "../Module.h"
-#include "../../hooks/client/LevelTickHook.h"
+#include "../../hooks/world/LevelTickHook.h"
 #include "../../hooks/render/SetupAndRenderHook.h"
 
 class ToggleSprint : public Module {

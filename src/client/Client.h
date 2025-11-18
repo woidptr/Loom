@@ -4,7 +4,7 @@
 // hooks
 #include "hooks/Hook.h"
 #include "hooks/input/WndProcHook.h"
-#include "hooks/client/LevelTickHook.h"
+#include "hooks/world/LevelTickHook.h"
 #include "hooks/render/SetupAndRenderHook.h"
 
 // modules
@@ -13,9 +13,12 @@
 
 class Client {
 private:
-	// static WndProcHook* wndProcHook;
-	static LevelTickHook* levelTickHook;
-	static SetupAndRenderHook* setupAndRenderHook;
+	// hooks
+	static inline std::unique_ptr<LevelTickHook> levelTickHook = nullptr;
+	static inline std::unique_ptr<SetupAndRenderHook> setupAndRenderHook = nullptr;
+
+	// modules
+	static inline std::unique_ptr<ToggleSprint> toggleSprintModule = nullptr;
 public:
 	static void construct();
 	static void destruct();

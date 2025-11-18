@@ -1,12 +1,12 @@
 #include "ToggleSprint.h"
 #include <core/Logger.h>
-#include <sdk/SDK.h>
+#include <sdk/GameContext.h>
 
 bool init = false;
 
 void ToggleSprint::tickCallback(void* a1) {
 	// Logger::info("Tick");
-	if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+	if (GameContext::clientInstance->getLocalPlayer() != nullptr) {
 		// Logger::info("Found renderCtx pointer");
 		/*if (SDK::renderCtx->clientInstance != nullptr) {
 			Logger::info("Found clientInstance pointer");
@@ -25,18 +25,18 @@ void ToggleSprint::tickCallback(void* a1) {
 			Logger::info("Found localPlayer pointer");
 		}*/
 
-		SDK::clientInstance->getLocalPlayer()->setSprinting(true);
+		GameContext::clientInstance->getLocalPlayer()->setSprinting(true);
 	}
 }
 
 void ToggleSprint::renderCallback(void* a1, MinecraftUIRenderContext* renderCtx) {
 	if (!init) {
-		SDK::renderCtx = renderCtx;
-		SDK::clientInstance = renderCtx->clientInstance;
+		GameContext::registerRenderContext(renderCtx);
 
 		uintptr_t moduleBase = (uintptr_t)GetModuleHandleA(NULL);
-		uintptr_t vtableAddr = ((uintptr_t)(*reinterpret_cast<void***>(SDK::renderCtx->clientInstance)[219])) - moduleBase;
+		uintptr_t vtableAddr = ((uintptr_t)(*reinterpret_cast<void***>(GameContext::clientInstance)[31])) - moduleBase;
 		Logger::info(std::format("ClientInstance vtable address: 0x{:X}", vtableAddr));
+		// Logger::info(std::format("ScreenContext runtime address: 0x{:X}", GameContext::renderCtx->getScreenContext()));
 
 		init = true;
 	}

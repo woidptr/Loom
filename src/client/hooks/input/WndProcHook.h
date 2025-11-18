@@ -3,7 +3,7 @@
 
 class WndProcHook : public Hook<LRESULT __stdcall, HWND, UINT, WPARAM, LPARAM> {
 private:
-	static LONG_PTR original;
+	static inline LONG_PTR original = NULL;
 	static inline std::vector<std::function<void(int)>> keyboardCallbacks;
 	static inline std::vector<std::function<void(int, int)>> mouseCallbacks;
 public:

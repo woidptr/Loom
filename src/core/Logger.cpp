@@ -4,6 +4,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fmt/printf.h>
+#include <fmt/color.h>
 
 std::atomic<bool> Logger::running{ false };
 std::mutex Logger::queueMutex;

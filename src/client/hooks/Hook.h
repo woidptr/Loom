@@ -17,6 +17,10 @@ public:
 		this->address = address;
 	}
 
+	virtual ~Hook() {
+		MH_DisableHook((void*)this->address);
+	}
+
 	static void callback(Args...args) {
 		for (auto& cb : callbacks) {
 			cb(args...);

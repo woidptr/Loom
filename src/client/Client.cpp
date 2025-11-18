@@ -5,23 +5,15 @@
 
 #include "hooks/input/WndProcHook.h"
 
-// WndProcHook* Client::wndProcHook = nullptr;
-LevelTickHook* Client::levelTickHook = nullptr;
-SetupAndRenderHook* Client::setupAndRenderHook = nullptr;
-
 void Client::construct() {
 	MH_Initialize();
 
-	// Client::wndProcHook = new WndProcHook();
-	Client::levelTickHook = new LevelTickHook();
-	Client::setupAndRenderHook = new SetupAndRenderHook();
+	// hooks
+	Client::levelTickHook = std::make_unique<LevelTickHook>();
+	Client::setupAndRenderHook = std::make_unique<SetupAndRenderHook>();
 
-	ToggleSprint* toggleSprint = new ToggleSprint(Client::levelTickHook, Client::setupAndRenderHook);
-
-	// Client::setupAndRenderHook->registerCallback(&toggleSprint->tickCallback);
-
-	// hooks.push_back(new SetupAndRenderHook());
-	// hooks.push_back(new WndProcHook());
+	// modules
+	Client::toggleSprintModule = std::make_unique<ToggleSprint>(Client::levelTickHook.get(), Client::setupAndRenderHook.get());
 }
 
 void Client::destruct() {

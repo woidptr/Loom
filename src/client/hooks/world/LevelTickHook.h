@@ -1,7 +1,6 @@
 #pragma once
 #include "../Hook.h"
-
-#include "../../../core/Signatures.h"
+#include <core/Signatures.h>
 
 class LevelTickHook : public Hook<void, void*> {
 public:
