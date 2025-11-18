@@ -11,3 +11,7 @@ void FileManager::getRootFolder() {
 
 	CoTaskMemFree(path);
 }
+
+void FileManager::getLogsFolder() {
+
+}

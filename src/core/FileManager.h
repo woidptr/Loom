@@ -6,4 +6,5 @@
 class FileManager {
 public:
 	void getRootFolder();
+	void getLogsFolder();
 };
