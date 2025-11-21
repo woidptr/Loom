@@ -1,4 +1,4 @@
-#include "GameContext.h"
+#include "GameContext.hpp"
 
 void GameContext::registerRenderContext(MinecraftUIRenderContext* renderCtx) {
 	GameContext::renderCtx = renderCtx;

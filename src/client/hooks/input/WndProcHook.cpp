@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <windowsx.h>
-#include "WndProcHook.h"
-#include <core/Logger.h>
+#include "WndProcHook.hpp"
+#include <core/Logger.hpp>
 
 LRESULT __stdcall WndProcHook::callback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
@@ -32,6 +32,6 @@ void WndProcHook::registerMouseCallback(std::function<void(int, int)> fn) {
 	mouseCallbacks.push_back(fn);
 }
 
-WndProcHook::WndProcHook() : Hook("WndProc", 1) {
+WndProcHook::WndProcHook() : Hook(Signatures::Level::tick) {
 	this->hook();
 }

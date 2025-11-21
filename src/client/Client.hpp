@@ -2,14 +2,14 @@
 #include <vector>
 
 // hooks
-#include "hooks/Hook.h"
-#include "hooks/input/WndProcHook.h"
-#include "hooks/world/LevelTickHook.h"
-#include "hooks/render/SetupAndRenderHook.h"
+#include "hooks/Hook.hpp"
+#include "hooks/input/WndProcHook.hpp"
+#include "hooks/world/LevelTickHook.hpp"
+#include "hooks/render/SetupAndRenderHook.hpp"
 
 // modules
-#include "modules/Module.h"
-#include "modules/movement/ToggleSprint.h"
+#include "modules/Module.hpp"
+#include "modules/movement/ToggleSprint.hpp"
 
 class Client {
 private:

@@ -1,6 +1,6 @@
 #include <Windows.h>
-#include "client/Client.h"
-#include "core/Logger.h"
+#include "client/Client.hpp"
+#include "core/Logger.hpp"
 #include <libhat/scanner.hpp>
 #include <format>
 

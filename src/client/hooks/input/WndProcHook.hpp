@@ -1,5 +1,5 @@
 #pragma once
-#include "../Hook.h"
+#include "../Hook.hpp"
 
 class WndProcHook : public Hook<LRESULT __stdcall, HWND, UINT, WPARAM, LPARAM> {
 private:
@@ -19,6 +19,6 @@ public:
 	virtual void hook() override {
 		SetWindowLongPtr(FindWindow(NULL, "Minecraft"), GWLP_WNDPROC, (LONG_PTR)callback);
 
-		Logger::info(std::format("Successfully initialized hook {}", this->name));
+		Logger::info(std::format("Successfully initialized hook {}", "WndProcHook"));
 	}
 };

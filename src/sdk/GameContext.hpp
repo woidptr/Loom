@@ -1,7 +1,7 @@
 #pragma once
-#include "render/MinecraftUIRenderContext.h"
-#include "client/IClientInstance.h"
-#include "actors/LocalPlayer.h"
+#include "render/MinecraftUIRenderContext.hpp"
+#include "client/IClientInstance.hpp"
+#include "actors/LocalPlayer.hpp"
 
 class GameContext {
 public:

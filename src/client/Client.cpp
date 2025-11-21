@@ -1,9 +1,7 @@
-#include "Client.h"
+#include "Client.hpp"
 #include <MinHook.h>
-#include "../core/Logger.h"
+#include <core/Logger.hpp>
 #include <format>
-
-#include "hooks/input/WndProcHook.h"
 
 void Client::construct() {
 	MH_Initialize();

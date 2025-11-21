@@ -1,5 +1,5 @@
 #pragma once
-#include "../actors/LocalPlayer.h"
+#include "../actors/LocalPlayer.hpp"
 
 class IClientInstance {
 public:
