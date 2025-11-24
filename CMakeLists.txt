@@ -17,7 +17,7 @@ endif()
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 # Add source to this project's executable.
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
@@ -45,25 +45,38 @@ FetchContent_Declare(
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG        v1.91.0
+    GIT_TAG        v1.92.5
 )
 
-FetchContent_MakeAvailable(libhat minhook fmt imgui)
+FetchContent_MakeAvailable(libhat minhook fmt)
 
-add_library(imgui_lib
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-)
+FetchContent_GetProperties(imgui)
+if(NOT imgui_POPULATED)
+    FetchContent_Populate(imgui)
 
-target_include_directories(imgui_lib PUBLIC ${imgui_SOURCE_DIR})
+    add_library(imgui)
 
-target_sources(imgui_lib PRIVATE
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_dx12.cpp
-)
+    target_sources(imgui PRIVATE
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
 
-target_link_libraries(imgui_lib PUBLIC d3d12 dxgi)
+        # ADD THESE:
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_dx12.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
+    )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat minhook fmt imgui_lib)
+    target_include_directories(imgui PUBLIC
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends
+    )
+
+    target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
+endif()
+
+# find_package(imgui CONFIG REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat minhook fmt imgui)

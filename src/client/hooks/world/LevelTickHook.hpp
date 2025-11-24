@@ -4,7 +4,7 @@
 
 class LevelTickHook : public Hook<void, void*> {
 public:
-	LevelTickHook() : Hook(Signatures::Level::tick) {
+	LevelTickHook() : Hook(SignatureRegistry::getSignature("Level::tick")) {
 		this->hook();
 	}
 };

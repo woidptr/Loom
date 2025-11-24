@@ -4,6 +4,10 @@
 #include <core/Logger.hpp>
 
 LRESULT __stdcall WndProcHook::callback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
+		return 0;
+	}
+
 	switch (uMsg) {
 	case WM_KEYDOWN:
 		for (auto& kcb : keyboardCallbacks) {
@@ -32,6 +36,6 @@ void WndProcHook::registerMouseCallback(std::function<void(int, int)> fn) {
 	mouseCallbacks.push_back(fn);
 }
 
-WndProcHook::WndProcHook() : Hook(Signatures::Level::tick) {
+WndProcHook::WndProcHook() : Hook("WndProc") {
 	this->hook();
 }
