@@ -1,5 +1,53 @@
 #include "UIRender.hpp"
 
+UIRender::UIRender(KeyboardFeedHook* keyboardFeedHook, MouseFeedHook* mouseFeedHook, WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook) {
+	//keyboardFeedHook->registerCallback(
+	//	[&](uintptr_t keyCode, int state) {
+	//		Logger::info(std::format("Keyboard pressed, state {}", state));
+	//	}
+	//);
+
+	//mouseFeedHook->registerCallback(
+	//	[&](void* mouseDevice, ActionButton actionButtonId, int8_t buttonData, int16_t x, int16_t y, int16_t dx, int16_t dy, bool forceMotionlessPointer) {
+	//		// mouseCallback(actionButtonId, buttonData);
+	//		Logger::info(std::format("Mouse hook data, actionButtonId {}, buttonData {}, x {}, y {}, dx {}, dy {}, forceMotionlessPointer {}", (int8_t)actionButtonId, buttonData, x, y, dx, dy, forceMotionlessPointer));
+	//	}
+	//);
+
+	windowProcHook->registerCallback(
+		[&](HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+
+			switch (msg) {
+			case WM_KEYDOWN:
+				keyboardCallback((int16_t)wParam, true);
+				break;
+			case WM_KEYUP:
+				keyboardCallback((int16_t)wParam, false);
+			}
+			// Logger::info(std::format("Window proc message: {}", msg));
+		}
+	);
+
+	presentHook->registerCallback(
+		[&](IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
+			renderCallback(swapChain, a1, a2);
+		}
+	);
+
+	executeCommandListHook->registerCallback(
+		[&](ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* commandList) {
+			executeCommandListCallback(commandQueue, a1, commandList);
+		}
+	);
+}
+
+void UIRender::keyboardCallback(int16_t key, bool isDown) {
+	if (key == VK_TAB && !isDown) {
+		this->draw_main_ui_flag = !this->draw_main_ui_flag;
+	}
+}
+
 void UIRender::initImgui(IDXGISwapChain3* swapChain) {
 	if (this->initialized) {
 		return;
@@ -49,10 +97,43 @@ void UIRender::initImgui(IDXGISwapChain3* swapChain) {
 
 	ImGui_ImplWin32_Init(desc.OutputWindow);
 	Logger::info(std::format("ImGui window: {}", (void*)desc.OutputWindow));
-	// SetWindowLongPtr(desc.OutputWindow, GWLP_WNDPROC, (LONG_PTR)wndProcCallback);
 	ImGui_ImplDX11_Init(this->d3d11Device, this->d3d11DeviceContext);
 
 	initialized = true;
+}
+
+void UIRender::drawMainUI() {
+	if (!this->draw_main_ui_flag) {
+		return;
+	}
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.WindowRounding = 20.0f;
+	style.FrameRounding = 12.0f;
+	style.GrabRounding = 12.0f;
+
+	style.WindowPadding = ImVec2(20, 20);
+	style.FramePadding = ImVec2(10, 6);
+
+	// ImVec4 backgroundColor = ImVec4(0.10f, 0.10f, 0.11f, 0.95f);
+	// ImGui::PushStyleColor(backgroundColor);
+
+	ImGui::SetNextWindowSize(ImVec2(900, 500), ImGuiCond_FirstUseEver);
+
+	ImGuiWindowFlags windowFlags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove;
+
+	if (ImGui::Begin("Loom", nullptr, windowFlags)) {
+		static char search[128] = "";
+
+		ImGui::SetNextItemWidth(300);
+		ImGui::InputTextWithHint("##search", "Search", search, sizeof(search));
+	}
+
+	ImGui::End();
 }
 
 void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
@@ -100,7 +181,9 @@ void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
 	ImGui::NewFrame();
 
 	// Draw your menu
-	ImGui::ShowDemoWindow();
+	// ImGui::ShowDemoWindow();
+
+	this->drawMainUI();
 
 	// Render
 	ImGui::Render();

@@ -1,9 +1,18 @@
 #pragma once
 #include "../Hook.hpp"
+#include <wrl.h>
 #include <dxgi1_4.h>
 #include <d3d11.h>
 #include <d3d12.h>
 #include <core/Logger.hpp>
+
+using Microsoft::WRL::ComPtr;
+
+class DirectXBoilerplate {
+public:
+	ComPtr<ID3D12Device> device;
+	ComPtr<ID3D12CommandQueue> queue;
+};
 
 class PresentHook : public Hook<HRESULT, IDXGISwapChain3*, UINT, UINT> {
 public:
@@ -190,3 +199,10 @@ public:
 		this->hook();
 	}
 };
+
+//class ResizeBuffersHook : public Hook<HRESULT, IDXGISwapChain3, UINT, UINT, UINT, DXGI_FORMAT, UINT> {
+//public:
+//	ResizeBuffersHook() : Hook("IDXGISwapChain::ResizeBuffers", 0) {
+//
+//	}
+//};

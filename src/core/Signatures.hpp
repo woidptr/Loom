@@ -12,17 +12,6 @@ public:
 	Signature(std::string signature, int16_t offset);
 
 	uintptr_t getAddress();
-
-	template <typename TRet, typename...Args>
-	TRet call(Args... args) {
-		if (this->address == 0) {
-			return;
-		}
-
-		using _func = TRet(*)(Args...);
-		_func func = reinterpret_cast<_func>(this->address);
-		return func(args...);
-	}
 };
 
 class SignatureRegistry {

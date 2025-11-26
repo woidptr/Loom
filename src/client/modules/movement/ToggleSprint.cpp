@@ -17,9 +17,15 @@ void ToggleSprint::renderCallback(void* a1, MinecraftUIRenderContext* renderCtx)
 	if (!init) {
 		GameContext::registerRenderContext(renderCtx);
 
-		uintptr_t moduleBase = (uintptr_t)GetModuleHandleA(NULL);
-		uintptr_t vtableAddr = ((uintptr_t)(*reinterpret_cast<void***>(GameContext::clientInstance)[31])) - moduleBase;
-		Logger::info(std::format("ClientInstance vtable address: 0x{:X}", vtableAddr));
+		// uintptr_t moduleBase = (uintptr_t)GetModuleHandleA(NULL);
+		// uintptr_t vtableAddr = ((uintptr_t)(*reinterpret_cast<void***>(GameContext::clientInstance)[31])) - moduleBase;
+		// Logger::info(std::format("ClientInstance vtable address: 0x{:X}", vtableAddr));
+
+		void* screenContext = renderCtx->screenContext;
+		Logger::info(std::format("Screen context runtime address: {:p}", screenContext));
+
+		void* guiData = renderCtx->clientInstance->getGuiData();
+		Logger::info(std::format("GuiData runtime address: {:p}", guiData));
 
 		// GameContext::renderCtx->getUIScene();
 		// Logger::info(std::format("UIScene offset: 0x{:X}", Signatures::MinecraftUIRenderContext::UIScene.getAddress()));

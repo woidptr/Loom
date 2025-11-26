@@ -1,5 +1,6 @@
 #pragma once
 #include "../actors/LocalPlayer.hpp"
+#include "GuiData.h"
 
 class IClientInstance {
 public:
@@ -11,5 +12,9 @@ public:
 
 	LocalPlayer* getLocalPlayer() {
 		return CallVFunc<31, LocalPlayer*>(this);
+	}
+
+	GuiData* getGuiData() {
+		return CallVFunc<218, GuiData*>(this);
 	}
 };
