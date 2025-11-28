@@ -1,4 +1,5 @@
 #include "FileManager.hpp"
+#include "Logger.hpp"
 
 fs::path FileManager::getRootFolder() {
 	PWSTR path = nullptr;
@@ -6,7 +7,7 @@ fs::path FileManager::getRootFolder() {
 	HRESULT hr = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
 
 	if (SUCCEEDED(hr)) {
-		fs::path rootPath = fs::path(path);
+		fs::path rootPath = fs::path(path) / ".loom";
 
 		if (!fs::exists(rootPath)) {
 			fs::create_directories(rootPath);

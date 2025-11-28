@@ -13,8 +13,9 @@ void Logger::init() {
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 #endif
 
-	fs::path logFilePath = FileManager::getLogsFolder() / "log.txt";
-	fopen_s(&logFile, logFilePath.string().c_str(), "a");
+	fs::path logFilePath = FileManager::getLogsFolder() / "latest.log";
+
+	fopen_s(&logFile, logFilePath.string().c_str(), "w");
 
 	running = true;
 	worker = std::thread(processLogs);
