@@ -5,14 +5,17 @@
 #include <mutex>
 #include <thread>
 #include <queue>
+#include "FileManager.hpp"
 
 class Logger {
 private:
-	static std::atomic<bool> running;
-	static std::mutex queueMutex;
-	static std::condition_variable cv;
-	static std::queue<std::string> logQueue;
-	static std::thread worker;
+	static inline std::atomic<bool> running{ false };
+	static inline std::mutex queueMutex;
+	static inline std::condition_variable cv;
+	static inline std::queue<std::string> logQueue;
+	static inline std::thread worker;
+
+	static inline FILE* logFile = nullptr;
 
 	static void log(std::string logType, std::string msg);
 	static void writeToFile(std::string msg);

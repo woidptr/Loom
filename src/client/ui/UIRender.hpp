@@ -1,8 +1,7 @@
 #pragma once
-#include <client/hooks/input/KeyboardFeedHook.hpp>
-#include <client/hooks/input/MouseFeedHook.hpp>
 #include <client/hooks/input/WindowProcHook.hpp>
 #include <client/hooks/render/DirectX.hpp>
+#include "elements/ToastNotification.hpp"
 #include <mutex>
 #include <d3d12.h>
 #include <d3d11.h>
@@ -30,7 +29,7 @@ private:
 
 	bool draw_main_ui_flag = false;
 public:
-	UIRender(KeyboardFeedHook* keyboardFeedHook, MouseFeedHook* mouseFeedHook, WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook);
+	UIRender(WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook);
 
 	void initImgui(IDXGISwapChain3* swapChain);
 

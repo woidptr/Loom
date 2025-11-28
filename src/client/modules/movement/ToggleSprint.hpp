@@ -1,7 +1,7 @@
 #include "../Module.hpp"
-#include "../../hooks/world/LevelTickHook.hpp"
-#include "../../hooks/render/SetupAndRenderHook.hpp"
-#include "../../hooks/render/DirectX.hpp"
+#include <client/hooks/world/LevelTickHook.hpp>
+#include <client/hooks/render/SetupAndRenderHook.hpp>
+#include <client/hooks/render/DirectX.hpp>
 
 class ToggleSprint : public Module {
 private:
@@ -9,13 +9,13 @@ private:
 public:
 	ToggleSprint(LevelTickHook* levelTickHook, SetupAndRenderHook* setupAndRenderHook) : Module("Toggle Sprint") {
 		levelTickHook->registerCallback(
-			[&](void* a1) {
+			[&](CallbackContext<void>& cbCtx, void* a1) {
 				tickCallback(a1);
 			}
 		);
 
 		setupAndRenderHook->registerCallback(
-			[&](void* a1, MinecraftUIRenderContext* renderCtx) {
+			[&](auto& cbCtx, void* a1, MinecraftUIRenderContext* renderCtx) {
 				renderCallback(a1, renderCtx);
 			}
 		);

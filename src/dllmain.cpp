@@ -7,13 +7,15 @@
 void init(HMODULE hModule) {
     Logger::init();
 
+    SignatureRegistry::registerSignatures();
+
+    if (!SignatureRegistry::performHealthCheck()) {
+        Logger::critical("Signature healthcheck failed, silently ejecting...");
+
+        FreeLibraryAndExitThread(hModule, 0);
+    }
+
     Client::construct();
-
-    /*constexpr hat::fixed_signature pattern = hat::compile_signature<"E8 ? ? ? ? F3 41 0F 10 4C 24 ? F3 41 0F 10 04 24 F3 0F 11 45 ? F3 0F 11 75">();
-    hat::scan_result result = hat::find_pattern(pattern, ".text");
-    std::byte* address = result.get();*/
-
-    // Logger::info(std::format("Tessellator::begin address {}", (uintptr_t)address));
 }
 
 void cleanup() {

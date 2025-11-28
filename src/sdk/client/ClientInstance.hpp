@@ -1,5 +1,5 @@
 #pragma once
-#include <sdk/client/IClientInstance.h>
+#include <sdk/client/IClientInstance.hpp>
 
 class ClientInstance : public IClientInstance {
 public:

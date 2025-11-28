@@ -3,8 +3,10 @@
 #include <shlobj.h>
 #include <filesystem>
 
+namespace fs = std::filesystem;
+
 class FileManager {
 public:
-	void getRootFolder();
-	void getLogsFolder();
+	static fs::path getRootFolder();
+	static fs::path getLogsFolder();
 };

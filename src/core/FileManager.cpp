@@ -1,17 +1,29 @@
 #include "FileManager.hpp"
 
-void FileManager::getRootFolder() {
+fs::path FileManager::getRootFolder() {
 	PWSTR path = nullptr;
 
 	HRESULT hr = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
 
 	if (SUCCEEDED(hr)) {
+		fs::path rootPath = fs::path(path);
 
+		if (!fs::exists(rootPath)) {
+			fs::create_directories(rootPath);
+		}
+
+		return rootPath;
 	}
 
 	CoTaskMemFree(path);
 }
 
-void FileManager::getLogsFolder() {
+fs::path FileManager::getLogsFolder() {
+	fs::path logsPath = getRootFolder() / "logs";
 
+	if (!fs::exists(logsPath)) {
+		fs::create_directories(logsPath);
+	}
+
+	return logsPath;
 }

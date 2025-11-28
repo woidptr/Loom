@@ -24,9 +24,9 @@ void SignatureRegistry::registerSignatures() {
 	signatures.insert(std::make_pair("Tessellator::begin", std::make_unique<Signature>("E8 ? ? ? ? F3 41 0F 10 4C 24 ? F3 41 0F 10 04 24 F3 0F 11 45 ? F3 0F 11 75", 1)));
 	signatures.insert(std::make_pair("ScreenView::setupAndRender", std::make_unique<Signature>("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 BC 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA", 0))); // E8 ? ? ? ? 48 8B 4B ? 48 85 C9 74 ? 48 8B 01 48 8B D7 48 8B 40 ? FF 15 ? ? ? ? 90
 	signatures.insert(std::make_pair("Level::tick", std::make_unique<Signature>("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 8B F9 45 33 F6 48 8B 01 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 48 8D 0D", 0)));
-	signatures.insert(std::make_pair("Keyboard::feed", std::make_unique<Signature>("40 53 48 83 EC ? 80 79 ? ? 8B DA", 0)));
-	signatures.insert(std::make_pair("MouseDevice::feed", std::make_unique<Signature>("48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 57 41 54 41 55 41 56 41 57 48 83 EC ? 44 0F B7 BC 24", 0)));
+	// signatures.insert(std::make_pair("MouseDevice::feed", std::make_unique<Signature>("48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 57 41 54 41 55 41 56 41 57 48 83 EC ? 44 0F B7 BC 24", 0)));
 	signatures.insert(std::make_pair("MainWindow::_windowProc", std::make_unique<Signature>("40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B F1 49 8B F8 8B F2", 0)));
+	signatures.insert(std::make_pair("Dimension::getTimeOfDay", std::make_unique<Signature>("44 8B C2 B8 F1 19 76 05 F7 EA", 0)));
 }
 
 bool SignatureRegistry::performHealthCheck() {

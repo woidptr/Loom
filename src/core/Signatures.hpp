@@ -23,7 +23,3 @@ public:
 	static bool performHealthCheck();
 	static Signature* getSignature(std::string name);
 };
-
-//namespace MinecraftUIRenderContext {
-//	inline Signature UIScene = Signature("MinecraftUIRenderContext::UIScene*", "48 89 AE ? ? ? ? C6 86 ? ? ? ? ? 48 8B C6", 1);
-//}

@@ -7,16 +7,9 @@
 void Client::construct() {
 	MH_Initialize();
 
-	SignatureRegistry::registerSignatures();
-
-	if (!SignatureRegistry::performHealthCheck()) {
-		return;
-	}
-
 	// hooks
-	Client::keyboardFeedHook = std::make_unique<KeyboardFeedHook>();
-	Client::mouseFeedHook = std::make_unique<MouseFeedHook>();
 	Client::windowProcHook = std::make_unique<WindowProcHook>();
+	Client::getTimeOfDayHook = std::make_unique<GetTimeOfDayHook>();
 	Client::levelTickHook = std::make_unique<LevelTickHook>();
 	Client::setupAndRenderHook = std::make_unique<SetupAndRenderHook>();
 	Client::presentHook = std::make_unique<PresentHook>();
@@ -24,8 +17,6 @@ void Client::construct() {
 
 	// ui
 	Client::uiRender = std::make_unique<UIRender>(
-		Client::keyboardFeedHook.get(),
-		Client::mouseFeedHook.get(),
 		Client::windowProcHook.get(),
 		Client::presentHook.get(),
 		Client::executeCommandList.get()
@@ -33,6 +24,7 @@ void Client::construct() {
 
 	// modules
 	Client::toggleSprintModule = std::make_unique<ToggleSprint>(Client::levelTickHook.get(), Client::setupAndRenderHook.get());
+	Client::timeChangerModule = std::make_unique<TimeChanger>(Client::getTimeOfDayHook.get());
 }
 
 void Client::destruct() {

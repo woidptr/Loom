@@ -22,3 +22,8 @@ cmake --build --preset x64-debug
 cmake --preset x64-release
 cmake --build --preset x64-release
 ```
+
+## Logs
+
+When compiled in debug mode and injected, you will see the console pop up and all the information will be printed there.
+When compiled in release mode, all the logs are stored at `%appdata%/.loom/logs`.

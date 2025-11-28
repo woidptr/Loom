@@ -1,21 +1,8 @@
 #include "UIRender.hpp"
 
-UIRender::UIRender(KeyboardFeedHook* keyboardFeedHook, MouseFeedHook* mouseFeedHook, WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook) {
-	//keyboardFeedHook->registerCallback(
-	//	[&](uintptr_t keyCode, int state) {
-	//		Logger::info(std::format("Keyboard pressed, state {}", state));
-	//	}
-	//);
-
-	//mouseFeedHook->registerCallback(
-	//	[&](void* mouseDevice, ActionButton actionButtonId, int8_t buttonData, int16_t x, int16_t y, int16_t dx, int16_t dy, bool forceMotionlessPointer) {
-	//		// mouseCallback(actionButtonId, buttonData);
-	//		Logger::info(std::format("Mouse hook data, actionButtonId {}, buttonData {}, x {}, y {}, dx {}, dy {}, forceMotionlessPointer {}", (int8_t)actionButtonId, buttonData, x, y, dx, dy, forceMotionlessPointer));
-	//	}
-	//);
-
+UIRender::UIRender(WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook) {
 	windowProcHook->registerCallback(
-		[&](HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+		[&](CallbackContext<LRESULT>& cbCtx, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
 			switch (msg) {
@@ -30,13 +17,13 @@ UIRender::UIRender(KeyboardFeedHook* keyboardFeedHook, MouseFeedHook* mouseFeedH
 	);
 
 	presentHook->registerCallback(
-		[&](IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
+		[&](CallbackContext<HRESULT>& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
 			renderCallback(swapChain, a1, a2);
 		}
 	);
 
 	executeCommandListHook->registerCallback(
-		[&](ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* commandList) {
+		[&](CallbackContext<void>& cbCtx, ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* commandList) {
 			executeCommandListCallback(commandQueue, a1, commandList);
 		}
 	);
@@ -45,6 +32,10 @@ UIRender::UIRender(KeyboardFeedHook* keyboardFeedHook, MouseFeedHook* mouseFeedH
 void UIRender::keyboardCallback(int16_t key, bool isDown) {
 	if (key == VK_TAB && !isDown) {
 		this->draw_main_ui_flag = !this->draw_main_ui_flag;
+	}
+
+	if (key == VK_SHIFT && !isDown) {
+		ToastManager::addToast("Test", 3.0f);
 	}
 }
 
@@ -183,6 +174,7 @@ void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
 	// Draw your menu
 	// ImGui::ShowDemoWindow();
 
+	ToastManager::renderToasts();
 	this->drawMainUI();
 
 	// Render
