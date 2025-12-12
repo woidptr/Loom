@@ -9,4 +9,5 @@ class FileManager {
 public:
 	static fs::path getRootFolder();
 	static fs::path getLogsFolder();
+	static fs::path getSettingsFolder();
 };

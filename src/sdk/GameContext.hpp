@@ -1,8 +1,8 @@
 #pragma once
-#include "render/MinecraftUIRenderContext.hpp"
-#include "render/Tessellator.hpp"
-#include "client/IClientInstance.hpp"
-#include "actors/LocalPlayer.hpp"
+#include "mc/client/render/screen/MinecraftUIRenderContext.hpp"
+#include "mc/client/render/Tessellator.hpp"
+#include "mc/client/game/IClientInstance.hpp"
+#include "mc/client/actors/LocalPlayer.hpp"
 
 class GameContext {
 public:

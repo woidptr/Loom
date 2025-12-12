@@ -6,10 +6,13 @@
 #include <d3d12.h>
 #include <d3d11.h>
 #include <d3d11on12.h>
+#include <wrl.h>
 #include <imgui.h>
 #include <imgui_impl_dx12.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
+
+using Microsoft::WRL::ComPtr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -25,17 +28,19 @@ private:
 	ID3D11Device* d3d11Device = nullptr;
 	ID3D11DeviceContext* d3d11DeviceContext = nullptr;
 	ID3D11On12Device* d3d11On12Device = nullptr;
-	ID3D11Resource* backBuffer11 = nullptr;
+	// ComPtr<ID3D11Resource> backBuffer11 = nullptr;
 
 	bool draw_main_ui_flag = false;
 public:
-	UIRender(WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook);
+	UIRender(WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook, ResizeBuffersHook* resizeBuffersHook);
 
 	void initImgui(IDXGISwapChain3* swapChain);
 
 	void keyboardCallback(int16_t key, bool isDown);
 
-	void drawMainUI();
+	void drawSetupScreen();
+	void drawSettingsScreen();
 	void renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2);
 	void executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* commandList);
+	void resizeBuffersCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4);
 };

@@ -6,10 +6,13 @@ void ToastManager::addToast(std::string msg, float duration = 3.0f) {
 
 void ToastManager::renderToasts() {
     ImGuiIO& io = ImGui::GetIO();
-    ImVec2 screen = io.DisplaySize;
+    // ImVec2 screen = io.DisplaySize;
 
-    const float padding = 20.0f;
-    const float spacing = 10.0f;
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    ImVec2 screen = ImVec2(viewport->Size.x, viewport->Size.y);
+
+    const float padding = 60.f;
     const float slideDist = 250.0f;
 
     float y = screen.y - padding;   // Bottom of screen
@@ -36,7 +39,7 @@ void ToastManager::renderToasts() {
 
         float slide = (1.0f - slideIn) * slideDist + slideOut * slideDist;
 
-        float alpha = (slideOut > 0) ? (1.0f - slideOut) : 1.0f;
+        float alpha = (slideOut > 0) ? (0.75f - slideOut) : 0.75f;
 
         ImGui::SetNextWindowBgAlpha(alpha);
 
@@ -50,7 +53,7 @@ void ToastManager::renderToasts() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(40, 20));
 
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.10f, 0.10f, 0.11f, 0.95f));
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.10f, 0.10f, 0.11f, 0.70f));
 
         ImGui::Begin(("toast_" + std::to_string(i)).c_str(),
             nullptr,
@@ -62,12 +65,14 @@ void ToastManager::renderToasts() {
         ImGui::SetWindowFontScale(2.0f);
 
         ImGui::TextUnformatted(t.text.c_str());
+
+        y -= ImGui::GetWindowSize().y + 2;
+
         ImGui::End();
 
         ImGui::PopStyleVar(2);
         ImGui::PopStyleColor(1);
 
-        y -= ImGui::GetItemRectSize().y + spacing;
         i++;
     }
 }

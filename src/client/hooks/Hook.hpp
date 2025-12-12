@@ -3,8 +3,8 @@
 #include <string>
 #include <core/Signatures.hpp>
 
-struct CallbackContextBase {
-protected:
+struct CallbackContext {
+private:
 	bool cancelFlag = false;
 public:
 	bool isCancelled() const {
@@ -16,18 +16,6 @@ public:
 	}
 };
 
-template <typename TReturn>
-struct CallbackContext : public CallbackContextBase {
-	std::optional<TReturn> overrideReturn;
-
-	void setReturn(TReturn value) {
-		overrideReturn = value;
-	}
-};
-
-template<>
-struct CallbackContext<void> : public CallbackContextBase {};
-
 template <typename TReturn, typename...Args>
 class Hook {
 public:
@@ -35,7 +23,8 @@ public:
 	uintptr_t address = 0;
 
 	static inline TReturn(*original)(Args...);
-	static inline std::vector<std::function<void(CallbackContext<TReturn>&, Args...)>> callbacks;
+	static inline std::vector<std::function<void(CallbackContext&, Args...)>> callbacks;
+	static inline std::function<TReturn(CallbackContext&, Args&...)> returnCallback = nullptr;
 public:
 	Hook(Signature* signature) : address(signature->getAddress()) {}
 	Hook(std::string name, uintptr_t address) : name(name), address(address) {}
@@ -45,38 +34,56 @@ public:
 	}
 
 	static TReturn callback(Args...args) {
-		CallbackContext<TReturn> cbCtx;
+		CallbackContext cbCtx;
+
+		if constexpr (!std::is_void_v<TReturn>) {
+			if (returnCallback) {
+				std::optional<TReturn> value = returnCallback(cbCtx, args...);
+
+				if (value.has_value()) {
+					return *value;
+				}
+			}
+		}
 
 		for (auto& cb : callbacks) {
 			cb(cbCtx, args...);
+		}
 
-			if constexpr (!std::is_void_v<TReturn>) {
-				if (cbCtx.overrideReturn.has_value()) {
-					return *cbCtx.overrideReturn;
-				}
-			}
-
-			if (cbCtx.isCancelled()) {
-				return TReturn{};
-			}
+		if (cbCtx.isCancelled()) {
+			return TReturn{};
 		}
 
 		return original(args...);
 	}
 
-	void registerCallback(std::function<void(CallbackContext<TReturn>&, Args...)> fn) {
+	void registerCallback(std::function<void(CallbackContext&, Args...)> fn) {
 		callbacks.push_back(fn);
 	}
 
+	void registerReturnCallback(std::function<TReturn(CallbackContext&, Args...)> fn)
+		requires(!std::is_void_v<TReturn>)
+	{
+		returnCallback = fn;
+	}
+
 	virtual void hook() {
-		if (this->address == 0) {
+		MH_STATUS status;
+
+		status = MH_CreateHook((void*)this->address, (void*)&callback, (void**)&original);
+
+		if (status != MH_OK) {
+			Logger::error(std::format("Failed to create hook at 0x{:X}: {}", this->address, MH_StatusToString(status)));
+
 			return;
 		}
 
-		MH_CreateHook((void*)this->address, (void*)&callback, (void**)&original);
+		status = MH_EnableHook((void*)this->address);
 
-		if (MH_EnableHook((void*)this->address) == MH_OK) {
-			Logger::info(std::format("Successfully initialized hook on 0x{:X}", this->address));
+		if (status != MH_OK) {
+			Logger::error(std::format("Failed to enable hook at 0x{:X}: {}", this->address, MH_StatusToString(status)));
+
+			return;
 		}
 	}
 };

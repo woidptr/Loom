@@ -1,6 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.14)
 project(Loom)
-set(CMAKE_CXX_STANDARD_REQUIRED 20)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Check if building on x64 Windows
 if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
@@ -26,33 +27,29 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
+include(cmake/CPM.cmake)
+# include(cmake/imgui.cmake)
+
+CPMAddPackage("gh:fmtlib/fmt#12.1.0")
+CPMAddPackage("gh:BasedInc/libhat@0.9.0")
+CPMAddPackage("gh:TsudaKageyu/minhook@1.3.4")
+CPMAddPackage(
+    URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
+    OPTIONS
+        "KIERO_INCLUDE_D3D11 ON"
+        "KIERO_INCLUDE_D3D12 ON"
+        "KIERO_BUILD_EXAMPLES OFF"
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt libhat::libhat minhook kiero::kiero)
+
 include(FetchContent)
-
-FetchContent_Declare(
-    libhat
-    GIT_REPOSITORY https://github.com/BasedInc/libhat.git
-    GIT_TAG        v0.8.0
-)
-
-FetchContent_Declare(
-    minhook
-    GIT_REPOSITORY https://github.com/TsudaKageyu/minhook.git
-    GIT_TAG        v1.3.4
-)
-
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG        12.1.0
-)
 
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
     GIT_TAG        v1.92.5
 )
-
-FetchContent_MakeAvailable(libhat minhook fmt)
 
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
@@ -67,7 +64,6 @@ if(NOT imgui_POPULATED)
         ${imgui_SOURCE_DIR}/imgui_tables.cpp
         ${imgui_SOURCE_DIR}/imgui_widgets.cpp
 
-        # ADD THESE:
         ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
         ${imgui_SOURCE_DIR}/backends/imgui_impl_dx12.cpp
         ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
@@ -81,6 +77,4 @@ if(NOT imgui_POPULATED)
     target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
 endif()
 
-# find_package(imgui CONFIG REQUIRED)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat minhook fmt imgui)
+target_link_libraries(${PROJECT_NAME} PRIVATE imgui)

@@ -28,3 +28,13 @@ fs::path FileManager::getLogsFolder() {
 
 	return logsPath;
 }
+
+fs::path FileManager::getSettingsFolder() {
+	fs::path settingsPath = getRootFolder() / "settings";
+
+	if (!fs::exists(settingsPath)) {
+		fs::create_directories(settingsPath);
+	}
+
+	return settingsPath;
+}

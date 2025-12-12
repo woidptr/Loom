@@ -1,6 +1,8 @@
 #pragma once
-#include "../actors/LocalPlayer.hpp"
-#include "GuiData.h"
+#include <sdk/mc/client/actors/LocalPlayer.hpp>
+#include <sdk/mc/client/gui/GuiData.hpp>
+
+class GuiData;
 
 class IClientInstance {
 public:

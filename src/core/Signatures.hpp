@@ -7,7 +7,7 @@
 
 class Signature {
 private:
-	uintptr_t address;
+	uintptr_t address = 0;
 public:
 	Signature(std::string signature, int16_t offset);
 

@@ -23,6 +23,10 @@ void Logger::init() {
 
 void Logger::shutdown() {
 #ifndef NDEBUG
+	if (stdout) fclose(stdout);
+	if (stderr) fclose(stderr);
+	if (stdin)  fclose(stdin);
+
 	FreeConsole();
 #endif
 

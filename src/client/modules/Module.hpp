@@ -1,16 +1,21 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 #include "Setting.hpp"
 
 class Module {
 private:
 	std::string name;
-	bool enabled = false;
-
-	std::vector<Setting> settings;
+	std::vector<Setting*> settings;
 public:
-	Module(std::string name) {
-		this->name = name;
-	}
+	bool enabled = false;
+public:
+	Module(std::string name);
+	virtual ~Module() = default;
+
+	std::string getName();
+
+	void registerSetting(Setting* setting);
+	std::vector<Setting*> getSettings();
 };
