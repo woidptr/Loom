@@ -27,8 +27,20 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
-include(cmake/CPM.cmake)
-# include(cmake/imgui.cmake)
+set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM.cmake")
+
+if (NOT EXISTS ${CPM_DOWNLOAD_LOCATION})
+    file(
+        DOWNLOAD
+        https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/CPM.cmake
+        ${CPM_DOWNLOAD_LOCATION}
+        TLS_VERIFY ON
+    )
+endif ()
+
+# message(FATAL_ERROR ${CPM_DOWNLOAD_LOCATION})
+
+include(${CPM_DOWNLOAD_LOCATION})
 
 CPMAddPackage("gh:fmtlib/fmt#12.1.0")
 CPMAddPackage("gh:BasedInc/libhat@0.9.0")
