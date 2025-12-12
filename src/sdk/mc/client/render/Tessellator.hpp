@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <core/Signatures.hpp>
-#include <sdk/mc/client/render/Mesh.h>
-#include <sdk/mc/deps/core/math/Color.h>
+#include <sdk/mc/client/render/Mesh.hpp>
+#include <sdk/mc/deps/core/math/Color.hpp>
 
 class Tessellator {
 public:
