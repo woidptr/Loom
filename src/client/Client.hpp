@@ -5,6 +5,7 @@
 #include "hooks/Hook.hpp"
 #include "hooks/input/WindowProcHook.hpp"
 #include "hooks/world/GetFovHook.hpp"
+#include "hooks/world/GetGammaHook.hpp"
 #include "hooks/world/GetTimeOfDayHook.hpp"
 #include "hooks/world/LevelTickHook.hpp"
 #include "hooks/render/SetupAndRenderHook.hpp"
@@ -27,6 +28,7 @@ private:
 	static inline std::unique_ptr<WindowProcHook> windowProcHook = nullptr;
 	static inline std::unique_ptr<GetTimeOfDayHook> getTimeOfDayHook = nullptr;
 	static inline std::unique_ptr<GetFovHook> getFovHook = nullptr;
+	static inline std::unique_ptr<GetGammaHook> getGammaHook = nullptr;
 	static inline std::unique_ptr<LevelTickHook> levelTickHook = nullptr;
 	static inline std::unique_ptr<SetupAndRenderHook> setupAndRenderHook = nullptr;
 	static inline std::unique_ptr<PresentHook> presentHook = nullptr;

@@ -11,12 +11,10 @@ public:
 	static uintptr_t getAddress() {
 		auto presentFunction = kiero::getMethod<&IDXGISwapChain3::Present>();
 
-		Logger::info(std::format("Present is located at: 0x{:X}", (uintptr_t)presentFunction));
-
 		return (uintptr_t)presentFunction;
 	}
 
-	PresentHook() : Hook("DirectXHook", getAddress()) {
+	PresentHook() : Hook(getAddress()) {
 		this->hook();
 	}
 };
@@ -29,7 +27,7 @@ public:
 		return (uintptr_t)executeCommandListFunction;
 	}
 
-	ExecuteCommandListHook() : Hook("ID3D12CommandQueue::ExecuteCommandLists", getAddress()) {
+	ExecuteCommandListHook() : Hook(getAddress()) {
 		this->hook();
 	}
 };
@@ -42,7 +40,7 @@ public:
 		return (uintptr_t)resizeBuffersHookFunction;
 	}
 
-	ResizeBuffersHook() : Hook("IDXGISwapChain::ResizeBuffers", getAddress()) {
+	ResizeBuffersHook() : Hook(getAddress()) {
 		this->hook();
 	}
 };

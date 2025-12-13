@@ -27,8 +27,6 @@ void Tessellator::color(mce::Color color) {
     this->mNextColor = result.intValue;
 }
 
-
-
 mce::Mesh Tessellator::end(int uploadMode, std::string_view debugName, int generatedNormals) {
 	return (this->*[] {static auto f = std::bit_cast<decltype(&Tessellator::end)>(SignatureRegistry::getSignature("Tessellator::end")); return f; }()) (uploadMode, debugName, generatedNormals);
 }

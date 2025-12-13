@@ -18,16 +18,18 @@ public:
 
 template <typename TReturn, typename...Args>
 class Hook {
-public:
-	std::string name;
+private:
+	using CallbackFunction = std::function<void(CallbackContext&, Args...)>;
+	using ReturnCallbackFunction = std::function<std::optional<TReturn>(CallbackContext&, Args...)>;
+private:
 	uintptr_t address = 0;
 
 	static inline TReturn(*original)(Args...);
-	static inline std::vector<std::function<void(CallbackContext&, Args...)>> callbacks;
-	static inline std::function<TReturn(CallbackContext&, Args&...)> returnCallback = nullptr;
+	static inline std::vector<CallbackFunction> callbacks;
+	static inline ReturnCallbackFunction returnCallback = nullptr;
 public:
 	Hook(Signature* signature) : address(signature->getAddress()) {}
-	Hook(std::string name, uintptr_t address) : name(name), address(address) {}
+	Hook(uintptr_t address) : address(address) {}
 
 	virtual ~Hook() {
 		MH_DisableHook((void*)this->address);
@@ -57,11 +59,11 @@ public:
 		return original(args...);
 	}
 
-	void registerCallback(std::function<void(CallbackContext&, Args...)> fn) {
+	void registerCallback(CallbackFunction fn) {
 		callbacks.push_back(fn);
 	}
 
-	void registerReturnCallback(std::function<TReturn(CallbackContext&, Args...)> fn)
+	void registerReturnCallback(ReturnCallbackFunction fn)
 		requires(!std::is_void_v<TReturn>)
 	{
 		returnCallback = fn;

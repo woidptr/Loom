@@ -15,6 +15,7 @@ void Client::construct() {
 	Client::getTimeOfDayHook = std::make_unique<GetTimeOfDayHook>();
 	// Client::getFovHook = std::make_unique<GetFovHook>();
 	// Client::levelTickHook = std::make_unique<LevelTickHook>();
+	Client::getGammaHook = std::make_unique<GetGammaHook>();
 	Client::setupAndRenderHook = std::make_unique<SetupAndRenderHook>();
 	Client::presentHook = std::make_unique<PresentHook>();
 	Client::executeCommandList = std::make_unique<ExecuteCommandListHook>();
@@ -41,7 +42,7 @@ void Client::initModules() {
 	modules.push_back(std::make_unique<ToggleSprint>(Client::setupAndRenderHook.get()));
 	modules.push_back(std::make_unique<TimeChanger>(Client::getTimeOfDayHook.get()));
 	modules.push_back(std::make_unique<FPSCounter>());
-	modules.push_back(std::make_unique<Fullbright>());
+	modules.push_back(std::make_unique<Fullbright>(Client::getGammaHook.get()));
 	// modules.push_back(std::make_unique<Zoom>(Client::getFovHook.get()));
 }
 

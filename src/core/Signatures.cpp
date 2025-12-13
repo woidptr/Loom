@@ -51,6 +51,9 @@ void SignatureRegistry::registerSignatures() {
 
 	// LevelRenderPlayer
 	signatures.insert(std::make_pair("LevelRendererPlayer::getFov", std::make_unique<Signature>("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? C6 41", 0)));
+
+	// Options
+	signatures.insert(std::make_pair("Options::getGamma", std::make_unique<Signature>("48 83 EC 28 48 8B 01 48 8D 54 24 ?? 41 B8 36 00 00 00 48 8B 40 08 FF 15 ?? ?? ?? ??", 0)));
 }
 
 bool SignatureRegistry::performHealthCheck() {
