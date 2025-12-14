@@ -13,5 +13,6 @@ public:
 public:
 	void begin(int a1, int maxVertices);
 	void color(mce::Color color);
+	void vertex(float x, float y, float z);
 	mce::Mesh end(int uploadMode, std::string_view debugName, int generateNormals);
 };

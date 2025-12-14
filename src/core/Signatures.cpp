@@ -15,7 +15,7 @@ Signature::Signature(std::string signature, int16_t offset) {
 	uintptr_t startAddress = (uintptr_t)minecraft.value().address();
 	uintptr_t endAddress = (uintptr_t)minecraft.value().get_module_data().size();
 
-	Logger::info(std::format("Start address: 0x{:X}, result: 0x{:X}", startAddress, (uintptr_t)result.get()));
+	$logInfo("Start address: 0x{:X}, result: 0x{:X}", startAddress, (uintptr_t)result.get());
 
 	if ((uintptr_t)result.get() != 0) {
 		if (offset == 0) {
@@ -59,12 +59,12 @@ void SignatureRegistry::registerSignatures() {
 bool SignatureRegistry::performHealthCheck() {
 	for (const auto& [name, signature] : signatures) {
 		if (signature.get()->getAddress() == 0) {
-			Logger::info(std::format("Failed to resolve signature {}", name));
+			$logError("Failed to resolve signature {}", name);
 			healthy = false;
 		}
 		else
 		{
-			Logger::info(std::format("Successfully resolved signature {} at 0x{:X}", name, signature.get()->getAddress()));
+			$logInfo("Successfully resolved signature {} at 0x{:X}", name, signature.get()->getAddress());
 		}
 	}
 

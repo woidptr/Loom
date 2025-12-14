@@ -9,5 +9,5 @@ Zoom::Zoom(GetFovHook* getFovHook) : Module("Zoom") {
 }
 
 void Zoom::getFovCallback(void* a1, float a2, bool a3) {
-	Logger::info(std::format("Fov: {}", a2));
+	$logInfo("Fov: {}", a2);
 }

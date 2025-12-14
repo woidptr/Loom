@@ -76,7 +76,7 @@ void UIRender::initImgui(IDXGISwapChain3* swapChain) {
 	);
 
 	if (FAILED(hr)) {
-		Logger::info("D3D11On12CreateDevice failed");
+		$logInfo("D3D11On12CreateDevice failed");
 	}
 	/*else
 	{
@@ -96,7 +96,7 @@ void UIRender::initImgui(IDXGISwapChain3* swapChain) {
 	swapChain->GetDesc(&desc);
 
 	ImGui_ImplWin32_Init(desc.OutputWindow);
-	Logger::info(std::format("ImGui window: {}", (void*)desc.OutputWindow));
+	$logInfo("ImGui window: {}", (void*)desc.OutputWindow);
 	ImGui_ImplDX11_Init(this->d3d11Device, this->d3d11DeviceContext);
 
 	initialized = true;
@@ -146,7 +146,7 @@ void DrawModuleItem(Module* mod) {
 	ImGui::SetCursorScreenPos(topRect.Min);
 	if (ImGui::InvisibleButton(("##" + mod->getName() + "_top_btn").c_str(), topRect.GetSize())) {
 		// Logic to open settings screen goes here
-		Logger::info(std::format("Opened settings for: ", mod->getName()));
+		$logInfo("Opened settings for: ", mod->getName());
 	}
 	bool topHovered = ImGui::IsItemHovered();
 	bool topActive = ImGui::IsItemActive();

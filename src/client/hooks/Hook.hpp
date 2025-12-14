@@ -31,7 +31,7 @@ public:
 	Hook(Signature* signature) : address(signature->getAddress()) {}
 	Hook(uintptr_t address) : address(address) {}
 
-	virtual ~Hook() {
+	~Hook() {
 		MH_DisableHook((void*)this->address);
 	}
 
@@ -59,23 +59,23 @@ public:
 		return original(args...);
 	}
 
-	void registerCallback(CallbackFunction fn) {
-		callbacks.push_back(fn);
+	void registerCallback(CallbackFunction&& fn) {
+		callbacks.emplace_back(std::forward<CallbackFunction>(fn));
 	}
 
-	void registerReturnCallback(ReturnCallbackFunction fn)
+	void registerReturnCallback(ReturnCallbackFunction&& fn)
 		requires(!std::is_void_v<TReturn>)
 	{
-		returnCallback = fn;
+		returnCallback = std::forward<ReturnCallbackFunction>(fn);
 	}
 
-	virtual void hook() {
+	void hook() {
 		MH_STATUS status;
 
 		status = MH_CreateHook((void*)this->address, (void*)&callback, (void**)&original);
 
 		if (status != MH_OK) {
-			Logger::error(std::format("Failed to create hook at 0x{:X}: {}", this->address, MH_StatusToString(status)));
+			$logError("Failed to create hook at 0x{:X}: {}", this->address, MH_StatusToString(status));
 
 			return;
 		}
@@ -83,7 +83,7 @@ public:
 		status = MH_EnableHook((void*)this->address);
 
 		if (status != MH_OK) {
-			Logger::error(std::format("Failed to enable hook at 0x{:X}: {}", this->address, MH_StatusToString(status)));
+			$logError("Failed to enable hook at 0x{:X}: {}", this->address, MH_StatusToString(status));
 
 			return;
 		}

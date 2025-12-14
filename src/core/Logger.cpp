@@ -6,7 +6,7 @@
 #include <fmt/printf.h>
 #include <fmt/color.h>
 
-void Logger::init() {
+Logger::Logger() {
 #ifndef NDEBUG
 	AllocConsole();
 	SetConsoleTitleA("Loom");
@@ -18,10 +18,10 @@ void Logger::init() {
 	fopen_s(&logFile, logFilePath.string().c_str(), "w");
 
 	running = true;
-	worker = std::thread(processLogs);
+	worker = std::thread(&Logger::processLogs, this);
 }
 
-void Logger::shutdown() {
+Logger::~Logger() {
 #ifndef NDEBUG
 	if (stdout) fclose(stdout);
 	if (stderr) fclose(stderr);
@@ -41,12 +41,28 @@ void Logger::shutdown() {
 	running = false;
 }
 
+void Logger::init() {
+	if (instance == nullptr) {
+		instance = new Logger();
+	}
+}
+
+Logger* Logger::getInstance() {
+	return instance;
+}
+
+void Logger::shutdown() {
+	if (instance) {
+		delete instance;
+	}
+}
+
 void Logger::processLogs() {
 	while (running || !logQueue.empty()) {
 		std::unique_lock<std::mutex> lock(queueMutex);
-		cv.wait(lock, [] {
+		cv.wait(lock, [&] {
 			return !logQueue.empty() || !running;
-		});
+			});
 
 		while (!logQueue.empty()) {
 			std::string msg = std::move(logQueue.front());
@@ -65,34 +81,6 @@ void Logger::processLogs() {
 	}
 }
 
-void Logger::log(std::string logType, std::string msg) {
-	std::lock_guard<std::mutex> lock(queueMutex);
-
-	logQueue.push(std::format("[Loom] [{}]: {}\n", logType, msg));
-
-	cv.notify_one();
-}
-
 void Logger::writeToFile(std::string msg) {
 	fwrite(msg.c_str(), 1, msg.size(), logFile);
-}
-
-void Logger::debug(std::string msg) {
-	log("DEBUG", msg);
-}
-
-void Logger::info(std::string msg) {
-	log("INFO", msg);
-}
-
-void Logger::warning(std::string msg) {
-	log("WARNING", msg);
-}
-
-void Logger::error(std::string msg) {
-	log("ERROR", msg);
-}
-
-void Logger::critical(std::string msg) {
-	log("CRITICAL", msg);
 }
