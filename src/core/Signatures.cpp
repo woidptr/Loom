@@ -50,7 +50,7 @@ void SignatureRegistry::registerSignatures() {
 	signatures.insert(std::make_pair("Dimension::getTimeOfDay", std::make_unique<Signature>("44 8B C2 B8 F1 19 76 05 F7 EA", 0)));
 
 	// LevelRenderPlayer
-	signatures.insert(std::make_pair("LevelRendererPlayer::getFov", std::make_unique<Signature>("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? C6 41", 0)));
+	signatures.insert(std::make_pair("LevelRendererPlayer::getFov", std::make_unique<Signature>("4C 8B DC 53 48 83 EC ? 0F 29 74 24", 0)));
 
 	// Options
 	signatures.insert(std::make_pair("Options::getGamma", std::make_unique<Signature>("48 83 EC 28 48 8B 01 48 8D 54 24 ?? 41 B8 36 00 00 00 48 8B 40 08 FF 15 ?? ?? ?? ??", 0)));

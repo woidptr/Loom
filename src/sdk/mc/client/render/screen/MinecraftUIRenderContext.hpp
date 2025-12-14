@@ -3,6 +3,8 @@
 #include <sdk/mc/client/game/IClientInstance.hpp>
 #include <sdk/mc/deps/input/RectangleArea.hpp>
 #include <sdk/mc/deps/core/math/Color.hpp>
+#include <sdk/mc/deps/core/math/Vec2.hpp>
+#include <sdk/mc/deps/renderer/TexturePtr.hpp>
 #include <libhat/access.hpp>
 #include <core/Logger.hpp>
 #include <core/Signatures.hpp>
@@ -19,7 +21,7 @@ public:
 	virtual void drawDebugText();
 	virtual void drawText();
 	virtual void flushText(float deltaTime);
-	virtual void drawImage();
+	virtual void drawImage(const mce::TexturePtr& texture, const Vec2& position, const Vec2& size, const Vec2& uv, const Vec2& uvSize, int rotation);
 	virtual void drawNineslice();
 	virtual void flushImages();
 	virtual void beginSharedMeshBatch();
