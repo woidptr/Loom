@@ -3,13 +3,13 @@
 Module::Module(std::string name) : name(name) {}
 
 std::string Module::getName() {
-	return name;
+    return name;
 }
 
 void Module::registerSetting(Setting* setting) {
-	settings.emplace_back(setting);
+    settings.emplace_back(setting);
 }
 
 std::vector<Setting*> Module::getSettings() {
-	return settings;
+    return settings;
 }

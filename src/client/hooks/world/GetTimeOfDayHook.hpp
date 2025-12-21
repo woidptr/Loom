@@ -1,9 +1,9 @@
 #pragma once
 #include "../Hook.hpp"
 
-class GetTimeOfDayHook : public Hook<float, void*, int, float>{
+class GetTimeOfDayHook : public Hook<float(void*, int, float)> {
 public:
-	GetTimeOfDayHook() : Hook(SignatureRegistry::getSignature("Dimension::getTimeOfDay")) {
-		this->hook();
-	}
+    GetTimeOfDayHook() : Hook($getSignature("Dimension::getTimeOfDay")) {
+        this->hook();
+    }
 };

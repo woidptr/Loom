@@ -1,8 +1,6 @@
 #pragma once
-#include <sdk/mc/client/actors/LocalPlayer.hpp>
+#include <sdk/mc/client/player/LocalPlayer.hpp>
 #include <sdk/mc/client/gui/GuiData.hpp>
-
-class GuiData;
 
 class IClientInstance {
 public:
@@ -14,9 +12,5 @@ public:
 
 	LocalPlayer* getLocalPlayer() {
 		return CallVFunc<31, LocalPlayer*>(this);
-	}
-
-	GuiData* getGuiData() {
-		return CallVFunc<218, GuiData*>(this);
 	}
 };

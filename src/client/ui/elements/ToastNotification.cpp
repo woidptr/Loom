@@ -6,16 +6,16 @@ void ToastManager::addToast(std::string msg, float duration = 3.0f) {
 
 void ToastManager::renderToasts() {
     ImGuiIO& io = ImGui::GetIO();
-    // ImVec2 screen = io.DisplaySize;
 
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     ImVec2 screen = ImVec2(viewport->Size.x, viewport->Size.y);
 
-    const float padding = 60.f;
+    const float padding_x = 5.f;
+    const float padding_y = 10.f;
     const float slideDist = 250.0f;
 
-    float y = screen.y - padding;   // Bottom of screen
+    float y = screen.y - padding_y;
 
     for (int i = 0; i < toasts.size(); )
     {
@@ -43,11 +43,10 @@ void ToastManager::renderToasts() {
 
         ImGui::SetNextWindowBgAlpha(alpha);
 
-        // FIXED X POSITION — using anchor (1,0) not (1,1)
         ImGui::SetNextWindowPos(
-            ImVec2(screen.x - padding + slide, y),
+            ImVec2(screen.x - padding_x + slide, y),
             ImGuiCond_Always,
-            ImVec2(1.0f, 0.0f)               // anchor = right-top
+            ImVec2(1.0f, 1.0f)
         );
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);

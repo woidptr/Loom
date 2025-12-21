@@ -6,6 +6,6 @@ public:
 	float y;
 	float z;
 public:
-	Vec3(float x, float y, float x)
+	Vec3(float x, float y, float z)
 		: x(x), y(y), z(z) { }
 };

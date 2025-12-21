@@ -3,5 +3,5 @@
 
 class FPSCounter : public Module {
 public:
-	FPSCounter();
+    FPSCounter();
 };

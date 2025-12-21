@@ -6,7 +6,7 @@
 
 class ToggleSprint : public Module {
 public:
-	ToggleSprint(SetupAndRenderHook* setupAndRenderHook);
+    ToggleSprint(SetupAndRenderHook* setupAndRenderHook);
 
-	void tickCallback(void* a1);
+    void tickCallback(void* a1);
 };

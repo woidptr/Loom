@@ -5,7 +5,7 @@
 
 class Zoom : public Module {
 public:
-	Zoom(GetFovHook* getFovHook);
+    Zoom(GetFovHook* getFovHook);
 
-	void getFovCallback(void* a1, float a2, bool a3);
+    void getFovCallback(void* a1, float a2, bool a3);
 };

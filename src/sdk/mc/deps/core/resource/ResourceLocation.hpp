@@ -9,7 +9,7 @@ public:
 	uint64_t mPathHash;
 	uint64_t mFullHash;
 public:
-	ResourceLocation(const std::string& path);
+	ResourceLocation(const std::string& path, ResourceFileSystem fileSystem = ResourceFileSystem::UserPackage);
 	// ResourceLocation& operator=(const ResourceLocation& other);
 private:
     void _computeHashes()

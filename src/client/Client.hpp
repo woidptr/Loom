@@ -9,6 +9,7 @@
 #include "hooks/world/GetTimeOfDayHook.hpp"
 #include "hooks/world/LevelTickHook.hpp"
 #include "hooks/render/SetupAndRenderHook.hpp"
+#include "hooks/render/RenderMeshHook.hpp"
 #include "hooks/render/DirectX.hpp"
 
 // ui
@@ -24,26 +25,27 @@
 
 class Client {
 private:
-	// hooks
-	static inline std::unique_ptr<WindowProcHook> windowProcHook = nullptr;
-	static inline std::unique_ptr<GetTimeOfDayHook> getTimeOfDayHook = nullptr;
-	static inline std::unique_ptr<GetFovHook> getFovHook = nullptr;
-	static inline std::unique_ptr<GetGammaHook> getGammaHook = nullptr;
-	static inline std::unique_ptr<LevelTickHook> levelTickHook = nullptr;
-	static inline std::unique_ptr<SetupAndRenderHook> setupAndRenderHook = nullptr;
-	static inline std::unique_ptr<PresentHook> presentHook = nullptr;
-	static inline std::unique_ptr<ExecuteCommandListHook> executeCommandList = nullptr;
-	static inline std::unique_ptr<ResizeBuffersHook> resizeBuffersHook = nullptr;
+    // hooks
+    static inline std::unique_ptr<WindowProcHook> windowProcHook = nullptr;
+    static inline std::unique_ptr<GetTimeOfDayHook> getTimeOfDayHook = nullptr;
+    static inline std::unique_ptr<GetFovHook> getFovHook = nullptr;
+    static inline std::unique_ptr<GetGammaHook> getGammaHook = nullptr;
+    static inline std::unique_ptr<LevelTickHook> levelTickHook = nullptr;
+    static inline std::unique_ptr<SetupAndRenderHook> setupAndRenderHook = nullptr;
+    static inline std::unique_ptr<RenderMeshHook> renderMeshHook = nullptr;
+    static inline std::unique_ptr<PresentHook> presentHook = nullptr;
+    static inline std::unique_ptr<ExecuteCommandListHook> executeCommandList = nullptr;
+    static inline std::unique_ptr<ResizeBuffersHook> resizeBuffersHook = nullptr;
 
-	// ui
-	static inline std::unique_ptr<UIRender> uiRender = nullptr;
+    // ui
+    static inline std::unique_ptr<UIRender> uiRender = nullptr;
 
-	// modules
-	static inline std::vector<std::unique_ptr<Module>> modules{};
+    // modules
+    static inline std::vector<Module*> modules{};
 public:
-	static void construct();
-	static void destruct();
+    static void construct();
+    static void destruct();
 
-	static void initModules();
-	static const std::vector<std::unique_ptr<Module>>& getModules();
+    static void initModules();
+    static const std::vector<Module*> getModules();
 };

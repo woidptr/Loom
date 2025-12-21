@@ -1,91 +1,103 @@
 #pragma once
-#include <MinHook.h>
 #include <string>
+#include <safetyhook.hpp>
 #include <core/Signatures.hpp>
 
 struct CallbackContext {
 private:
-	bool cancelFlag = false;
+    bool cancelFlag = false;
 public:
-	bool isCancelled() const {
-		return cancelFlag;
-	}
+    bool isCancelled() const {
+        return cancelFlag;
+    }
 
-	void cancel() {
-		cancelFlag = true;
-	}
+    void cancel() {
+        cancelFlag = true;
+    }
 };
 
+template <typename>
+class Hook;
+
 template <typename TReturn, typename...Args>
-class Hook {
+class Hook<TReturn(Args...)> {
 private:
-	using CallbackFunction = std::function<void(CallbackContext&, Args...)>;
-	using ReturnCallbackFunction = std::function<std::optional<TReturn>(CallbackContext&, Args...)>;
+    using CallbackFunction = std::function<void(CallbackContext&, Args...)>;
+    using ReturnCallbackFunction = std::function<std::optional<TReturn>(CallbackContext&, Args...)>;
 private:
-	uintptr_t address = 0;
-
-	static inline TReturn(*original)(Args...);
-	static inline std::vector<CallbackFunction> callbacks;
-	static inline ReturnCallbackFunction returnCallback = nullptr;
+    uintptr_t address = 0;
+private:
+    static inline SafetyHookInline inlineHook;
+    static inline std::vector<CallbackFunction> callbacks;
+    static inline ReturnCallbackFunction returnCallback = nullptr;
 public:
-	Hook(Signature* signature) : address(signature->getAddress()) {}
-	Hook(uintptr_t address) : address(address) {}
+    Hook() {}
+    Hook(Signature* signature) : address(signature->getAddress()) {}
+    Hook(uintptr_t address) : address(address) {}
 
-	~Hook() {
-		MH_DisableHook((void*)this->address);
-	}
+    static TReturn callback(Args...args) {
+        CallbackContext cbCtx;
 
-	static TReturn callback(Args...args) {
-		CallbackContext cbCtx;
+        if constexpr (!std::is_void_v<TReturn>) {
+            if (returnCallback) {
+                std::optional<TReturn> value = returnCallback(cbCtx, args...);
 
-		if constexpr (!std::is_void_v<TReturn>) {
-			if (returnCallback) {
-				std::optional<TReturn> value = returnCallback(cbCtx, args...);
+                if (value.has_value()) {
+                    return *value;
+                }
+            }
+        }
 
-				if (value.has_value()) {
-					return *value;
-				}
-			}
-		}
+        for (auto& cb : callbacks) {
+            cb(cbCtx, args...);
+        }
 
-		for (auto& cb : callbacks) {
-			cb(cbCtx, args...);
-		}
+        if (cbCtx.isCancelled()) {
+            if constexpr (!std::is_void_v<TReturn>) {
+                return TReturn{};
+            } else {
+                return;
+            }
+        }
 
-		if (cbCtx.isCancelled()) {
-			return TReturn{};
-		}
+        return inlineHook.call<TReturn>(args...);
+    }
 
-		return original(args...);
-	}
+    void registerCallback(CallbackFunction&& fn) {
+        callbacks.emplace_back(std::forward<CallbackFunction>(fn));
+    }
 
-	void registerCallback(CallbackFunction&& fn) {
-		callbacks.emplace_back(std::forward<CallbackFunction>(fn));
-	}
+    void registerReturnCallback(ReturnCallbackFunction&& fn)
+        requires(!std::is_void_v<TReturn>)
+    {
+        returnCallback = std::forward<ReturnCallbackFunction>(fn);
+    }
 
-	void registerReturnCallback(ReturnCallbackFunction&& fn)
-		requires(!std::is_void_v<TReturn>)
-	{
-		returnCallback = std::forward<ReturnCallbackFunction>(fn);
-	}
+    void hook() {
+        inlineHook = safetyhook::create_inline((void*)address, (void*)&callback);
+    }
+};
 
-	void hook() {
-		MH_STATUS status;
+class MidHook {
+private:
+    using CallbackFunction = std::function<void(SafetyHookContext&)>;
+private:
+    uintptr_t address = 0;
 
-		status = MH_CreateHook((void*)this->address, (void*)&callback, (void**)&original);
+    static inline SafetyHookMid midHook;
+    static inline CallbackFunction callbackFunction = nullptr;
+public:
+    static void callback(SafetyHookContext& ctx) {
+        if (callbackFunction) {
+            callbackFunction(ctx);
+        }
+    }
 
-		if (status != MH_OK) {
-			$logError("Failed to create hook at 0x{:X}: {}", this->address, MH_StatusToString(status));
+    void registerCallback(CallbackFunction&& fn) {
+        callbackFunction = std::forward<CallbackFunction>(fn);
+    }
 
-			return;
-		}
-
-		status = MH_EnableHook((void*)this->address);
-
-		if (status != MH_OK) {
-			$logError("Failed to enable hook at 0x{:X}: {}", this->address, MH_StatusToString(status));
-
-			return;
-		}
-	}
+    void hook() {
+        midHook = safetyhook::create_mid((void*)this->address, &MidHook::callback);
+    }
 };

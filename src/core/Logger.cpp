@@ -8,79 +8,79 @@
 
 Logger::Logger() {
 #ifndef NDEBUG
-	AllocConsole();
-	SetConsoleTitleA("Loom");
-	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+    AllocConsole();
+    SetConsoleTitleA("Loom");
+    freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 #endif
 
-	fs::path logFilePath = FileManager::getLogsFolder() / "latest.log";
+    fs::path logFilePath = FileManager::getLogsFolder() / "latest.log";
 
-	fopen_s(&logFile, logFilePath.string().c_str(), "w");
+    fopen_s(&logFile, logFilePath.string().c_str(), "w");
 
-	running = true;
-	worker = std::thread(&Logger::processLogs, this);
+    running = true;
+    worker = std::thread(&Logger::processLogs, this);
 }
 
 Logger::~Logger() {
 #ifndef NDEBUG
-	if (stdout) fclose(stdout);
-	if (stderr) fclose(stderr);
-	if (stdin)  fclose(stdin);
+    if (stdout) fclose(stdout);
+    if (stderr) fclose(stderr);
+    if (stdin)  fclose(stdin);
 
-	FreeConsole();
+    FreeConsole();
 #endif
 
-	if (worker.joinable()) {
-		worker.join();
-	}
+    if (worker.joinable()) {
+        worker.join();
+    }
 
-	if (logFile) {
-		fclose(logFile);
-	}
+    if (logFile) {
+        fclose(logFile);
+    }
 
-	running = false;
+    running = false;
 }
 
 void Logger::init() {
-	if (instance == nullptr) {
-		instance = new Logger();
-	}
+    if (instance == nullptr) {
+        instance = new Logger();
+    }
 }
 
 Logger* Logger::getInstance() {
-	return instance;
+    return instance;
 }
 
 void Logger::shutdown() {
-	if (instance) {
-		delete instance;
-	}
+    if (instance) {
+        delete instance;
+    }
 }
 
 void Logger::processLogs() {
-	while (running || !logQueue.empty()) {
-		std::unique_lock<std::mutex> lock(queueMutex);
-		cv.wait(lock, [&] {
-			return !logQueue.empty() || !running;
-			});
+    while (running || !logQueue.empty()) {
+        std::unique_lock<std::mutex> lock(queueMutex);
+        cv.wait(lock, [&] {
+            return !logQueue.empty() || !running;
+            });
 
-		while (!logQueue.empty()) {
-			std::string msg = std::move(logQueue.front());
+        while (!logQueue.empty()) {
+            std::string msg = std::move(logQueue.front());
 
-			logQueue.pop();
-			lock.unlock();
+            logQueue.pop();
+            lock.unlock();
 
 #ifndef NDEBUG
-			fmt::print("{}", msg);
+            fmt::print("{}", msg);
 #endif
 
-			writeToFile(msg);
+            writeToFile(msg);
 
-			lock.lock();
-		}
-	}
+            lock.lock();
+        }
+    }
 }
 
 void Logger::writeToFile(std::string msg) {
-	fwrite(msg.c_str(), 1, msg.size(), logFile);
+    fwrite(msg.c_str(), 1, msg.size(), logFile);
 }

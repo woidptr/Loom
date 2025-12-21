@@ -1,15 +1,14 @@
 #include "ResourceLocation.hpp"
 
-ResourceLocation::ResourceLocation(const std::string& path) {
+ResourceLocation::ResourceLocation(const std::string& path, ResourceFileSystem fileSystem) {
 	this->mFileSystem = ResourceFileSystem::Raw;
 	this->mPath = path;
-	/*this->mPathHash = HashedString(path).mStrHash;
 
-	uint64_t fsHash = 0xCBF29CE484222325ULL ^ (uint8_t)this->mFileSystem;
-	fsHash *= 0x100000001B3ULL;
+	uint64_t hash = HashedString::computeHash(mPath);
 
-	this->mFullHash = this->mPathHash ^ fsHash;*/
-
+	// this->mPathHash = hash;
+	// this->mFullHash = hash ^ static_cast<uint64_t>(mFileSystem);
+	// this->mFullHash = (0x100000001B3 * ((uint8_t)this->mFileSystem ^ 0xCBF29CE484222325)) ^ hash;
 	_computeHashes();
 }
 

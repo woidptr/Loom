@@ -5,5 +5,7 @@
 
 class Fullbright : public Module {
 public:
-	Fullbright(GetGammaHook* getGammaHook);
+    Fullbright(GetGammaHook* getGammaHook);
+
+    std::optional<float> gammaReturnCallback(CallbackContext& cbCtx, void* options);
 };

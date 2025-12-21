@@ -1,9 +1,9 @@
 #pragma once
 #include "../Hook.hpp"
 
-class GetFovHook : public Hook<float, void*, float, bool> {
+class GetFovHook : public Hook<float(void*, float, bool)> {
 public:
-	GetFovHook() : Hook(SignatureRegistry::getSignature("LevelRendererPlayer::getFov")) {
-		this->hook();
-	}
+    GetFovHook() : Hook($getSignature("LevelRendererPlayer::getFov")) {
+        this->hook();
+    }
 };

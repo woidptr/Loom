@@ -1,8 +1,13 @@
 #include "Tessellator.hpp"
 #include <libhat.hpp>
 
-void Tessellator::begin(int a1, int maxVertices) {
-	return reinterpret_cast<decltype(+[](Tessellator*, int, int) -> void {}) > (SignatureRegistry::getSignature("Tessellator::begin"))(this, a1, maxVertices);
+void Tessellator::begin(mce::PrimitiveMode mode, int maxVertices, bool buildFaceData) {
+    // return Memory::Call<void(mce::PrimitiveMode, int, bool)>($getOffset("Tessellator::begin"), this, mode, maxVertices, buildFaceData);
+
+    using function = void(__thiscall*)(Tessellator*, mce::PrimitiveMode, int, bool);
+
+    static auto func = reinterpret_cast<function>($getAddress("Tessellator::begin"));
+    func(this, mode, maxVertices, buildFaceData);
 }
 
 void Tessellator::color(mce::Color color) {
@@ -27,10 +32,19 @@ void Tessellator::color(mce::Color color) {
     this->mNextColor = result.intValue;
 }
 
-void Tessellator::vertex(float x, float y, float z) {
+void Tessellator::color(uint32_t color) {
+    this->mNextColor = color;
+}
 
+void Tessellator::vertex(float x, float y, float z) {
+    return Memory::Call<decltype(&Tessellator::vertex)>($getAddress("Tessellator::vertex"), this, x, y, z);
+}
+
+void Tessellator::vertexUV(Vec3 pos, Vec2 nextUV) {
+    this->mNextUV[0] = nextUV;
+    this->vertex(pos.x, pos.y, pos.z);
 }
 
 mce::Mesh Tessellator::end(int uploadMode, std::string_view debugName, int generatedNormals) {
-	return (this->*[] {static auto f = std::bit_cast<decltype(&Tessellator::end)>(SignatureRegistry::getSignature("Tessellator::end")); return f; }()) (uploadMode, debugName, generatedNormals);
+    return Memory::Call<decltype(&Tessellator::end)>($getAddress("Tessellator::end"), this, uploadMode, debugName, generatedNormals);
 }

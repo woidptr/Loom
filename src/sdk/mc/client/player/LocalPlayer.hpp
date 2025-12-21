@@ -1,6 +1,7 @@
 #pragma once
+#include <sdk/mc/world/actor/player/Player.hpp>
 
-class LocalPlayer {
+class LocalPlayer : public Player {
 public:
 	template <unsigned int IIdx, typename TRet, typename... TArgs>
 	static inline TRet CallVFunc(void* thisptr, TArgs... argList) {

@@ -7,7 +7,7 @@ namespace fs = std::filesystem;
 
 class FileManager {
 public:
-	static fs::path getRootFolder();
-	static fs::path getLogsFolder();
-	static fs::path getSettingsFolder();
+    static fs::path getRootFolder();
+    static fs::path getLogsFolder();
+    static fs::path getSettingsFolder();
 };

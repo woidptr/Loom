@@ -16,6 +16,7 @@ endif()
 
 if (MSVC)
     add_compile_options(/EHsc)
+    add_compile_options(/D_ITERATOR_DEBUG_LEVEL=0)
 endif()
 
 # Fun
@@ -44,7 +45,8 @@ include(${CPM_DOWNLOAD_LOCATION})
 
 CPMAddPackage("gh:fmtlib/fmt#12.1.0")
 CPMAddPackage("gh:BasedInc/libhat@0.9.0")
-CPMAddPackage("gh:TsudaKageyu/minhook@1.3.4")
+CPMAddPackage("gh:cursey/safetyhook@0.6.9")
+CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
 CPMAddPackage(
     URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
     OPTIONS
@@ -53,7 +55,7 @@ CPMAddPackage(
         "KIERO_BUILD_EXAMPLES OFF"
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt libhat::libhat minhook kiero::kiero)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT)
 
 include(FetchContent)
 
@@ -90,3 +92,25 @@ if(NOT imgui_POPULATED)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
+
+function(ADD_RESOURCES out_var)
+    set(result)
+    foreach (in_f ${ARGN})
+        file(RELATIVE_PATH src_f ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${in_f})
+        set(out_f "${PROJECT_BINARY_DIR}/${in_f}.o")
+        add_custom_command(OUTPUT ${out_f}
+            COMMAND ld.exe -r -b binary -o ${out_f} ${src_f}
+            DEPENDS ${in_f}
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMENT "Building object ${out_f}"
+            VERBATIM
+        )
+        list(APPEND result ${out_f})
+    endforeach()
+    set(${out_var} "${result}" PARENT_SCOPE)
+endfunction()
+
+file(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_CURRENT_LIST_DIR} CONFIGURE_DEPENDS "assets/*")
+add_resources(EMBEDDED_RESOURCES ${RESOURCES})
+
+target_sources(${PROJECT_NAME} PRIVATE ${EMBEDDED_RESOURCES})

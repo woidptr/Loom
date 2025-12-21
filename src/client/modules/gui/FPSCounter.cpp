@@ -5,4 +5,3 @@
 FPSCounter::FPSCounter() : Module("FPS Counter") {
 
 }
-
