@@ -25,8 +25,8 @@ void SettingsScreen::render() {
     const float baseW = 900.0f;
     const float baseH = 500.0f;
 
-    float scale = min(viewport->Size.x / baseW, viewport->Size.y / baseH);
-    scale = min(scale, 1.0f);
+    float scale = std::min(viewport->Size.x / baseW, viewport->Size.y / baseH);
+    scale = std::min(scale, 1.0f);
 
     ImVec2 scaledSize(baseW * scale, baseH * scale);
 

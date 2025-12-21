@@ -2,7 +2,7 @@
 #include "mc/client/render/screen/MinecraftUIRenderContext.hpp"
 #include "mc/client/render/Tessellator.hpp"
 #include "mc/client/game/IClientInstance.hpp"
-#include "mc/client/actors/LocalPlayer.hpp"
+#include <sdk/mc/client/player/LocalPlayer.hpp>
 #include <sdk/mc/deps/renderer/MaterialPtr.hpp>
 
 class GameContext {

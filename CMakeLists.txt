@@ -1,9 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.14)
 project(Loom)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Check if building on x64 Windows
 if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
     message(FATAL_ERROR "This project requires 64-bit Windows (x64)")
 endif()
@@ -14,15 +13,15 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+add_compile_definitions(NOMINMAX)
+
 if (MSVC)
     add_compile_options(/EHsc)
     add_compile_options(/D_ITERATOR_DEBUG_LEVEL=0)
 endif()
 
-# Fun
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
-# Add source to this project's executable.
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
@@ -38,8 +37,6 @@ if (NOT EXISTS ${CPM_DOWNLOAD_LOCATION})
         TLS_VERIFY ON
     )
 endif ()
-
-# message(FATAL_ERROR ${CPM_DOWNLOAD_LOCATION})
 
 include(${CPM_DOWNLOAD_LOCATION})
 

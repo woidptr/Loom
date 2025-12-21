@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include "Screen.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
