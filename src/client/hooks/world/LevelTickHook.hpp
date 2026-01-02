@@ -2,9 +2,11 @@
 #include "../Hook.hpp"
 #include <core/Signatures.hpp>
 
-class LevelTickHook : public Hook<void(void*)> {
+struct LevelTickHookTag {};
+
+class LevelTickHook : public Hook<LevelTickHookTag, void(void*)> {
 public:
-    LevelTickHook() : Hook($getSignature("Level::tick")) {
+    LevelTickHook() : Hook($get_signature("Level::tick")) {
         this->hook();
     }
 };

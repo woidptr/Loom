@@ -2,9 +2,11 @@
 #include <Windows.h>
 #include "../Hook.hpp"
 
-class WindowProcHook : public Hook<LRESULT(HWND, UINT, WPARAM, LPARAM)> {
+struct WindowProcHookTag {};
+
+class WindowProcHook : public Hook<WindowProcHookTag, LRESULT(HWND, UINT, WPARAM, LPARAM)> {
 public:
-    WindowProcHook() : Hook($getSignature("MainWindow::_windowProc")) {
+    WindowProcHook() : Hook($get_signature("MainWindow::_windowProc")) {
         this->hook();
     }
 };

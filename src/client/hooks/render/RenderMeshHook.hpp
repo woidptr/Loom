@@ -5,9 +5,11 @@
 #include <sdk/mc/deps/renderer/MaterialPtr.hpp>
 #include <core/Signatures.hpp>
 
-class RenderMeshHook : public Hook<void(ScreenContext*, Tessellator*, MaterialPtr*)> {
+struct RenderMeshHookTag {};
+
+class RenderMeshHook : public Hook<RenderMeshHookTag, void(ScreenContext*, Tessellator*, MaterialPtr*)> {
 public:
-    RenderMeshHook() : Hook($getSignature("MeshHelpers::renderMeshImmediately")) {
+    RenderMeshHook() : Hook($get_signature("MeshHelpers::renderMeshImmediately")) {
         this->hook();
     }
 };

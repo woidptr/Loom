@@ -2,7 +2,6 @@
 #include <vector>
 
 // hooks
-#include "hooks/Hook.hpp"
 #include "hooks/input/WindowProcHook.hpp"
 #include "hooks/world/GetFovHook.hpp"
 #include "hooks/world/GetGammaHook.hpp"
@@ -23,29 +22,27 @@
 #include "modules/gui/FPSCounter.hpp"
 #include "modules/gui/Zoom.hpp"
 
+#include <client/hooks/HookRegistry.hpp>
+
+#define $get_modules() Client::getInstance()->getModules()
+
 class Client {
 private:
-    // hooks
-    static inline std::unique_ptr<WindowProcHook> windowProcHook = nullptr;
-    static inline std::unique_ptr<GetTimeOfDayHook> getTimeOfDayHook = nullptr;
-    static inline std::unique_ptr<GetFovHook> getFovHook = nullptr;
-    static inline std::unique_ptr<GetGammaHook> getGammaHook = nullptr;
-    static inline std::unique_ptr<LevelTickHook> levelTickHook = nullptr;
-    static inline std::unique_ptr<SetupAndRenderHook> setupAndRenderHook = nullptr;
-    static inline std::unique_ptr<RenderMeshHook> renderMeshHook = nullptr;
-    static inline std::unique_ptr<PresentHook> presentHook = nullptr;
-    static inline std::unique_ptr<ExecuteCommandListHook> executeCommandList = nullptr;
-    static inline std::unique_ptr<ResizeBuffersHook> resizeBuffersHook = nullptr;
-
+    static inline Client* instance = nullptr;
+private:
     // ui
-    static inline std::unique_ptr<UIRender> uiRender = nullptr;
+    std::unique_ptr<UIRender> uiRender = nullptr;
 
     // modules
-    static inline std::vector<Module*> modules{};
+    std::vector<Module*> modules{};
 public:
+    Client();
+    ~Client();
+
     static void construct();
     static void destruct();
+    static Client* getInstance();
 
-    static void initModules();
-    static const std::vector<Module*> getModules();
+    void initModules();
+    const std::vector<Module*> getModules();
 };

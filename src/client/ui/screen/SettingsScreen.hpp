@@ -45,7 +45,7 @@ public:
         ImGui::SetCursorScreenPos(topRect.Min);
         if (ImGui::InvisibleButton(("##" + mod->getName() + "_top_btn").c_str(), topRect.GetSize())) {
             // Logic to open settings screen goes here
-            $logInfo("Opened settings for: ", mod->getName());
+            $log_info("Opened settings for: ", mod->getName());
         }
         bool topHovered = ImGui::IsItemHovered();
         bool topActive = ImGui::IsItemActive();
@@ -120,6 +120,75 @@ public:
         ImGui::SetCursorScreenPos(p_max);
         // Add a little padding below the card
         ImGui::Dummy(ImVec2(0, 10));
+    }
+
+    void DrawModCard(Module* mod, float width, float height) {
+        ImGui::PushID(mod->getName().c_str());
+
+        // -- Style Colors for this card --
+        ImVec4 bgCol = ImVec4(0.18f, 0.18f, 0.18f, 1.0f);        // Dark Card Background
+        ImVec4 btnColEnv = ImVec4(0.26f, 0.59f, 0.28f, 1.0f);    // Green (Enabled)
+        ImVec4 btnColDis = ImVec4(0.60f, 0.20f, 0.20f, 1.0f);    // Red (Disabled)
+        ImVec4 hoverCol = ImVec4(0.22f, 0.22f, 0.22f, 1.0f);     // Card Hover
+
+        // -- Background Group --
+        ImGui::BeginGroup();
+
+        // Draw Card Background
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        ImVec2 p = ImGui::GetCursorScreenPos();
+        drawList->AddRectFilled(p, ImVec2(p.x + width, p.y + height), ImGui::GetColorU32(bgCol), 8.0f);
+
+        // -- 1. Icon Area (Top 60% of card) --
+        // Since we don't have textures, we simulate an "Icon" with large text or a shape
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 25.0f); // Padding top
+
+        // Center the fake icon text
+        float fontScale = 2.0f; // Make fake icon big
+        ImGui::SetWindowFontScale(fontScale);
+        float textWidth = ImGui::CalcTextSize(mod->getName().c_str()).x;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - textWidth) * 0.5f);
+        ImGui::TextColored(ImVec4(1, 1, 1, 0.9f), "%s", mod->getName().c_str());
+        ImGui::SetWindowFontScale(1.0f); // Reset scale
+
+        // Draw Real Name below icon
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.0f);
+        float nameWidth = ImGui::CalcTextSize(mod->getName().c_str()).x;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - nameWidth) * 0.5f - (width * 0.05f)); // rough center reset
+        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "%s", mod->getName().c_str());
+
+        // -- 2. Action Bar (Bottom of card) --
+        // We manually position the cursor to the bottom area
+        float bottomBarHeight = 35.0f;
+        ImGui::SetCursorScreenPos(ImVec2(p.x + 5, p.y + height - bottomBarHeight - 5));
+
+        // 'Enabled' Toggle Button (Takes up 75% width)
+        float toggleWidth = (width - 15) * 0.75f;
+
+        if (mod->enabled) {
+            ImGui::PushStyleColor(ImGuiCol_Button, btnColEnv);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.65f, 0.3f, 1.0f));
+        }
+        else {
+            ImGui::PushStyleColor(ImGuiCol_Button, btnColDis);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.65f, 0.25f, 0.25f, 1.0f));
+        }
+
+        if (ImGui::Button(mod->enabled ? "ENABLED" : "DISABLED", ImVec2(toggleWidth, bottomBarHeight))) {
+            mod->enabled = !mod->enabled;
+        }
+        ImGui::PopStyleColor(2);
+
+        // Settings Button (Takes up remaining width)
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.12f, 0.12f, 0.12f, 1.0f)); // Darker grey for settings
+        if (ImGui::Button("*", ImVec2((width - 15) * 0.25f, bottomBarHeight))) {
+            // Open Settings Logic Here
+        }
+        ImGui::PopStyleColor();
+
+        ImGui::EndGroup();
+        ImGui::PopID();
     }
 
     virtual void render() override;

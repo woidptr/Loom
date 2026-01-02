@@ -2,12 +2,7 @@
 #include <libhat.hpp>
 
 void Tessellator::begin(mce::PrimitiveMode mode, int maxVertices, bool buildFaceData) {
-    // return Memory::Call<void(mce::PrimitiveMode, int, bool)>($getOffset("Tessellator::begin"), this, mode, maxVertices, buildFaceData);
-
-    using function = void(__thiscall*)(Tessellator*, mce::PrimitiveMode, int, bool);
-
-    static auto func = reinterpret_cast<function>($getAddress("Tessellator::begin"));
-    func(this, mode, maxVertices, buildFaceData);
+    // return Memory::CallMember<decltype(&Tessellator::begin)>($get_address("Tessellator::begin"), *this, mode, maxVertices, buildFaceData);
 }
 
 void Tessellator::color(mce::Color color) {
@@ -37,7 +32,7 @@ void Tessellator::color(uint32_t color) {
 }
 
 void Tessellator::vertex(float x, float y, float z) {
-    return Memory::Call<decltype(&Tessellator::vertex)>($getAddress("Tessellator::vertex"), this, x, y, z);
+    // return Memory::CallMember<decltype(&Tessellator::vertex)>($getAddress("Tessellator::vertex"), *this, x, y, z);
 }
 
 void Tessellator::vertexUV(Vec3 pos, Vec2 nextUV) {
@@ -45,6 +40,6 @@ void Tessellator::vertexUV(Vec3 pos, Vec2 nextUV) {
     this->vertex(pos.x, pos.y, pos.z);
 }
 
-mce::Mesh Tessellator::end(int uploadMode, std::string_view debugName, int generatedNormals) {
-    return Memory::Call<decltype(&Tessellator::end)>($getAddress("Tessellator::end"), this, uploadMode, debugName, generatedNormals);
-}
+//mce::Mesh Tessellator::end(int uploadMode, std::string_view debugName, int generatedNormals) {
+//    return Memory::CallMember<decltype(&Tessellator::end)>($getAddress("Tessellator::end"), *this, uploadMode, debugName, generatedNormals);
+//}

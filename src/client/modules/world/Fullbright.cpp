@@ -1,7 +1,8 @@
 #include "Fullbright.hpp"
+#include <client/hooks/HookRegistry.hpp>
 
-Fullbright::Fullbright(GetGammaHook* getGammaHook) : Module("Fullbright") {
-    getGammaHook->registerReturnCallback(
+Fullbright::Fullbright() : Module("Fullbright") {
+    Hooks::getGammaHook->registerReturnCallback(
         [&](CallbackContext& cbCtx, void* options) -> std::optional<float> {
             return gammaReturnCallback(cbCtx, options);
         }
@@ -9,5 +10,9 @@ Fullbright::Fullbright(GetGammaHook* getGammaHook) : Module("Fullbright") {
 }
 
 std::optional<float> Fullbright::gammaReturnCallback(CallbackContext& cbCtx, void* options) {
-    return std::nullopt;
+    if (!enabled) {
+        return std::nullopt;
+    }
+
+    return gamma;
 }

@@ -4,6 +4,7 @@
 #include "mc/client/game/IClientInstance.hpp"
 #include <sdk/mc/client/player/LocalPlayer.hpp>
 #include <sdk/mc/deps/renderer/MaterialPtr.hpp>
+#include <sdk/mc/client/player/LocalPlayer.hpp>
 
 class GameContext {
 public:
@@ -11,6 +12,7 @@ public:
 	static inline IClientInstance* clientInstance = nullptr;
 	static inline Tessellator* tessellator = nullptr;
 	static inline MaterialPtr* materialPtr = nullptr;
+	static inline LocalPlayer* localPlayer = nullptr;
 
 	static void registerRenderContext(MinecraftUIRenderContext* renderCtx);
 };

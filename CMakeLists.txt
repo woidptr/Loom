@@ -40,10 +40,10 @@ endif ()
 
 include(${CPM_DOWNLOAD_LOCATION})
 
-CPMAddPackage("gh:fmtlib/fmt#12.1.0")
 CPMAddPackage("gh:BasedInc/libhat@0.9.0")
 CPMAddPackage("gh:cursey/safetyhook@0.6.9")
 CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
+CPMAddPackage("gh:nlohmann/json@3.12.0")
 CPMAddPackage(
     URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
     OPTIONS
@@ -51,8 +51,19 @@ CPMAddPackage(
         "KIERO_INCLUDE_D3D12 ON"
         "KIERO_BUILD_EXAMPLES OFF"
 )
+CPMAddPackage(
+    NAME kawa_meta
+    URI "gh:superPuero/kawa_meta#21a87374a70a535b572cbfa95b6b9afbe22004c6"
+    DOWNLOAD_ONLY YES
+)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT)
+if (kawa_meta_ADDED)
+    add_library(kawa_meta INTERFACE)
+
+    target_include_directories(kawa_meta INTERFACE ${kawa_meta_SOURCE_DIR})
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json kawa_meta)
 
 include(FetchContent)
 

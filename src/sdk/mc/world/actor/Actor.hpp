@@ -5,5 +5,5 @@ class Actor {
 public:
     EntityContext mEntityContext;
 public:
-    virtual void test();
+    virtual ~Actor() = 0;
 };

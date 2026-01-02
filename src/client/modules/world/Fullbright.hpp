@@ -4,8 +4,10 @@
 #include <client/hooks/world/GetGammaHook.hpp>
 
 class Fullbright : public Module {
+private:
+    float gamma = 20.f;
 public:
-    Fullbright(GetGammaHook* getGammaHook);
+    Fullbright();
 
     std::optional<float> gammaReturnCallback(CallbackContext& cbCtx, void* options);
 };

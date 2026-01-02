@@ -20,5 +20,5 @@ public:
 	void color(uint32_t color);
 	void vertex(float x, float y, float z);
 	void vertexUV(Vec3 pos, Vec2 nextUV);
-	mce::Mesh end(int uploadMode, std::string_view debugName, int generateNormals);
+	// mce::Mesh end(int uploadMode, std::string_view debugName, int generateNormals);
 };

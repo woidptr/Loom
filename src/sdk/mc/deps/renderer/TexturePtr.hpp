@@ -7,7 +7,7 @@
 namespace mce {
 	class TexturePtr {
 	public:
-		std::shared_ptr<void> mClientTexture = nullptr;
+		std::shared_ptr<BedrockTextureData> mClientTexture;
 		std::shared_ptr<ResourceLocation> mResourceLocation;
 	public:
 		TexturePtr(const ResourceLocation& resourceLocation);

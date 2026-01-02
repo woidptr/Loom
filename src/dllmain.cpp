@@ -10,7 +10,7 @@ void init(HMODULE hModule) {
     SignatureRegistry::registerSignatures();
 
     if (!SignatureRegistry::performHealthCheck()) {
-        $logCritical("Signature healthcheck failed, silently ejecting...");
+        $log_critical("Signature healthcheck failed, silently ejecting...");
 
         FreeLibraryAndExitThread(hModule, 0);
     }

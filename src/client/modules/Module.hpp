@@ -12,7 +12,7 @@ public:
     bool enabled = false;
 public:
     Module(std::string name);
-    virtual ~Module() = default;
+    virtual ~Module();
 
     std::string getName();
 

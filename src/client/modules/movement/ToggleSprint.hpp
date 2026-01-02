@@ -6,7 +6,7 @@
 
 class ToggleSprint : public Module {
 public:
-    ToggleSprint(SetupAndRenderHook* setupAndRenderHook);
+    ToggleSprint();
 
-    void tickCallback(void* a1);
+    void renderCallback(MinecraftUIRenderContext* renderCtx);
 };

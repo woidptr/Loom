@@ -4,24 +4,29 @@
 #include <sdk/mc/deps/renderer/TexturePtr.hpp>
 #include <core/Signatures.hpp>
 #include <client/ui/impl/ImGuiImplMC.hpp>
+#include <sdk/mc/entity/components/MoveInputComponent.hpp>
+#include <client/hooks/HookRegistry.hpp>
 
-ToggleSprint::ToggleSprint(SetupAndRenderHook* setupAndRenderHook) : Module("Toggle Sprint") {
-    setupAndRenderHook->registerCallback(
-        [&](CallbackContext& cbCtx, void* screenView, MinecraftUIRenderContext* renderCtx) {
+ToggleSprint::ToggleSprint() : Module("Toggle Sprint") {
+    Hooks::setupAndRenderHook->registerCallbackBeforeOriginal(
+        [&](CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
             void** vtable = *(void***)renderCtx;
             uintptr_t staticVtable = reinterpret_cast<uintptr_t>(vtable) - reinterpret_cast<uintptr_t>(GetModuleHandle(NULL));
             // Logger::info(std::format("MinecraftUIRenderContext vtable address: 0x{:X}", staticVtable));
             // Logger::info(std::format("Text alpha: {}", renderCtx->getTextAlpha()));
             static bool initTest = false;
             if (!initTest) {
-                void** ci_vtable = *(void***)renderCtx->clientInstance;
+                GameContext::clientInstance = renderCtx->mClient;
+                void** ci_vtable = *(void***)renderCtx->mClient;
                 uintptr_t ci_staticVtable = reinterpret_cast<uintptr_t>(ci_vtable) - reinterpret_cast<uintptr_t>(GetModuleHandle(NULL));
 
-                $logDebug("ClientInstance vtable address: 0x{:X}", ci_staticVtable);
-                $logDebug("ClientInstance::getLocalPlayer dynamic address: {:P}", ci_vtable[31]);
+                $log_debug("ClientInstance vtable address: 0x{:X}", ci_staticVtable);
+                $log_debug("ClientInstance::getLocalPlayer dynamic address: {:P}", ci_vtable[31]);
                 // $logDebug("ClientInstance::getLocalPlayer static address: {:P}", ((void*)ci_staticVtable)[31]);
 
-                $logDebug("GuiData runtime address: 0x{:X}", (uintptr_t)renderCtx->screenContext->guiData);
+                $log_debug("GuiData runtime address: 0x{:X}", (uintptr_t)renderCtx->screenContext->guiData);
+
+                // $logDebug("LocalPlayer runtime address: 0x{:X}", (uintptr_t)renderCtx->clientInstance->getLocalPlayer());
                 // $logDebug("ScreenView->tessellator offset: 0x{:X}", *(int32_t*)$getSignatureAddr("ScreenContext->tessellator"));
 
                 // ImGui::CreateContext();
@@ -29,6 +34,16 @@ ToggleSprint::ToggleSprint(SetupAndRenderHook* setupAndRenderHook) : Module("Tog
 
                 initTest = true;
             }
+
+            if (LocalPlayer* lp = renderCtx->mClient->getLocalPlayer()) {
+                MoveInputComponent* mic = lp->mEntityContext.tryGetComponent<MoveInputComponent>();
+
+                mic->mInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
+                mic->mRawInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
+                mic->mFlagValues.set(static_cast<size_t>(MoveInputComponent::Flag::Sprinting), true);
+            }
+
+            // $logDebug("Screen name: {}", screenView->mVisualTree->name);
 
             /*ImGui_ImplMC_NewFrame(renderCtx);
             ImGui::NewFrame();
@@ -52,6 +67,16 @@ ToggleSprint::ToggleSprint(SetupAndRenderHook* setupAndRenderHook) : Module("Tog
     );
 }
 
-void ToggleSprint::tickCallback(void* a1) {
+void ToggleSprint::renderCallback(MinecraftUIRenderContext* renderCtx) {
+    if (!enabled) {
+        return;
+    }
 
+    if (LocalPlayer* lp = renderCtx->mClient->getLocalPlayer()) {
+        MoveInputComponent* mic = lp->mEntityContext.tryGetComponent<MoveInputComponent>();
+
+        mic->mInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
+        mic->mRawInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
+        mic->mFlagValues.set(static_cast<size_t>(MoveInputComponent::Flag::Sprinting), true);
+    }
 }

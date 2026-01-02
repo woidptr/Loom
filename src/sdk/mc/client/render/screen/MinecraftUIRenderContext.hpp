@@ -11,7 +11,7 @@
 
 class MinecraftUIRenderContext {
 public:
-	IClientInstance* clientInstance;
+	IClientInstance* mClient;
 	ScreenContext* screenContext;
 public:
 	virtual ~MinecraftUIRenderContext() = 0;

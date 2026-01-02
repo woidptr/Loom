@@ -4,11 +4,12 @@
 
 class ScreenContext {
 public:
-	$padding(0xA7);
+	// $padding(0xA7);
 
-	GuiData* guiData;
+	// GuiData* guiData;
 
-	$field(Tessellator*, tessellator, $getOffset("ScreenContext->tessellator"));
+	$field(GuiData*, guiData);
+	$field(Tessellator*, tessellator);
 
 	// $padding(0x8);
 

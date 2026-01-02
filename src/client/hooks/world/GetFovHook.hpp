@@ -1,9 +1,12 @@
 #pragma once
 #include "../Hook.hpp"
+#include <sdk/mc/client/render/game/LevelRendererPlayer.hpp>
 
-class GetFovHook : public Hook<float(void*, float, bool)> {
+struct GetFovHookTag {};
+
+class GetFovHook : public Hook<GetFovHookTag, float(LevelRendererPlayer*, float, bool)> {
 public:
-    GetFovHook() : Hook($getSignature("LevelRendererPlayer::getFov")) {
+    GetFovHook() : Hook($get_signature("LevelRendererPlayer::getFov")) {
         this->hook();
     }
 };

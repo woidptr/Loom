@@ -4,7 +4,7 @@
 
 class TimeChanger : public Module {
 public:
-    TimeChanger(GetTimeOfDayHook* getTimeOfDayHook);
+    TimeChanger();
 
-    float getTimeOfDayCallback(CallbackContext& cbCtx, void* dimension, int time, float alpha);
+    std::optional<float> getTimeOfDayCallback(CallbackContext& cbCtx, void* dimension, int time, float alpha);
 };

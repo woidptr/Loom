@@ -3,8 +3,6 @@
 #include <print>
 #include <iostream>
 #include <filesystem>
-#include <fmt/printf.h>
-#include <fmt/color.h>
 
 Logger::Logger() {
 #ifndef NDEBUG
@@ -47,14 +45,14 @@ void Logger::init() {
     }
 }
 
-Logger* Logger::getInstance() {
-    return instance;
-}
-
 void Logger::shutdown() {
     if (instance) {
         delete instance;
     }
+}
+
+Logger* Logger::getInstance() {
+    return instance;
 }
 
 void Logger::processLogs() {
@@ -71,7 +69,7 @@ void Logger::processLogs() {
             lock.unlock();
 
 #ifndef NDEBUG
-            fmt::print("{}", msg);
+            std::print("{}", msg);
 #endif
 
             writeToFile(msg);

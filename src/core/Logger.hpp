@@ -8,11 +8,11 @@
 #include <chrono>
 #include "FileManager.hpp"
 
-#define $logDebug(msg, ...)    Logger::getInstance()->debug(msg, ##__VA_ARGS__);
-#define $logInfo(msg, ...)     Logger::getInstance()->info(msg, ##__VA_ARGS__);
-#define $logWarning(msg, ...)  Logger::getInstance()->warning(msg, ##__VA_ARGS__);
-#define $logError(msg, ...)    Logger::getInstance()->error(msg, ##__VA_ARGS__);
-#define $logCritical(msg, ...) Logger::getInstance()->critical(msg, ##__VA_ARGS__);
+#define $log_debug(msg, ...)    Logger::getInstance()->debug(msg, ##__VA_ARGS__);
+#define $log_info(msg, ...)     Logger::getInstance()->info(msg, ##__VA_ARGS__);
+#define $log_warning(msg, ...)  Logger::getInstance()->warning(msg, ##__VA_ARGS__);
+#define $log_error(msg, ...)    Logger::getInstance()->error(msg, ##__VA_ARGS__);
+#define $log_critical(msg, ...) Logger::getInstance()->critical(msg, ##__VA_ARGS__);
 
 enum class LogLevel {
     Debug,
@@ -63,8 +63,8 @@ public:
     ~Logger();
 
     static void init();
-    static Logger* getInstance();
     static void shutdown();
+    static Logger* getInstance();
 
     template <typename...Args>
     void debug(std::format_string<Args...> fmt, Args&&... args) {

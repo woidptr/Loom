@@ -1,11 +1,14 @@
 #pragma once
 #include "../Hook.hpp"
+#include <sdk/mc/client/gui/screens/ScreenView.hpp>
 #include <sdk/mc/client/render/screen/MinecraftUIRenderContext.hpp>
 #include <core/Signatures.hpp>
 
-class SetupAndRenderHook : public Hook<void(void*, MinecraftUIRenderContext*)> {
+struct SetupAndRenderHookTag {};
+
+class SetupAndRenderHook : public Hook<SetupAndRenderHookTag, void(ScreenView*, MinecraftUIRenderContext*)> {
 public:
-    SetupAndRenderHook() : Hook($getSignature("ScreenView::setupAndRender")) {
+    SetupAndRenderHook() : Hook($get_signature("ScreenView::setupAndRender")) {
         this->hook();
     }
 };

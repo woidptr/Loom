@@ -1,37 +1,33 @@
 #pragma once
 #include <string>
 #include <safetyhook.hpp>
-#include <core/Signatures.hpp>
+#include <core/Memory.hpp>
 
 struct CallbackContext {
 private:
     bool cancelFlag = false;
 public:
-    bool isCancelled() const {
-        return cancelFlag;
-    }
-
-    void cancel() {
-        cancelFlag = true;
-    }
+    bool isCancelled() const { return cancelFlag; }
+    void cancel() { cancelFlag = true; }
 };
 
-template <typename>
+template <typename Tag, typename TFunc>
 class Hook;
 
-template <typename TReturn, typename...Args>
-class Hook<TReturn(Args...)> {
+template <typename Tag, typename TReturn, typename...Args>
+class Hook<Tag, TReturn(Args...)> {
 private:
-    using CallbackFunction = std::function<void(CallbackContext&, Args...)>;
+    using BeforeCallbackFunction = std::function<void(CallbackContext&, Args...)>;
+    using AfterCallbackFunction = std::function<void(Args...)>;
     using ReturnCallbackFunction = std::function<std::optional<TReturn>(CallbackContext&, Args...)>;
 private:
     uintptr_t address = 0;
 private:
     static inline SafetyHookInline inlineHook;
-    static inline std::vector<CallbackFunction> callbacks;
+    static inline std::vector<BeforeCallbackFunction> beforeCallbacks;
+    static inline std::vector<AfterCallbackFunction> afterCallbacks;
     static inline ReturnCallbackFunction returnCallback = nullptr;
 public:
-    Hook() {}
     Hook(Signature* signature) : address(signature->getAddress()) {}
     Hook(uintptr_t address) : address(address) {}
 
@@ -48,23 +44,41 @@ public:
             }
         }
 
-        for (auto& cb : callbacks) {
+        for (auto& cb : beforeCallbacks) {
             cb(cbCtx, args...);
         }
 
-        if (cbCtx.isCancelled()) {
-            if constexpr (!std::is_void_v<TReturn>) {
+        if constexpr (!std::is_void_v<TReturn>) {
+            if (cbCtx.isCancelled()) {
                 return TReturn{};
-            } else {
+            }
+
+            TReturn value = inlineHook.call<TReturn>(args...);
+
+            for (auto& cb : afterCallbacks) {
+                cb(args...);
+            }
+
+            return value;
+        } else {
+            if (cbCtx.isCancelled()) {
                 return;
             }
-        }
 
-        return inlineHook.call<TReturn>(args...);
+            inlineHook.call<TReturn>(args...);
+
+            for (auto& cb : afterCallbacks) {
+                cb(args...);
+            }
+        }
     }
 
-    void registerCallback(CallbackFunction&& fn) {
-        callbacks.emplace_back(std::forward<CallbackFunction>(fn));
+    void registerCallbackBeforeOriginal(BeforeCallbackFunction&& fn) {
+        beforeCallbacks.emplace_back(std::forward<BeforeCallbackFunction>(fn));
+    }
+
+    void registerCallbackAfterOriginal(AfterCallbackFunction&& fn) {
+        afterCallbacks.emplace_back(std::forward<AfterCallbackFunction>(fn));
     }
 
     void registerReturnCallback(ReturnCallbackFunction&& fn)
@@ -87,6 +101,8 @@ private:
     static inline SafetyHookMid midHook;
     static inline CallbackFunction callbackFunction = nullptr;
 public:
+    MidHook(Signature* signature) : address(signature->getAddress()) {}
+
     static void callback(SafetyHookContext& ctx) {
         if (callbackFunction) {
             callbackFunction(ctx);

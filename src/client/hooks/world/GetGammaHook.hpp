@@ -1,9 +1,11 @@
 #pragma once
 #include "../Hook.hpp"
 
-class GetGammaHook : public Hook<float(void*)> {
+struct GetGammaHookTag {};
+
+class GetGammaHook : public Hook<GetGammaHookTag, float(void*)> {
 public:
-    GetGammaHook() : Hook($getSignature("Options::getGamma")) {
+    GetGammaHook() : Hook($get_signature("Options::getGamma")) {
         this->hook();
     }
 };

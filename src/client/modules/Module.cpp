@@ -2,6 +2,12 @@
 
 Module::Module(std::string name) : name(name) {}
 
+Module::~Module() {
+    for (Setting* setting : settings) {
+        delete setting;
+    }
+}
+
 std::string Module::getName() {
     return name;
 }

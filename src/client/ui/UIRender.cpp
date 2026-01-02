@@ -2,9 +2,12 @@
 
 #include <client/Client.hpp>
 #include <imgui_internal.h>
+#include <sdk/GameContext.hpp>
+#include <sdk/mc/entity/components/MoveInputComponent.hpp>
+#include <sdk/mc/client/gui/screens/SceneFactory.hpp>
 
-UIRender::UIRender(WindowProcHook* windowProcHook, PresentHook* presentHook, ExecuteCommandListHook* executeCommandListHook, ResizeBuffersHook* resizeBuffersHook) {
-    windowProcHook->registerReturnCallback(
+UIRender::UIRender() {
+    Hooks::windowProcHook->registerReturnCallback(
         [&](CallbackContext& cbCtx, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> std::optional<LRESULT> {
             ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
@@ -31,31 +34,41 @@ UIRender::UIRender(WindowProcHook* windowProcHook, PresentHook* presentHook, Exe
         }
     );
 
-    presentHook->registerCallback(
+    Hooks::presentHook->registerCallbackBeforeOriginal(
         [&](CallbackContext& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
             renderCallback(swapChain, a1, a2);
         }
     );
 
-    executeCommandListHook->registerCallback(
+    Hooks::executeCommandListHook->registerCallbackBeforeOriginal(
         [&](CallbackContext& cbCtx, ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList) {
             executeCommandListCallback(commandQueue, a1, commandList);
         }
     );
 
-    resizeBuffersHook->registerCallback(
-        [&](CallbackContext& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4) {
-            resizeBuffersCallback(swapChain, a1, a2, a3, format, a4);
+    resizeBuffersHandler();
+
+    Hooks::setupAndRenderHook->registerCallbackBeforeOriginal(
+        [&](CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
+            setupAndRenderCallback(cbCtx, screenView, renderCtx);
         }
     );
 }
 
 void UIRender::keyboardCallback(int16_t key, bool isDown) {
     if (key == 'L' && !isDown) {
-        ScreenManager::setScreen(std::make_unique<CustomizationScreen>());
+        if (!ScreenManager::getCurrentScreen()) {
+            SceneFactory* sceneFactory = GameContext::clientInstance->getSceneFactory();
+            ISceneStack* sceneStack = GameContext::clientInstance->getClientSceneStack().value;
+            sceneStack->pushScreen(sceneFactory->createPauseScreen(), false);
+            ScreenManager::setScreen(std::make_unique<CustomizationScreen>());
+        }
     }
 
     if (key == VK_SHIFT && !isDown) {
+        // $log_debug("Check: 0x{:X}", $get_address("SceneFactory::createPauseScreen"));
+        /*auto* mic = GameContext::localPlayer->mEntityContext.tryGetComponent<MoveInputComponent>();
+        mic->mInputState.mSprintDown = true;*/
         ToastManager::addToast("Test", 3.0f);
     }
 
@@ -64,141 +77,65 @@ void UIRender::keyboardCallback(int16_t key, bool isDown) {
     }
 }
 
-void UIRender::initImgui(IDXGISwapChain3* swapChain) {
-    if (this->initialized) {
-        return;
-    }
+void UIRender::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
+    /*ResourceLocation rl("C:\\Users\\firel\\Downloads\\test.png", ResourceFileSystem::Raw);
 
-    if (DX12Context::device) {
-        DXGI_SWAP_CHAIN_DESC desc;
-        swapChain->GetDesc(&desc);
-        Win32Context::window = desc.OutputWindow;
+    mce::TexturePtr texture = renderCtx->getTexture(rl, true);
 
-        D3D_FEATURE_LEVEL featureLevels[] = {
-            D3D_FEATURE_LEVEL_11_1,
-            D3D_FEATURE_LEVEL_11_0,
-        };
+    $log_debug("Status: {}", (bool)texture.mClientTexture.get()->mIsMissingTexture);
 
-        D3D11_CREATE_DEVICE_FLAG deviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+    renderCtx->drawImage(texture, Vec2(50, 50), Vec2(50, 50), Vec2(0, 0), Vec2(50, 50), 0);
+    renderCtx->flushImages(mce::Color(1.f, 1.f, 1.f, 1.f), 1.f, HashedString::HashedString("ui_flush"));*/
 
-        HRESULT hr = D3D11On12CreateDevice(
-            DX12Context::device.get(),
-            deviceFlags,
-            featureLevels,
-            _countof(featureLevels),
-            (IUnknown**)&DX12Context::cmdQueue,
-            1,
-            0,
-            DX11Context::device.put(),
-            DX11Context::context.put(),
-            nullptr
-        );
+    // $log_debug("ScreenContext->tessellator offset: {}", $get_offset("ScreenContext->tessellator"));
 
-        if (FAILED(hr)) {
-            $logInfo("D3D11On12CreateDevice failed");
-        }
-        /*else
-        {
-            Logger::info(std::format("D3D11 device: 0x{:X}, context: 0x{:X}", (uintptr_t)this->d3d11Device, (uintptr_t)this->d3d11DeviceContext));
-        }*/
-
-        DX11Context::device->QueryInterface(__uuidof(ID3D11On12Device), (void**)&this->d3d11On12Device);
-
-        ImGui::CreateContext();
-
-        ImGuiIO& io = ImGui::GetIO();
-        // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-        const Asset arimoFont = $get_asset(fonts_Arimo_Medium_ttf);
-
-        io.Fonts->AddFontFromMemoryTTF(
-            (void*)arimoFont.begin(),
-            arimoFont.size(),
-            16.0f
-        );
-
-        ImGui_ImplWin32_Init(Win32Context::window);
-        ImGui_ImplDX11_Init(DX11Context::device.get(), DX11Context::context.get());
-
-        initialized = true;
+    if (ScreenManager::getCurrentScreen()) {
+        cbCtx.cancel();
     }
 }
 
+void UIRender::initRenderer(RenderType type) {
+    if (initialized) {
+        return;
+    }
+
+    switch (type) {
+    case RenderType::D3D12:
+        this->imguiRenderer = new ImGuiDX12();
+        break;
+    case RenderType::D3D11:
+        this->imguiRenderer = new ImGuiDX11();
+    }
+
+    initialized = true;
+}
+
 void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
-    if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(DX12Context::device.put())))) {
-        if (!DX12Context::cmdQueue) {
-            return;
-        }
+    ID3D12Device5* d3d12Device5 = nullptr;
+    if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
+        d3d12Device5->RemoveDevice();
 
-        this->initImgui(swapChain);
+        /*this->initRenderer(RenderType::D3D12);
 
-        ID3D12Resource* backBuffer12 = nullptr;
-        swapChain->GetBuffer(swapChain->GetCurrentBackBufferIndex(), IID_PPV_ARGS(&backBuffer12));
-
-        D3D11_RESOURCE_FLAGS flags = { D3D11_BIND_RENDER_TARGET };
-
-        ID3D11Resource* backBuffer11 = nullptr;
-
-        this->d3d11On12Device->CreateWrappedResource(
-            backBuffer12,
-            &flags,
-            D3D12_RESOURCE_STATE_PRESENT,
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
-            IID_PPV_ARGS(&backBuffer11)
-        );
-
-        this->d3d11On12Device->AcquireWrappedResources(&backBuffer11, 1);
-
-        ID3D11RenderTargetView* rtv = nullptr;
-        DX11Context::device->CreateRenderTargetView(backBuffer11, nullptr, &rtv);
-
-        DX11Context::context->OMSetRenderTargets(1, &rtv, nullptr);
-
-        ImGui_ImplWin32_NewFrame();
-        ImGui_ImplDX11_NewFrame();
-        ImGui::NewFrame();
+        imguiRenderer->Init(swapChain);
+        imguiRenderer->PreRender(swapChain);
 
         ToastManager::renderToasts();
         ScreenManager::render();
 
-        ImGui::Render();
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-        ID3D11RenderTargetView* nullRTV[1] = { nullptr };
-        DX11Context::context->OMSetRenderTargets(1, nullRTV, nullptr);
-        this->d3d11On12Device->ReleaseWrappedResources(&backBuffer11, 1);
-        DX11Context::context->Flush();
-
-        backBuffer11->Release();
-        backBuffer12->Release();
+        imguiRenderer->Render(swapChain);*/
     }
     else if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(DX11Context::device.put())))) {
-        this->initImgui(swapChain);
+        this->initRenderer(RenderType::D3D11);
 
-        ID3D11Resource* backBuffer11 = nullptr;
-        swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer11));
+        imguiRenderer->Init(swapChain);
 
-        ID3D11RenderTargetView* rtv = nullptr;
-        DX11Context::device->CreateRenderTargetView(backBuffer11, nullptr, &rtv);
-
-        DX11Context::context->OMSetRenderTargets(1, &rtv, nullptr);
-
-        ImGui_ImplWin32_NewFrame();
-        ImGui_ImplDX11_NewFrame();
-        ImGui::NewFrame();
+        imguiRenderer->PreRender(swapChain);
 
         ToastManager::renderToasts();
         ScreenManager::render();
 
-        ImGui::Render();
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-        ID3D11RenderTargetView* nullRTV[1] = { nullptr };
-        DX11Context::context->OMSetRenderTargets(1, nullRTV, nullptr);
-        DX11Context::context->Flush();
-
-        backBuffer11->Release();
+        imguiRenderer->Render(swapChain);
     }
 }
 
@@ -212,8 +149,16 @@ void UIRender::executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT
     }
 }
 
-void UIRender::resizeBuffersCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4) {
-    if (!this->initialized) {
-        return;
-    }
+void UIRender::resizeBuffersHandler() {
+    Hooks::resizeBuffersHook->registerCallbackBeforeOriginal(
+        [&](CallbackContext& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4) {
+            imguiRenderer->PreResize(swapChain);
+        }
+    );
+
+    Hooks::resizeBuffersHook->registerCallbackAfterOriginal(
+        [&](IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4) {
+            imguiRenderer->PostResize(swapChain);
+        }
+    );
 }
