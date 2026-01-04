@@ -24,6 +24,7 @@ namespace brstd::detail {
         constexpr Derived& set(size_type pos, bool value) {
             auto idx = pos / bits_per_value;
             auto offset = pos % bits_per_value;
+
             if (value) {
                 container_[idx] |= (underlying_type(1) << offset);
             }

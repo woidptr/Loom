@@ -55,6 +55,17 @@ UIRender::UIRender() {
     );
 }
 
+void UIRender::loadFonts() {
+    ImGuiIO& io = ImGui::GetIO();
+    const Asset arimoFont = $get_asset(fonts_Arimo_Medium_ttf);
+
+    io.Fonts->AddFontFromMemoryTTF(
+        (void*)arimoFont.begin(),
+        arimoFont.size(),
+        16.0f
+    );
+}
+
 void UIRender::keyboardCallback(int16_t key, bool isDown) {
     if (key == 'L' && !isDown) {
         if (!ScreenManager::getCurrentScreen()) {
@@ -94,71 +105,53 @@ void UIRender::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screen
     }
 }
 
-void UIRender::initRenderer(RenderType type) {
-    if (initialized) {
-        return;
-    }
-
-    switch (type) {
-    case RenderType::D3D12:
-        this->imguiRenderer = new ImGuiDX12();
-        break;
-    case RenderType::D3D11:
-        this->imguiRenderer = new ImGuiDX11();
-    }
-
-    initialized = true;
-}
-
 void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
-    ID3D12Device5* d3d12Device5 = nullptr;
-    if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
-        d3d12Device5->RemoveDevice();
+    if (!renderer) {
+        ID3D12Device5* d3d12Device5 = nullptr;
+        ID3D11Device* d3d11Device = nullptr;
+        if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
+            renderer = std::make_unique<ImGuiDX12>();
+            d3d12Device5->Release();
+            // d3d12Device5->RemoveDevice();
+        } else if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
+            renderer = std::make_unique<ImGuiDX11>();
+        }
 
-        /*this->initRenderer(RenderType::D3D12);
-
-        imguiRenderer->Init(swapChain);
-        imguiRenderer->PreRender(swapChain);
-
-        ToastManager::renderToasts();
-        ScreenManager::render();
-
-        imguiRenderer->Render(swapChain);*/
+        if (renderer) {
+            if (!renderer->Init(swapChain, cmdQueue)) {
+                $log_error("Failed to init renderer");
+            }
+        }
     }
-    else if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(DX11Context::device.put())))) {
-        this->initRenderer(RenderType::D3D11);
 
-        imguiRenderer->Init(swapChain);
-
-        imguiRenderer->PreRender(swapChain);
+    if (renderer) {
+        renderer->NewFrame(swapChain);
+        ImGui::NewFrame();
 
         ToastManager::renderToasts();
         ScreenManager::render();
 
-        imguiRenderer->Render(swapChain);
+        ImGui::Render();
+        renderer->RenderDrawData(swapChain);
     }
 }
 
 void UIRender::executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList) {
-    if (!DX12Context::cmdQueue) {
-        DX12Context::cmdQueue = commandQueue;
-    }
-
-    if (!DX12Context::cmdList) {
-        DX12Context::cmdList = *commandList;
+    if (!cmdQueue) {
+        cmdQueue = commandQueue;
     }
 }
 
 void UIRender::resizeBuffersHandler() {
     Hooks::resizeBuffersHook->registerCallbackBeforeOriginal(
         [&](CallbackContext& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4) {
-            imguiRenderer->PreResize(swapChain);
+            renderer->OnResizePre(swapChain);
         }
     );
 
     Hooks::resizeBuffersHook->registerCallbackAfterOriginal(
         [&](IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4) {
-            imguiRenderer->PostResize(swapChain);
+            renderer->OnResizePost(swapChain);
         }
     );
 }

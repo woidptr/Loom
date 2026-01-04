@@ -12,47 +12,62 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
-$load_asset(fonts_Arimo_Medium_ttf);
-
 class IImguiRenderer {
 public:
     virtual ~IImguiRenderer() = default;
 
-    virtual void Init(IDXGISwapChain3* swapChain) = 0;
-    virtual void PreRender(IDXGISwapChain3* swapChain) = 0;
-    virtual void Render(IDXGISwapChain3* swapChain) = 0;
-    virtual void PreResize(IDXGISwapChain3* swapChain) = 0;
-    virtual void PostResize(IDXGISwapChain3* swapChain) = 0;
+    virtual bool Init(IDXGISwapChain3* swapChain, void* commandQueue = nullptr) = 0;
+
+    virtual void NewFrame(IDXGISwapChain3* swapChain) = 0;
+    virtual void RenderDrawData(IDXGISwapChain3* swapChain) = 0;
+
+    virtual void OnResizePre(IDXGISwapChain3* swapChain) = 0;
+    virtual void OnResizePost(IDXGISwapChain3* swapChain) = 0;
+
+    virtual bool IsReady() const { return true; }
+};
+
+struct FrameContext {
+    winrt::com_ptr<ID3D12CommandAllocator> commandAllocator = nullptr;
+    winrt::com_ptr<ID3D12Resource> mainRenderTargetResource = nullptr;
+    D3D12_CPU_DESCRIPTOR_HANDLE mainRenderTargetDescriptor;
 };
 
 class ImGuiDX12 : public IImguiRenderer {
 private:
-    bool initialized = false;
     winrt::com_ptr<ID3D12Device> device = nullptr;
+    winrt::com_ptr<ID3D12DescriptorHeap> rtvDescHeap = nullptr;
+    winrt::com_ptr<ID3D12DescriptorHeap> srvDescHeap = nullptr;
     winrt::com_ptr<ID3D12CommandQueue> cmdQueue = nullptr;
-    winrt::com_ptr<ID3D12DescriptorHeap> rtvHeap = nullptr;
-    UINT backBufferCount = 0;
+    winrt::com_ptr<ID3D12GraphicsCommandList> cmdList = nullptr;
+    winrt::com_ptr<ID3D12Fence> fence = nullptr;
 
-    struct FrameContext {
-        winrt::com_ptr<ID3D12CommandAllocator> allocator;
-        winrt::com_ptr<ID3D12GraphicsCommandList> cmdList;
-        winrt::com_ptr<ID3D12DescriptorHeap> rtvHeap;
-    };
+    UINT64 fenceValue = 0;
+    HANDLE fenceEvent = nullptr;
+    std::vector<UINT64> frameFenceValues;
 
-    std::vector<FrameContext> frameCommands;
+    std::vector<FrameContext> frameContext;
+
+    UINT bufferCount = 0;
 public:
     ImGuiDX12() : IImguiRenderer() {}
 
-    void Init(IDXGISwapChain3* swapChain) override;
-    void PreRender(IDXGISwapChain3* swapChain) override {}
-    void Render(IDXGISwapChain3* swapChain) override {}
-    void PreResize(IDXGISwapChain3* swapChain) override {}
-    void PostResize(IDXGISwapChain3* swapChain) override {}
+    bool Init(IDXGISwapChain3* swapChain, void* commandQueue = nullptr) override;
+
+    void NewFrame(IDXGISwapChain3* swapChain) override;
+    void RenderDrawData(IDXGISwapChain3* swapChain) override;
+
+    void OnResizePre(IDXGISwapChain3* swapChain) override;
+    void OnResizePost(IDXGISwapChain3* swapChain) override;
+
+    bool IsReady() const override;
+private:
+    void SetupRenderTargets(IDXGISwapChain3* swapChain);
+    void CleanupRenderTargets();
 };
 
 class ImGuiDX11 : public IImguiRenderer {
 private:
-    bool initialized = false;
     winrt::com_ptr<ID3D11Device> device = nullptr;
     winrt::com_ptr<ID3D11DeviceContext> context = nullptr;
     winrt::com_ptr<ID3D11Resource> backBuffer = nullptr;
@@ -60,11 +75,14 @@ private:
 public:
     ImGuiDX11() : IImguiRenderer() {}
 
-    void Init(IDXGISwapChain3* swapChain) override;
-    void PreRender(IDXGISwapChain3* swapChain) override;
-    void Render(IDXGISwapChain3* swapChain) override;
-    void PreResize(IDXGISwapChain3* swapChain) override;
-    void PostResize(IDXGISwapChain3* swapChain) override;
+    bool Init(IDXGISwapChain3* swapChain, void* commandQueue = nullptr) override;
+
+    void NewFrame(IDXGISwapChain3* swapChain) override;
+    void RenderDrawData(IDXGISwapChain3* swapChain) override;
+
+    void OnResizePre(IDXGISwapChain3* swapChain) override;
+    void OnResizePost(IDXGISwapChain3* swapChain) override;
 private:
-    void CreateRenderTarget(IDXGISwapChain3* swapChain);
+    void SetupRenderTargets(IDXGISwapChain3* swapChain);
+    void CleanupRenderTargets();
 };

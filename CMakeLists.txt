@@ -21,6 +21,12 @@ if (MSVC)
 endif()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+# set(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+
+add_compile_definitions(
+    _ITERATOR_DEBUG_LEVEL=0
+    _HAS_ITERATOR_DEBUGGING=0
+)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
@@ -51,21 +57,37 @@ CPMAddPackage(
         "KIERO_INCLUDE_D3D12 ON"
         "KIERO_BUILD_EXAMPLES OFF"
 )
-CPMAddPackage(
-    NAME kawa_meta
-    URI "gh:superPuero/kawa_meta#21a87374a70a535b572cbfa95b6b9afbe22004c6"
-    DOWNLOAD_ONLY YES
+#CPMAddPackage(
+#    NAME kawa_meta
+#    URI "gh:superPuero/kawa_meta#21a87374a70a535b572cbfa95b6b9afbe22004c6"
+#    DOWNLOAD_ONLY YES
+#)
+
+#if (kawa_meta_ADDED)
+#    add_library(kawa_meta INTERFACE)
+
+#    target_include_directories(kawa_meta INTERFACE ${kawa_meta_SOURCE_DIR})
+#endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    kawa_meta
+    GIT_REPOSITORY https://github.com/superPuero/kawa_meta.git
+    GIT_TAG        master
 )
 
-if (kawa_meta_ADDED)
+if(NOT kawa_meta_POPULATED)
+    FetchContent_Populate(kawa_meta)
+
     add_library(kawa_meta INTERFACE)
 
     target_include_directories(kawa_meta INTERFACE ${kawa_meta_SOURCE_DIR})
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json kawa_meta)
-
-include(FetchContent)
+target_link_libraries(${PROJECT_NAME} PRIVATE kawa_meta)
 
 FetchContent_Declare(
     imgui

@@ -13,7 +13,8 @@ public:
 	// $padding(0x170);
 	$padding(0x14C);
 	std::optional<Vec2> mNextUV[3];
-	std::optional<uint32_t> mNextColor;
+	// std::optional<uint32_t> mNextColor;
+	$field(std::optional<uint32_t>, mNextColor);
 public:
 	void begin(mce::PrimitiveMode mode, int maxVertices, bool buildFaceData);
 	void color(mce::Color color);

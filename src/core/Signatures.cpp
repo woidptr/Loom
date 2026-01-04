@@ -42,7 +42,7 @@ void SignatureRegistry::registerSignatures() {
     * Signatures marked with `->` are sigs to the field offsets
     */
 
-    signatures.insert(std::make_pair("Tessellator->color", std::make_unique<Signature>("89 86 ? ? ? ? 44 38 36 75 ? C6 86 ? ? ? ? ? 0F 57 DB 0F 57 D2", 0)));
+    signatures.insert(std::make_pair("Tessellator->mNextColor", std::make_unique<Signature>("89 86 ? ? ? ? 44 38 36 75 ? C6 86 ? ? ? ? ? 0F 57 DB 0F 57 D2", 0)));
     signatures.insert(std::make_pair("Tessellator::begin", std::make_unique<Signature>("40 57 48 83 EC ? 80 B9 ? ? ? ? ? 4C 8B D1", 0)));
     signatures.insert(std::make_pair("Tessellator::vertex", std::make_unique<Signature>("E8 ? ? ? ? F3 0F 10 4E ? 0F 2F F9", 1)));
     signatures.insert(std::make_pair("Tessellator::end", std::make_unique<Signature>("E8 ? ? ? ? 48 8D 55 ? 49 8B CC E8 ? ? ? ? 48 8D 4D ? E8 ? ? ? ? F3 45 0F 11 65", 1)));

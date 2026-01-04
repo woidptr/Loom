@@ -35,14 +35,6 @@ ToggleSprint::ToggleSprint() : Module("Toggle Sprint") {
                 initTest = true;
             }
 
-            if (LocalPlayer* lp = renderCtx->mClient->getLocalPlayer()) {
-                MoveInputComponent* mic = lp->mEntityContext.tryGetComponent<MoveInputComponent>();
-
-                mic->mInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
-                mic->mRawInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
-                mic->mFlagValues.set(static_cast<size_t>(MoveInputComponent::Flag::Sprinting), true);
-            }
-
             // $logDebug("Screen name: {}", screenView->mVisualTree->name);
 
             /*ImGui_ImplMC_NewFrame(renderCtx);
@@ -63,20 +55,24 @@ ToggleSprint::ToggleSprint() : Module("Toggle Sprint") {
             // mce::TexturePtr texturePtr = mce::TexturePtr(resLoc);
             // renderCtx->drawImage(texture, Vec2{ 50, 50 }, Vec2{ 200, 200 }, Vec2{ 0, 0 }, Vec2{ 100, 100 }, 0);
             // renderCtx->flushImages(mce::Color(1.f, 1.f, 1.f, 0.f), 1.f, HashedString("test_material"));
+
+            renderCallback(renderCtx);
         }
     );
 }
 
 void ToggleSprint::renderCallback(MinecraftUIRenderContext* renderCtx) {
-    if (!enabled) {
-        return;
-    }
+    // if (!enabled) {
+    //     return;
+    // }
 
     if (LocalPlayer* lp = renderCtx->mClient->getLocalPlayer()) {
         MoveInputComponent* mic = lp->mEntityContext.tryGetComponent<MoveInputComponent>();
 
-        mic->mInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
-        mic->mRawInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
-        mic->mFlagValues.set(static_cast<size_t>(MoveInputComponent::Flag::Sprinting), true);
+        if (mic) {
+            mic->mInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
+            mic->mRawInputState.mFlagValues.set(static_cast<size_t>(MoveInputState::Flag::SprintDown), true);
+            mic->mFlagValues.set(static_cast<size_t>(MoveInputComponent::Flag::Sprinting), true);
+        }
     }
 }
