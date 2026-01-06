@@ -1,15 +1,15 @@
 #pragma once
 #include <algorithm>
-#include "Screen.hpp"
+#include "IScreen.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <core/Logger.hpp>
 #include <client/modules/Module.hpp>
 #include <client/Client.hpp>
 
-class SettingsScreen : public Screen {
+class SettingsScreen : public IScreen {
 public:
-    SettingsScreen() : Screen("SettingsScreen") {}
+    SettingsScreen() : IScreen("SettingsScreen") {}
 
     void DrawModuleItem(Module* mod) {
         ImVec2 cardSize = ImVec2(180.f, 180.f);

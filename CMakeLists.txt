@@ -48,8 +48,9 @@ include(${CPM_DOWNLOAD_LOCATION})
 
 CPMAddPackage("gh:BasedInc/libhat@0.9.0")
 CPMAddPackage("gh:cursey/safetyhook@0.6.9")
-CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
 CPMAddPackage("gh:nlohmann/json@3.12.0")
+CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
+CPMAddPackage("gh:woidptr/kawa_meta#19f188ceda374714ac788e52f94e7f663b1cf43d")
 CPMAddPackage(
     URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
     OPTIONS
@@ -57,37 +58,10 @@ CPMAddPackage(
         "KIERO_INCLUDE_D3D12 ON"
         "KIERO_BUILD_EXAMPLES OFF"
 )
-#CPMAddPackage(
-#    NAME kawa_meta
-#    URI "gh:superPuero/kawa_meta#21a87374a70a535b572cbfa95b6b9afbe22004c6"
-#    DOWNLOAD_ONLY YES
-#)
 
-#if (kawa_meta_ADDED)
-#    add_library(kawa_meta INTERFACE)
-
-#    target_include_directories(kawa_meta INTERFACE ${kawa_meta_SOURCE_DIR})
-#endif()
-
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json)
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json kawa_meta::kawa_meta)
 
 include(FetchContent)
-
-FetchContent_Declare(
-    kawa_meta
-    GIT_REPOSITORY https://github.com/superPuero/kawa_meta.git
-    GIT_TAG        master
-)
-
-if(NOT kawa_meta_POPULATED)
-    FetchContent_Populate(kawa_meta)
-
-    add_library(kawa_meta INTERFACE)
-
-    target_include_directories(kawa_meta INTERFACE ${kawa_meta_SOURCE_DIR})
-endif()
-
-target_link_libraries(${PROJECT_NAME} PRIVATE kawa_meta)
 
 FetchContent_Declare(
     imgui
@@ -142,5 +116,7 @@ endfunction()
 
 file(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_CURRENT_LIST_DIR} CONFIGURE_DEPENDS "assets/*")
 add_resources(EMBEDDED_RESOURCES ${RESOURCES})
+add_resources(SIGNATURES signatures.json)
 
 target_sources(${PROJECT_NAME} PRIVATE ${EMBEDDED_RESOURCES})
+target_sources(${PROJECT_NAME} PRIVATE ${SIGNATURES})

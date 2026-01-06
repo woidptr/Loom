@@ -156,4 +156,22 @@ namespace Memory {
 
 		return 0;
 	}
+
+	inline uintptr_t ResolveInstructionTarget(uintptr_t addr) {
+		ZydisDecoder decoder;
+		ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64);
+
+		ZydisDecodedInstruction instruction;
+		ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
+
+		if (ZYAN_SUCCESS(ZydisDecoderDecodeFull(&decoder, (void*)addr, 15, &instruction, operands))) {
+			if (instruction.attributes & ZYDIS_ATTRIB_IS_RELATIVE) {
+				uintptr_t absoluteAddress = 0;
+				ZydisCalcAbsoluteAddress(&instruction, operands, addr, &absoluteAddress);
+				return absoluteAddress;
+			}
+		}
+
+		return addr;
+	}
 }

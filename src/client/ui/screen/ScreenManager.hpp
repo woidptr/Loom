@@ -1,16 +1,16 @@
 #pragma once
 #include <memory>
-#include "Screen.hpp"
+#include "IScreen.hpp"
 
 class ScreenManager {
 private:
-    static inline std::unique_ptr<Screen> currentScreen;
+    static inline std::unique_ptr<IScreen> currentScreen;
 public:
-    static void setScreen(std::unique_ptr<Screen> screen) {
+    static void setScreen(std::unique_ptr<IScreen> screen) {
         currentScreen = std::move(screen);
     }
 
-    static Screen* getCurrentScreen() {
+    static IScreen* getCurrentScreen() {
         return currentScreen.get();
     }
 

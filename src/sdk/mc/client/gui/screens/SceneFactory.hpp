@@ -17,9 +17,6 @@ public:
     virtual ~SceneFactory() = 0;
 public:
     $member_function(std::shared_ptr<AbstractScene>, createHudScreen);
-    // $member_function(std::shared_ptr<AbstractScene>, createPauseScreen);
-
-    std::shared_ptr<AbstractScene> createPauseScreen() {
-        return Memory::CallMember<decltype(&SceneFactory::createPauseScreen)>($get_address("SceneFactory::createPauseScreen"), *this);
-    }
+    $member_function(std::shared_ptr<AbstractScene>, createPauseScreen);
+    $member_function(std::shared_ptr<AbstractScene>, test);
 };

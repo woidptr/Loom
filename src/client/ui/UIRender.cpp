@@ -68,7 +68,7 @@ void UIRender::loadFonts() {
 
 void UIRender::keyboardCallback(int16_t key, bool isDown) {
     if (key == 'L' && !isDown) {
-        if (!ScreenManager::getCurrentScreen()) {
+        if (!ScreenManager::getCurrentScreen() && GameContext::clientInstance->getScreenName() == "hud_screen") {
             SceneFactory* sceneFactory = GameContext::clientInstance->getSceneFactory();
             ISceneStack* sceneStack = GameContext::clientInstance->getClientSceneStack().value;
             sceneStack->pushScreen(sceneFactory->createPauseScreen(), false);
@@ -80,7 +80,9 @@ void UIRender::keyboardCallback(int16_t key, bool isDown) {
         // $log_debug("Check: 0x{:X}", $get_address("SceneFactory::createPauseScreen"));
         /*auto* mic = GameContext::localPlayer->mEntityContext.tryGetComponent<MoveInputComponent>();
         mic->mInputState.mSprintDown = true;*/
+        test = !test;
         ToastManager::addToast("Test", 3.0f);
+        $log_debug("Current screen name: {}", GameContext::clientInstance->getScreenName());
     }
 
     if (key == VK_ESCAPE && !isDown) {
@@ -100,7 +102,19 @@ void UIRender::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screen
 
     // $log_debug("ScreenContext->tessellator offset: {}", $get_offset("ScreenContext->tessellator"));
 
+    /*if (GameContext::clientInstance == nullptr) return;
+
+    if (GameContext::clientInstance->getScreenName() == "start_screen") {
+        if (true) {
+            ScreenManager::setScreen(std::make_unique<StartScreen>());
+        }
+    }*/
+
     if (ScreenManager::getCurrentScreen()) {
+        cbCtx.cancel();
+    }
+
+    if (test) {
         cbCtx.cancel();
     }
 }
@@ -115,6 +129,7 @@ void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
             // d3d12Device5->RemoveDevice();
         } else if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
             renderer = std::make_unique<ImGuiDX11>();
+            d3d11Device->Release();
         }
 
         if (renderer) {
@@ -127,6 +142,10 @@ void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
     if (renderer) {
         renderer->NewFrame(swapChain);
         ImGui::NewFrame();
+
+        for (DirectXDrawCallback& cb : drawCallbacks) {
+            cb();
+        }
 
         ToastManager::renderToasts();
         ScreenManager::render();

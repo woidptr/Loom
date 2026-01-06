@@ -5,12 +5,9 @@
 #include "elements/ToastNotification.hpp"
 #include "screen/ScreenManager.hpp"
 #include "screen/CustomizationScreen.hpp"
+#include "screen/StartScreen.hpp"
 #include <core/Asset.hpp>
 #include <mutex>
-#include <d3d12.h>
-#include <d3d11.h>
-#include <d3d11on12.h>
-#include <winrt/base.h>
 #include <imgui.h>
 
 #include "utils/ImGuiUtils.hpp"
@@ -21,8 +18,12 @@ $load_asset(fonts_Arimo_Medium_ttf);
 
 class UIRender {
 private:
+    using DirectXDrawCallback = std::function<void()>;
+private:
+    bool test = false;
     ID3D12CommandQueue* cmdQueue = nullptr;
     std::unique_ptr<IImguiRenderer> renderer = nullptr;
+    std::vector<DirectXDrawCallback> drawCallbacks;
 public:
     UIRender();
 
