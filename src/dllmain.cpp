@@ -17,11 +17,18 @@ void init(HMODULE hModule) {
         FreeLibraryAndExitThread(hModule, 0);
     }
 
-    fi::FakeImportConfig::set_config({
+    /*fi::FakeImportConfig::set_config({
         .mock_dll_name = "mcapi.dll",
         .resolve_address = Memory::ResolveAddress,
     });
-    fi::load_all_imports();
+    fi::load_all_imports();*/
+
+    FakeImports::construct({
+        .dll_name = "mcapi.dll",
+        .resolve = Memory::ResolveAddress,
+    });
+
+    FakeImports::load_all_imports();
 
     Client::construct();
 }

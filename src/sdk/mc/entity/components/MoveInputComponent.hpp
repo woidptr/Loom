@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <chrono>
+#include <sdk/mc/deps/ecs/Entity.hpp>
 #include <sdk/mc/deps/core/math/Vec2.hpp>
 #include <sdk/mc/deps/core/math/Vec3.hpp>
 #include <sdk/mc/platform/brstd/bitset.hpp>

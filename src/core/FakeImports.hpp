@@ -155,19 +155,20 @@ namespace fi {
     private:
         static std::mutex IatMutex;
     };
-
-    using ResolveAddressPtrFn = uintptr_t(*)(const char* mangledName);
-    struct ImportResolver {
-        std::string dll_name;
-        ResolveAddressPtrFn resolve;
-    };
-
-    struct FakeImportConfig {
-        std::string mock_dll_name{};
-        ResolveAddressPtrFn resolve_address{ nullptr };
-        static const FakeImportConfig& config();
-        static void set_config(FakeImportConfig&& config);
-    };
-
-    void load_all_imports();
 }
+
+struct ImportResolver {
+private:
+    using ResolveAddressPtrFn = uintptr_t(*)(const char* mangledName);
+public:
+    std::string dll_name{};
+    ResolveAddressPtrFn resolve{ nullptr };
+};
+
+class FakeImports {
+public:
+    static inline ImportResolver resolver;
+public:
+    static void construct(ImportResolver&& config);
+    static void load_all_imports();
+};

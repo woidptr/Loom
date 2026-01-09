@@ -3,8 +3,7 @@
 static std::atomic_bool batching = false;
 
 extern "C" {
-    FARPROC WINAPI __delayLoadHelper2(const fi::ImgDelayDescr* pidd,
-        FARPROC* ppfnIATEntry) {
+    FARPROC WINAPI __delayLoadHelper2(const fi::ImgDelayDescr* pidd, FARPROC* ppfnIATEntry) {
         $log_debug("Resolving: {:x}", std::bit_cast<uintptr_t>(ppfnIATEntry));
         fi::IDD idd{ pidd };
         if (idd.attributes != fi::Attributes::RVA) {
@@ -34,7 +33,7 @@ extern "C" {
 
         // 6. Call User Resolver
         uintptr_t resolved_address = 0;
-        if (auto resolver = fi::FakeImportConfig::config().resolve_address) {
+        if (auto resolver = FakeImports::resolver.resolve) {
             $log_debug("{}", funcName);
             resolved_address = resolver(funcName);
         }
@@ -74,30 +73,6 @@ namespace fi {
         return nt;
     }
 
-    static FakeImportConfig cfg;
-    const FakeImportConfig& FakeImportConfig::config() {
-        return cfg;
-    }
-
-    void FakeImportConfig::set_config(FakeImportConfig&& config) {
-        cfg = std::move(config);
-    }
-
-    void load_all_imports() {
-        const auto raw_idd = fi::ImgDelayDescr::idd_from_base();
-        if (!raw_idd) return;
-
-        const fi::IDD idd{ raw_idd };
-        auto iat_entry = idd.import_address_table;
-        const auto iat_size = idd.iat_size();
-        const auto iat_end = iat_entry + iat_size;
-
-        for (; iat_entry < iat_end; ++iat_entry) {
-            // Manually trigger the helper for every entry
-            __delayLoadHelper2(raw_idd, const_cast<FARPROC*>(reinterpret_cast<const FARPROC*>(iat_entry.get())));
-        }
-    }
-
     std::mutex IATWrite::IatMutex = std::mutex{};
 
     IATWrite::IATWrite(uintptr_t iat_address, const std::function<void()>& callback, const IDD& idd) {
@@ -125,13 +100,12 @@ namespace fi {
             return nullptr;
         }
 
-        auto current_idd = RVAPtr<const ImgDelayDescr>(
-            entry.VirtualAddress);
+        auto current_idd = RVAPtr<const ImgDelayDescr>(entry.VirtualAddress);
 
         RVAString name{ current_idd->rvaDLLName };
         while (current_idd->rvaDLLName != 0) {
 
-            if (FakeImportConfig::config().mock_dll_name == name.get()) {
+            if (FakeImports::resolver.dll_name == name.get()) {
                 return current_idd;
             }
 
@@ -165,5 +139,23 @@ namespace fi {
     uintptr_t IDD::offset_in_iat(const IATEntry iat_entry) const {
         const auto* iat_entry_true = std::bit_cast<const IMAGE_THUNK_DATA*>(iat_entry);
         return std::bit_cast<uintptr_t>(iat_entry_true - this->import_address_table);
+    }
+}
+
+void FakeImports::construct(ImportResolver&& resolver) {
+    FakeImports::resolver = std::move(resolver);
+}
+
+void FakeImports::load_all_imports() {
+    const auto raw_idd = fi::ImgDelayDescr::idd_from_base();
+    if (!raw_idd) return;
+
+    const fi::IDD idd{ raw_idd };
+    auto iat_entry = idd.import_address_table;
+    const auto iat_size = idd.iat_size();
+    const auto iat_end = iat_entry + iat_size;
+
+    for (; iat_entry < iat_end; ++iat_entry) {
+        __delayLoadHelper2(raw_idd, const_cast<FARPROC*>(reinterpret_cast<const FARPROC*>(iat_entry.get())));
     }
 }
