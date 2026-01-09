@@ -4,9 +4,9 @@
 
 struct LevelTickHookTag {};
 
-class LevelTickHook : public Hook<LevelTickHookTag, void(void*)> {
+class LevelTickHook : public InlineHook<LevelTickHookTag, void(void*)> {
 public:
-    LevelTickHook() : Hook($get_signature("Level::tick")) {
+    LevelTickHook() : InlineHook($get_signature("Level::tick")) {
         this->hook();
     }
 };

@@ -2,6 +2,7 @@
 #include <string>
 #include <safetyhook.hpp>
 #include <core/Memory.hpp>
+#include <sdk/GameContext.hpp>
 
 struct CallbackContext {
 private:
@@ -12,15 +13,15 @@ public:
 };
 
 template <typename Tag, typename TFunc>
-class Hook;
+class InlineHook;
 
 template <typename Tag, typename TReturn, typename...Args>
-class Hook<Tag, TReturn(Args...)> {
+class InlineHook<Tag, TReturn(Args...)> {
 private:
     using BeforeCallbackFunction = std::function<void(CallbackContext&, Args...)>;
     using AfterCallbackFunction = std::function<void(Args...)>;
     using ReturnCallbackFunction = std::function<std::optional<TReturn>(CallbackContext&, Args...)>;
-private:
+protected:
     uintptr_t address = 0;
 private:
     static inline SafetyHookInline inlineHook;
@@ -28,8 +29,9 @@ private:
     static inline std::vector<AfterCallbackFunction> afterCallbacks;
     static inline ReturnCallbackFunction returnCallback = nullptr;
 public:
-    Hook(Signature* signature) : address(signature->getAddress()) {}
-    Hook(uintptr_t address) : address(address) {}
+    InlineHook(Signature* signature) : address(signature->getAddress()) {}
+    InlineHook(uintptr_t address) : address(address) {}
+    InlineHook() {}
 
     static TReturn callback(Args...args) {
         CallbackContext cbCtx;
@@ -92,6 +94,7 @@ public:
     }
 };
 
+template <typename Tag>
 class MidHook {
 private:
     using CallbackFunction = std::function<void(SafetyHookContext&)>;

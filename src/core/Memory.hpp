@@ -2,9 +2,11 @@
 #include <bit>
 #include <cstddef>
 #include <type_traits>
+#include <Windows.h>
+#include <DbgHelp.h>
 #include <libhat/access.hpp>
 #include <core/Signatures.hpp>
-#include <meta.h>
+#include <kawa/core/meta.h>
 #include <Zydis/Zydis.h>
 
 #define $get_signature(signature) SignatureRegistry::getSignature(signature)
@@ -37,20 +39,6 @@ public: \
 #define $field(type, name) $build_access(type, name, $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*this)>>()) + "->" + #name));
 
 #define $_arg_expansion(...) __VA_ARGS__
-
-#define $member_function(return_type, function_name) \
-	return_type function_name() { \
-		using CurrentClass = std::remove_reference_t<decltype(*this)>; \
-		std::string sig = std::string(kawa::meta::type_name<CurrentClass>()) + "::" + #function_name; \
-		return Memory::CallMember<decltype(&CurrentClass::function_name)>($get_address(sig), *this); \
-	}
-
-#define $member_function_args(return_type, function_name, args_decl, args_pass) \
-	return_type function_name args_decl { \
-		using CurrentClass = std::remove_reference_t<decltype(*this)>; \
-		std::string sig = std::string(kawa::meta::type_name<CurrentClass>()) + "::" + #function_name; \
-		return Memory::CallMember<decltype(&CurrentClass::function_name)>($get_address(sig), *this); \
-	}
 
 #define $virtual_function(return_type, function_name, index) \
 	return_type function_name() { \
@@ -137,41 +125,7 @@ namespace Memory {
 		return reinterpret_cast<Fn>(funcAddress)(thisptr, args...);
 	}
 
-	inline int32_t GetOffset(uintptr_t addr) {
-		ZydisDecoder decoder;
-		ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64);
-
-		ZydisDecodedInstruction instruction;
-		ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
-
-		if (ZYAN_SUCCESS(ZydisDecoderDecodeFull((&decoder), (void*)addr, 15, &instruction, operands))) {
-			for (int i = 0; i < instruction.operand_count; i++) {
-				if (operands[i].type == ZYDIS_OPERAND_TYPE_MEMORY) {
-					if (operands[i].mem.disp.has_displacement) {
-						return (int32_t)operands[i].mem.disp.value;
-					}
-				}
-			}
-		}
-
-		return 0;
-	}
-
-	inline uintptr_t ResolveInstructionTarget(uintptr_t addr) {
-		ZydisDecoder decoder;
-		ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64);
-
-		ZydisDecodedInstruction instruction;
-		ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
-
-		if (ZYAN_SUCCESS(ZydisDecoderDecodeFull(&decoder, (void*)addr, 15, &instruction, operands))) {
-			if (instruction.attributes & ZYDIS_ATTRIB_IS_RELATIVE) {
-				uintptr_t absoluteAddress = 0;
-				ZydisCalcAbsoluteAddress(&instruction, operands, addr, &absoluteAddress);
-				return absoluteAddress;
-			}
-		}
-
-		return addr;
-	}
+	int32_t GetOffset(uintptr_t addr);
+	uintptr_t ResolveInstructionTarget(uintptr_t addr);
+	uintptr_t ResolveAddress(const char* mangledName);
 }

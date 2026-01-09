@@ -3,9 +3,9 @@
 
 struct GetTimeOfDayHookTag {};
 
-class GetTimeOfDayHook : public Hook<GetTimeOfDayHookTag, float(void*, int, float)> {
+class GetTimeOfDayHook : public InlineHook<GetTimeOfDayHookTag, float(void*, int, float)> {
 public:
-    GetTimeOfDayHook() : Hook($get_signature("Dimension::getTimeOfDay")) {
+    GetTimeOfDayHook() : InlineHook($get_signature("Dimension::getTimeOfDay")) {
         this->hook();
     }
 };

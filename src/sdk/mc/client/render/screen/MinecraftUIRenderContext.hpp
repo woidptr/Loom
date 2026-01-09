@@ -1,6 +1,4 @@
 #pragma once
-#include <sdk/mc/client/gui/screens/ScreenContext.hpp>
-#include <sdk/mc/client/game/IClientInstance.hpp>
 #include <sdk/mc/deps/input/RectangleArea.hpp>
 #include <sdk/mc/deps/core/math/Color.hpp>
 #include <sdk/mc/deps/core/math/Vec2.hpp>
@@ -8,6 +6,9 @@
 #include <libhat/access.hpp>
 #include <core/Logger.hpp>
 #include <core/Signatures.hpp>
+
+class IClientInstance;
+class ScreenContext;
 
 class MinecraftUIRenderContext {
 public:

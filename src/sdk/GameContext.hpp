@@ -1,10 +1,19 @@
 #pragma once
-#include "mc/client/render/screen/MinecraftUIRenderContext.hpp"
-#include "mc/client/render/Tessellator.hpp"
-#include "mc/client/game/IClientInstance.hpp"
+#include <sdk/mc/client/gui/screens/SceneFactory.hpp>
+#include <sdk/mc/client/gui/screens/ScreenContext.hpp>
+#include <sdk/mc/client/render/screen/MinecraftUIRenderContext.hpp>
+#include <sdk/mc/client/render/Tessellator.hpp>
+#include <sdk/mc/client/game/IClientInstance.hpp>
 #include <sdk/mc/client/player/LocalPlayer.hpp>
 #include <sdk/mc/deps/renderer/MaterialPtr.hpp>
-#include <sdk/mc/client/player/LocalPlayer.hpp>
+#include <sdk/mc/deps/renderer/TexturePtr.hpp>
+#include <sdk/mc/network/Packet.h>
+#include <sdk/mc/network/MinecraftPackets.hpp>
+#include <sdk/mc/network/IPacketHandlerDispatcher.hpp>
+
+#pragma comment(lib, "delayimp")
+
+#define MCAPI __declspec(dllimport)
 
 class GameContext {
 public:

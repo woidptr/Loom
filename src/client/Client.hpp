@@ -12,7 +12,7 @@
 #include "hooks/render/DirectX.hpp"
 
 // ui
-#include "ui/UIRender.hpp"
+#include "ui/RenderCore.hpp"
 
 // modules
 #include "modules/Module.hpp"
@@ -30,8 +30,7 @@ class Client {
 private:
     static inline Client* instance = nullptr;
 private:
-    // ui
-    std::unique_ptr<UIRender> uiRender = nullptr;
+    RenderCore* uiRender = nullptr;
 
     // modules
     std::vector<Module*> modules{};
@@ -42,6 +41,8 @@ public:
     static void construct();
     static void destruct();
     static Client* getInstance();
+
+    RenderCore* getUIRender();
 
     void initModules();
     const std::vector<Module*> getModules();

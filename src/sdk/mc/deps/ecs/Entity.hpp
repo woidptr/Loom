@@ -1,6 +1,5 @@
 #pragma once
-#include <cstdint>
-#include <concepts>
+#include <sdk/Predefine.hpp>
 #include <entt/entt.hpp>
 
 struct EntityId {

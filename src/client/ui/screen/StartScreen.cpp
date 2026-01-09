@@ -25,7 +25,7 @@ void StartScreen::render() {
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoBackground;
 
-    if (ImGui::Begin("##play_button", nullptr, flags)) {
+    /*if (ImGui::Begin("##play_button", nullptr, flags)) {
         if (ImGui::Button("Play", ImVec2(200, 70))) {
             SceneFactory* sceneFactory = GameContext::clientInstance->getSceneFactory();
             ISceneStack* sceneStack = GameContext::clientInstance->getClientSceneStack().value;
@@ -33,7 +33,7 @@ void StartScreen::render() {
         }
 
         ImGui::End();
-    }
+    }*/
 
     ImGui::PopStyleVar(2);
     ImGui::PopStyleColor(4);

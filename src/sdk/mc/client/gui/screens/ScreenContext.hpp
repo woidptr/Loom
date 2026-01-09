@@ -4,11 +4,11 @@
 
 class ScreenContext {
 public:
-	// $padding(0xA7);
+	$padding(0xA7);
 
-	// GuiData* guiData;
+	GuiData* guiData;
 
-	$field(GuiData*, guiData);
+	// $field(GuiData*, guiData);
 	$field(Tessellator*, tessellator);
 
 	// $padding(0x8);

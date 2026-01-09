@@ -1,8 +1,10 @@
-#include <Windows.h>
-#include "client/Client.hpp"
-#include "core/Logger.hpp"
-#include <libhat/scanner.hpp>
 #include <format>
+#include <Windows.h>
+#include <client/Client.hpp>
+#include <core/Logger.hpp>
+#include <core/Memory.hpp>
+#include <libhat/scanner.hpp>
+#include <core/FakeImports.hpp>
 
 void init(HMODULE hModule) {
     Logger::init();
@@ -14,6 +16,12 @@ void init(HMODULE hModule) {
 
         FreeLibraryAndExitThread(hModule, 0);
     }
+
+    fi::FakeImportConfig::set_config({
+        .mock_dll_name = "mcapi.dll",
+        .resolve_address = Memory::ResolveAddress,
+    });
+    fi::load_all_imports();
 
     Client::construct();
 }

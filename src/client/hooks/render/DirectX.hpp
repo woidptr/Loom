@@ -8,27 +8,27 @@
 
 struct PresentHookTag {};
 
-class PresentHook : public Hook<PresentHookTag, HRESULT(IDXGISwapChain3*, UINT, UINT)> {
+class PresentHook : public InlineHook<PresentHookTag, HRESULT(IDXGISwapChain3*, UINT, UINT)> {
 public:
-    PresentHook() : Hook((uintptr_t)kiero::getMethod<&IDXGISwapChain3::Present>()) {
+    PresentHook() : InlineHook((uintptr_t)kiero::getMethod<&IDXGISwapChain3::Present>()) {
         this->hook();
     }
 };
 
 struct ExecuteCommandListHookTag {};
 
-class ExecuteCommandListHook : public Hook<ExecuteCommandListHookTag, void(ID3D12CommandQueue*, UINT, ID3D12CommandList* const*)> {
+class ExecuteCommandListHook : public InlineHook<ExecuteCommandListHookTag, void(ID3D12CommandQueue*, UINT, ID3D12CommandList* const*)> {
 public:
-    ExecuteCommandListHook() : Hook((uintptr_t)kiero::getMethod<&ID3D12CommandQueue::ExecuteCommandLists>()) {
+    ExecuteCommandListHook() : InlineHook((uintptr_t)kiero::getMethod<&ID3D12CommandQueue::ExecuteCommandLists>()) {
         this->hook();
     }
 };
 
 struct ResizeBuffersHookTag {};
 
-class ResizeBuffersHook : public Hook<ResizeBuffersHookTag, HRESULT(IDXGISwapChain3*, UINT, UINT, UINT, DXGI_FORMAT, UINT)> {
+class ResizeBuffersHook : public InlineHook<ResizeBuffersHookTag, HRESULT(IDXGISwapChain3*, UINT, UINT, UINT, DXGI_FORMAT, UINT)> {
 public:
-    ResizeBuffersHook() : Hook((uintptr_t)kiero::getMethod<&IDXGISwapChain3::ResizeBuffers>()) {
+    ResizeBuffersHook() : InlineHook((uintptr_t)kiero::getMethod<&IDXGISwapChain3::ResizeBuffers>()) {
         this->hook();
     }
 };

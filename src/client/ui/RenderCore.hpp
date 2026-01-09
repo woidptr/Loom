@@ -16,18 +16,19 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 $load_asset(fonts_Arimo_Medium_ttf);
 
-class UIRender {
+class RenderCore {
 private:
-    using DirectXDrawCallback = std::function<void()>;
+    using ImGuiDrawCallback = std::function<void()>;
 private:
-    bool test = false;
     ID3D12CommandQueue* cmdQueue = nullptr;
     std::unique_ptr<IImguiRenderer> renderer = nullptr;
-    std::vector<DirectXDrawCallback> drawCallbacks;
+    std::vector<ImGuiDrawCallback> imguiDrawCallbacks;
 public:
-    UIRender();
+    RenderCore();
 
     void loadFonts();
+
+    void registerImGuiDrawCallback(ImGuiDrawCallback&& fn);
 
     void keyboardCallback(int16_t key, bool isDown);
     void setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx);

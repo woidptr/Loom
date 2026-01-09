@@ -7,9 +7,9 @@
 
 struct RenderMeshHookTag {};
 
-class RenderMeshHook : public Hook<RenderMeshHookTag, void(ScreenContext*, Tessellator*, MaterialPtr*)> {
+class RenderMeshHook : public InlineHook<RenderMeshHookTag, void(ScreenContext*, Tessellator*, MaterialPtr*)> {
 public:
-    RenderMeshHook() : Hook($get_signature("MeshHelpers::renderMeshImmediately")) {
+    RenderMeshHook() : InlineHook($get_signature("MeshHelpers::renderMeshImmediately")) {
         this->hook();
     }
 };

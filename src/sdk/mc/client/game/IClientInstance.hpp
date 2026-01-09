@@ -20,5 +20,5 @@ public:
 	$virtual_function(SceneFactory*, getSceneFactory, $get_index("IClientInstance$$getSceneFactory"));
 	// $virtual_function(NotNullNonOwnerPtr<ISceneStack>, getClientSceneStack, $get_index("IClientInstance$$getSceneFactory"));
 	NotNullNonOwnerPtr<ISceneStack> getClientSceneStack();
-	$virtual_function(std::string, getScreenName, 247);
+	$virtual_function(std::string, getTopScreenName, 138);
 };

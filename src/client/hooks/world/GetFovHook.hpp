@@ -4,9 +4,9 @@
 
 struct GetFovHookTag {};
 
-class GetFovHook : public Hook<GetFovHookTag, float(LevelRendererPlayer*, float, bool)> {
+class GetFovHook : public InlineHook<GetFovHookTag, float(LevelRendererPlayer*, float, bool)> {
 public:
-    GetFovHook() : Hook($get_signature("LevelRendererPlayer::getFov")) {
+    GetFovHook() : InlineHook($get_signature("LevelRendererPlayer::getFov")) {
         this->hook();
     }
 };

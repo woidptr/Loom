@@ -1,6 +1,6 @@
 #pragma once
+#include <sdk/Predefine.hpp>
 #include <sdk/mc/world/actor/player/Player.hpp>
-#include <core/Memory.hpp>
 
 class LocalPlayer : public Player {
 public:

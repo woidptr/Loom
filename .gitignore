@@ -363,5 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .idea/
+
+# wip things
 assets/
 signatures.json
+settings.json

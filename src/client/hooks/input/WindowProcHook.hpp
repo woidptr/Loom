@@ -4,9 +4,9 @@
 
 struct WindowProcHookTag {};
 
-class WindowProcHook : public Hook<WindowProcHookTag, LRESULT(HWND, UINT, WPARAM, LPARAM)> {
+class WindowProcHook : public InlineHook<WindowProcHookTag, LRESULT(HWND, UINT, WPARAM, LPARAM)> {
 public:
-    WindowProcHook() : Hook($get_signature("MainWindow::_windowProc")) {
+    WindowProcHook() : InlineHook($get_signature("MainWindow::_windowProc")) {
         this->hook();
     }
 };

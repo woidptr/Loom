@@ -20,17 +20,6 @@ bool ImGuiDX12::Init(IDXGISwapChain3* swapChain, void* commandQueue) {
         DXGI_SWAP_CHAIN_DESC desc;
         swapChain->GetDesc(&desc);
 
-        D3D12_DESCRIPTOR_HEAP_DESC rtvDesc = {
-            .Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-            .NumDescriptors = 3,
-            .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-            .NodeMask = 1,
-        };
-
-        if (FAILED(device->CreateDescriptorHeap(&rtvDesc, IID_PPV_ARGS(rtvDescHeap.put())))) {
-            return false;
-        }
-
         D3D12_DESCRIPTOR_HEAP_DESC srvDesc = {
             .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
             .NumDescriptors = 1,
@@ -83,11 +72,10 @@ bool ImGuiDX12::Init(IDXGISwapChain3* swapChain, void* commandQueue) {
 }
 
 void ImGuiDX12::CleanupRenderTargets() {
-    HANDLE evt = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-    cmdQueue->Signal(fence.get(), 1);
-    fence->SetEventOnCompletion(1, evt);
-    WaitForSingleObject(evt, INFINITE);
-    CloseHandle(evt);
+    fenceValue++;
+    cmdQueue->Signal(fence.get(), fenceValue);
+    fence->SetEventOnCompletion(fenceValue, fenceEvent);
+    WaitForSingleObject(fenceEvent, INFINITE);
 
     for (FrameContext& frame : frameContext) {
         if (frame.mainRenderTargetResource) frame.mainRenderTargetResource = nullptr;
@@ -95,6 +83,8 @@ void ImGuiDX12::CleanupRenderTargets() {
     }
 
     frameContext.clear();
+
+    rtvDescHeap = nullptr;
 }
 
 void ImGuiDX12::NewFrame(IDXGISwapChain3 *swapChain) {
@@ -149,21 +139,35 @@ void ImGuiDX12::RenderDrawData(IDXGISwapChain3 *swapChain) {
 }
 
 void ImGuiDX12::OnResizePre(IDXGISwapChain3* swapChain) {
-    CleanupRenderTargets();
     ImGui_ImplDX12_InvalidateDeviceObjects();
+    CleanupRenderTargets();
+    ImGui_ImplDX12_Shutdown();
 }
 
 void ImGuiDX12::OnResizePost(IDXGISwapChain3 *swapChain) {
-    SetupRenderTargets(swapChain);
-    ImGui_ImplDX12_CreateDeviceObjects();
+    Init(swapChain, cmdQueue.get());
+    // SetupRenderTargets(swapChain);
+    // ImGui_ImplDX12_CreateDeviceObjects();
 }
 
 void ImGuiDX12::SetupRenderTargets(IDXGISwapChain3* swapChain) {
     DXGI_SWAP_CHAIN_DESC desc = {};
     swapChain->GetDesc(&desc);
+
     bufferCount = desc.BufferCount;
     frameContext.clear();
+    frameFenceValues.clear();
     frameContext.resize(bufferCount);
+    frameFenceValues.resize(bufferCount, 0);
+
+    D3D12_DESCRIPTOR_HEAP_DESC rtvDesc = {
+        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
+        .NumDescriptors = desc.BufferCount,
+        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
+        .NodeMask = 1,
+    };
+
+    device->CreateDescriptorHeap(&rtvDesc, IID_PPV_ARGS(rtvDescHeap.put()));
 
     UINT rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvDescHeap->GetCPUDescriptorHandleForHeapStart();

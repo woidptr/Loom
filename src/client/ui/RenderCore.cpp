@@ -1,4 +1,4 @@
-#include "UIRender.hpp"
+#include "RenderCore.hpp"
 
 #include <client/Client.hpp>
 #include <imgui_internal.h>
@@ -6,7 +6,7 @@
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
 #include <sdk/mc/client/gui/screens/SceneFactory.hpp>
 
-UIRender::UIRender() {
+RenderCore::RenderCore() {
     Hooks::windowProcHook->registerReturnCallback(
         [&](CallbackContext& cbCtx, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> std::optional<LRESULT> {
             ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
@@ -55,7 +55,7 @@ UIRender::UIRender() {
     );
 }
 
-void UIRender::loadFonts() {
+void RenderCore::loadFonts() {
     ImGuiIO& io = ImGui::GetIO();
     const Asset arimoFont = $get_asset(fonts_Arimo_Medium_ttf);
 
@@ -66,9 +66,13 @@ void UIRender::loadFonts() {
     );
 }
 
-void UIRender::keyboardCallback(int16_t key, bool isDown) {
+void RenderCore::registerImGuiDrawCallback(ImGuiDrawCallback&& fn) {
+    imguiDrawCallbacks.emplace_back(std::forward<ImGuiDrawCallback>(fn));
+}
+
+void RenderCore::keyboardCallback(int16_t key, bool isDown) {
     if (key == 'L' && !isDown) {
-        if (!ScreenManager::getCurrentScreen() && GameContext::clientInstance->getScreenName() == "hud_screen") {
+        if (!ScreenManager::getCurrentScreen() && GameContext::clientInstance->getTopScreenName() == "hud_screen") {
             SceneFactory* sceneFactory = GameContext::clientInstance->getSceneFactory();
             ISceneStack* sceneStack = GameContext::clientInstance->getClientSceneStack().value;
             sceneStack->pushScreen(sceneFactory->createPauseScreen(), false);
@@ -80,9 +84,9 @@ void UIRender::keyboardCallback(int16_t key, bool isDown) {
         // $log_debug("Check: 0x{:X}", $get_address("SceneFactory::createPauseScreen"));
         /*auto* mic = GameContext::localPlayer->mEntityContext.tryGetComponent<MoveInputComponent>();
         mic->mInputState.mSprintDown = true;*/
-        test = !test;
         ToastManager::addToast("Test", 3.0f);
-        $log_debug("Current screen name: {}", GameContext::clientInstance->getScreenName());
+        std::string name = GameContext::clientInstance->getTopScreenName();
+        $log_debug("Screen name: {}", name);
     }
 
     if (key == VK_ESCAPE && !isDown) {
@@ -90,7 +94,7 @@ void UIRender::keyboardCallback(int16_t key, bool isDown) {
     }
 }
 
-void UIRender::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
+void RenderCore::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
     /*ResourceLocation rl("C:\\Users\\firel\\Downloads\\test.png", ResourceFileSystem::Raw);
 
     mce::TexturePtr texture = renderCtx->getTexture(rl, true);
@@ -113,13 +117,9 @@ void UIRender::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screen
     if (ScreenManager::getCurrentScreen()) {
         cbCtx.cancel();
     }
-
-    if (test) {
-        cbCtx.cancel();
-    }
 }
 
-void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
+void RenderCore::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
     if (!renderer) {
         ID3D12Device5* d3d12Device5 = nullptr;
         ID3D11Device* d3d11Device = nullptr;
@@ -134,6 +134,7 @@ void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
 
         if (renderer) {
             if (!renderer->Init(swapChain, cmdQueue)) {
+                renderer.reset();
                 $log_error("Failed to init renderer");
             }
         }
@@ -143,7 +144,7 @@ void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
         renderer->NewFrame(swapChain);
         ImGui::NewFrame();
 
-        for (DirectXDrawCallback& cb : drawCallbacks) {
+        for (ImGuiDrawCallback& cb : imguiDrawCallbacks) {
             cb();
         }
 
@@ -155,13 +156,13 @@ void UIRender::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
     }
 }
 
-void UIRender::executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList) {
+void RenderCore::executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList) {
     if (!cmdQueue) {
         cmdQueue = commandQueue;
     }
 }
 
-void UIRender::resizeBuffersHandler() {
+void RenderCore::resizeBuffersHandler() {
     Hooks::resizeBuffersHook->registerCallbackBeforeOriginal(
         [&](CallbackContext& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2, UINT a3, DXGI_FORMAT format, UINT a4) {
             renderer->OnResizePre(swapChain);

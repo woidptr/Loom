@@ -31,6 +31,8 @@ add_compile_definitions(
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE ENTT_PRETTY_FUNCTION=__FUNCSIG__)
+
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM.cmake")
@@ -50,7 +52,8 @@ CPMAddPackage("gh:BasedInc/libhat@0.9.0")
 CPMAddPackage("gh:cursey/safetyhook@0.6.9")
 CPMAddPackage("gh:nlohmann/json@3.12.0")
 CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
-CPMAddPackage("gh:woidptr/kawa_meta#19f188ceda374714ac788e52f94e7f663b1cf43d")
+CPMAddPackage("gh:superPuero/kawa_core#a04c1012a9e32bb1472d2fc92fcf2efb51b84793")
+# CPMAddPackage("gh:corrosion-rs/corrosion@0.6.0")
 CPMAddPackage(
     URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
     OPTIONS
@@ -58,22 +61,14 @@ CPMAddPackage(
         "KIERO_INCLUDE_D3D12 ON"
         "KIERO_BUILD_EXAMPLES OFF"
 )
-
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json kawa_meta::kawa_meta)
-
-include(FetchContent)
-
-FetchContent_Declare(
-    imgui
-    GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG        v1.92.5
+CPMAddPackage(
+    NAME imgui
+    GITHUB_REPOSITORY ocornut/imgui
+    GIT_TAG v1.92.5
 )
 
-FetchContent_GetProperties(imgui)
-if(NOT imgui_POPULATED)
-    FetchContent_Populate(imgui)
-
-    add_library(imgui)
+if (NOT TARGET imgui)
+    add_library(imgui STATIC)
 
     target_sources(imgui PRIVATE
         ${imgui_SOURCE_DIR}/imgui.cpp
@@ -93,9 +88,11 @@ if(NOT imgui_POPULATED)
     )
 
     target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
-endif()
+endif ()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
+# corrosion_import_crate(MANIFEST_PATH utils/config)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json kawa_core imgui Dbghelp)
 
 function(ADD_RESOURCES out_var)
     set(result)
@@ -120,3 +117,17 @@ add_resources(SIGNATURES signatures.json)
 
 target_sources(${PROJECT_NAME} PRIVATE ${EMBEDDED_RESOURCES})
 target_sources(${PROJECT_NAME} PRIVATE ${SIGNATURES})
+
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib
+    COMMAND lib /DEF:${CMAKE_CURRENT_SOURCE_DIR}/import.def /OUT:${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib /MACHINE:x64
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/import.def
+)
+
+add_custom_target(RefLibGen DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib)
+add_library(RefLib UNKNOWN IMPORTED)
+set_property(TARGET RefLib PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib)
+add_dependencies(RefLib RefLibGen)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE RefLib)
+
+target_link_options(${PROJECT_NAME} PRIVATE "/DELAYLOAD:mcapi.dll")

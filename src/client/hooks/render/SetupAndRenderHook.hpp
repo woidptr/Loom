@@ -6,9 +6,9 @@
 
 struct SetupAndRenderHookTag {};
 
-class SetupAndRenderHook : public Hook<SetupAndRenderHookTag, void(ScreenView*, MinecraftUIRenderContext*)> {
+class SetupAndRenderHook : public InlineHook<SetupAndRenderHookTag, void(ScreenView*, MinecraftUIRenderContext*)> {
 public:
-    SetupAndRenderHook() : Hook($get_signature("ScreenView::setupAndRender")) {
+    SetupAndRenderHook() : InlineHook($get_signature("ScreenView::setupAndRender")) {
         this->hook();
     }
 };

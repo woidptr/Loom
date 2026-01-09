@@ -3,9 +3,9 @@
 
 struct GetGammaHookTag {};
 
-class GetGammaHook : public Hook<GetGammaHookTag, float(void*)> {
+class GetGammaHook : public InlineHook<GetGammaHookTag, float(void*)> {
 public:
-    GetGammaHook() : Hook($get_signature("Options::getGamma")) {
+    GetGammaHook() : InlineHook($get_signature("Options::getGamma")) {
         this->hook();
     }
 };

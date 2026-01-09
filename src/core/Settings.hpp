@@ -1,4 +1,6 @@
 #pragma once
+#include <fstream>
+#include <core/FileManager.hpp>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -49,6 +51,28 @@ public:
 
         return j;
     }
+};
+
+struct ModuleSetting {
+    bool enabled;
+    json settings;
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ModuleSetting, enabled, settings);
+};
+
+struct RootSettings {
+    std::unordered_map<std::string, ModuleSetting> modules;
+};
+
+class SettingsManager {
+private:
+    void* config;
+public:
+    SettingsManager() {}
+
+    void get() {}
+    void set() {}
+    void save() {}
 };
 
 class Settings {

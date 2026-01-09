@@ -36,7 +36,7 @@ Client::Client() {
     Hooks::resizeBuffersHook = std::make_unique<ResizeBuffersHook>();
 
     // ui
-    uiRender = std::make_unique<UIRender>();
+    uiRender = new RenderCore();
 
     initModules();
 
@@ -44,6 +44,8 @@ Client::Client() {
 }
 
 Client::~Client() {
+    delete uiRender;
+
     for (Module* mod : modules) {
         delete mod;
     }
@@ -65,6 +67,10 @@ void Client::destruct() {
 
 Client* Client::getInstance() {
     return instance;
+}
+
+RenderCore* Client::getUIRender() {
+    return uiRender;
 }
 
 void Client::initModules() {

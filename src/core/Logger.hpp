@@ -41,6 +41,26 @@ private:
     void log(LogLevel level, std::format_string<Args...> msg, Args&&... args) {
         std::lock_guard<std::mutex> lock(queueMutex);
 
+        std::string logLevel;
+
+        switch (level) {
+        case LogLevel::Debug:
+            logLevel = "DEBUG";
+            break;
+        case LogLevel::Info:
+            logLevel = "INFO";
+            break;
+        case LogLevel::Warning:
+            logLevel = "WARNING";
+            break;
+        case LogLevel::Error:
+            logLevel = "ERROR";
+            break;
+        case LogLevel::Critical:
+            logLevel = "CRITICAL";
+            break;
+        }
+
         std::string message = std::format(
             "[{}] [Loom] [{}]: {}\n",
             std::format(
@@ -50,7 +70,7 @@ private:
                     std::chrono::system_clock::now()
                 }
             ),
-            "DEBUG",
+            logLevel,
             std::format(msg, std::forward<Args>(args)...)
         );
 

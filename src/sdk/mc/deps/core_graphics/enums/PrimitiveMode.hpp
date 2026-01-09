@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include <sdk/Predefine.hpp>
 
 namespace mce {
 	enum class PrimitiveMode : uint8_t {
