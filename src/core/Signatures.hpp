@@ -6,8 +6,6 @@
 #include <core/Asset.hpp>
 #include <core/Logger.hpp>
 
-$load_signatures();
-
 using json = nlohmann::json;
 
 class Signature {

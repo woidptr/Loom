@@ -1,6 +1,5 @@
 #pragma once
-#include <array>
-#include <chrono>
+#include <sdk/Predefine.hpp>
 #include <sdk/mc/deps/ecs/Entity.hpp>
 #include <sdk/mc/deps/core/math/Vec2.hpp>
 #include <sdk/mc/deps/core/math/Vec3.hpp>
@@ -61,7 +60,8 @@ public:
         IsRotControlledByMoveDirection = 10,
         Count = 11,
     };
-
+public:
+    static constexpr hat::fixed_string type_name = "struct MoveInputComponent";
 public:
     MoveInputState mInputState;
     MoveInputState mRawInputState;

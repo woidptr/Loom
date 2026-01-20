@@ -1,5 +1,5 @@
 #pragma once
-#include <algorithm>
+/*#include <algorithm>
 #include "IScreen.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -25,38 +25,63 @@ public:
         ImVec2 p_max = ImVec2(p_min.x + cardSize.x, p_min.y + cardSize.y);
         ImRect totalRect(p_min, p_max);
 
-        float bottomButtonHeight = 40.0f; // Height of the green "ENABLED" area
-        float topAreaHeight = cardSize.y - bottomButtonHeight;
+        float bottomRowHeight = 40.0f;
+        float topAreaHeight = cardSize.y - bottomRowHeight;
         float cardRounding = 12.0f;
 
-        // Define the split rectangles
+        // 1. Top Area (Content)
         ImRect topRect(p_min, ImVec2(p_max.x, p_min.y + topAreaHeight));
-        ImRect bottomRect(ImVec2(p_min.x, p_max.y - bottomButtonHeight), p_max);
+
+        // 2. Bottom Area Split
+        // We make the settings button a square (width = height)
+        float settingsBtnWidth = bottomRowHeight;
+        float enableBtnWidth = cardSize.x - settingsBtnWidth;
+
+        // Left side: Enable Button
+        ImRect enableRect(
+            ImVec2(p_min.x, p_max.y - bottomRowHeight),
+            ImVec2(p_min.x + enableBtnWidth, p_max.y)
+        );
+
+        // Right side: Settings Button
+        ImRect settingsRect(
+            ImVec2(p_min.x + enableBtnWidth, p_max.y - bottomRowHeight),
+            p_max
+        );
 
         // --- IDs for interactions ---
         ImGuiID topID = window->GetID((mod->getName() + "_top").c_str());
-        ImGuiID bottomID = window->GetID((mod->getName() + "_bottom").c_str());
+        ImGuiID enableID = window->GetID((mod->getName() + "_enable").c_str());
+        ImGuiID settingsID = window->GetID((mod->getName() + "_settings").c_str());
 
         // ========================================================
         // Interaction Logic (Invisible Buttons)
         // ========================================================
 
-        // 1. Top Area Interaction (Click to go to options)
+        // 1. Top Area (Optional: Dragging or Selecting?)
+        // Leaving this empty or generic since settings moved to bottom
         ImGui::SetCursorScreenPos(topRect.Min);
         if (ImGui::InvisibleButton(("##" + mod->getName() + "_top_btn").c_str(), topRect.GetSize())) {
-            // Logic to open settings screen goes here
-            $log_info("Opened settings for: ", mod->getName());
+            // Optional: Select module logic
         }
         bool topHovered = ImGui::IsItemHovered();
-        bool topActive = ImGui::IsItemActive();
 
-        // 2. Bottom Area Interaction (Click to toggle enable)
-        ImGui::SetCursorScreenPos(bottomRect.Min);
-        if (ImGui::InvisibleButton(("##" + mod->getName() + "_bottom_btn").c_str(), bottomRect.GetSize())) {
+        // 2. Enable Button Interaction (Left)
+        ImGui::SetCursorScreenPos(enableRect.Min);
+        if (ImGui::InvisibleButton(("##" + mod->getName() + "_enable_btn").c_str(), enableRect.GetSize())) {
             mod->enabled = !mod->enabled;
         }
-        bool bottomHovered = ImGui::IsItemHovered();
-        bool bottomActive = ImGui::IsItemActive();
+        bool enableHovered = ImGui::IsItemHovered();
+        bool enableActive = ImGui::IsItemActive();
+
+        // 3. Settings Button Interaction (Right)
+        ImGui::SetCursorScreenPos(settingsRect.Min);
+        if (ImGui::InvisibleButton(("##" + mod->getName() + "_settings_btn").c_str(), settingsRect.GetSize())) {
+            // Logic to open settings screen moved here
+            $log_info("Opened settings for: {}", mod->getName());
+        }
+        bool settingsHovered = ImGui::IsItemHovered();
+        bool settingsActive = ImGui::IsItemActive();
 
 
         // ========================================================
@@ -64,132 +89,70 @@ public:
         // ========================================================
 
         // --- 1. Draw Main Card Background & Border ---
-        ImU32 cardBgCol = IM_COL32(30, 30, 35, 255); // Dark background
-        ImU32 borderColor = IM_COL32(60, 60, 65, 255); // Subtle lighter border
+        ImU32 cardBgCol = IM_COL32(30, 30, 35, 255);
+        ImU32 borderColor = IM_COL32(60, 60, 65, 255);
 
-        // Draw overall background with rounding on all corners
         draw_list->AddRectFilled(totalRect.Min, totalRect.Max, cardBgCol, cardRounding);
 
-        // Optional: Visual feedback when hovering top area
         if (topHovered) {
             draw_list->AddRectFilled(topRect.Min, topRect.Max, IM_COL32(255, 255, 255, 15), cardRounding, ImDrawFlags_RoundCornersTop);
         }
 
         // --- 2. Draw Top Content (Icon & Text) ---
-        // Center points for top area
         ImVec2 topCenter = topRect.GetCenter();
-
-        // B. Draw Module Name
         ImVec2 textSize = ImGui::CalcTextSize(mod->getName().c_str());
-        ImVec2 textPos = ImVec2(topCenter.x - textSize.x * 0.5f, topCenter.y + 15.0f); // Shift down below icon
+        ImVec2 textPos = ImVec2(topCenter.x - textSize.x * 0.5f, topCenter.y + 15.0f);
         draw_list->AddText(textPos, IM_COL32(255, 255, 255, 255), mod->getName().c_str());
 
-        // --- 3. Draw Separator Line ---
-        draw_list->AddLine(bottomRect.Min, ImVec2(bottomRect.Max.x, bottomRect.Min.y), IM_COL32(50, 50, 55, 255), 1.0f);
+        // --- 3. Draw Separator Line (Horizontal) ---
+        draw_list->AddLine(ImVec2(p_min.x, enableRect.Min.y), ImVec2(p_max.x, enableRect.Min.y), IM_COL32(50, 50, 55, 255), 1.0f);
 
-        // --- 4. Draw Bottom Button Area ---
-        ImU32 bottomBgCol;
-        ImU32 bottomTextCol = IM_COL32(255, 255, 255, 255);
+        // --- 4. Draw Enable Button (Left) ---
+        ImU32 enableBgCol;
+        ImU32 enableTextCol = IM_COL32(255, 255, 255, 255);
         const char* statusText;
 
         if (mod->enabled) {
-            // Green color when enabled
-            bottomBgCol = bottomActive ? IM_COL32(35, 130, 75, 255) : IM_COL32(46, 174, 98, 255);
+            enableBgCol = enableActive ? IM_COL32(35, 130, 75, 255) : IM_COL32(46, 174, 98, 255);
             statusText = "ENABLED";
         }
         else {
-            // Dark gray/red color when disabled
-            bottomBgCol = bottomActive ? IM_COL32(50, 50, 50, 255) : IM_COL32(70, 70, 70, 255);
+            enableBgCol = enableActive ? IM_COL32(50, 50, 50, 255) : IM_COL32(70, 70, 70, 255);
             statusText = "DISABLED";
-            bottomTextCol = IM_COL32(180, 180, 180, 255);
+            enableTextCol = IM_COL32(180, 180, 180, 255);
         }
 
-        // IMPORTANT: Draw rect with rounding ONLY on the bottom corners so it fits perfectly.
-        draw_list->AddRectFilled(bottomRect.Min, bottomRect.Max, bottomBgCol, cardRounding, ImDrawFlags_RoundCornersBottom);
+        // ROUNDING: Only Bottom Left corner
+        draw_list->AddRectFilled(enableRect.Min, enableRect.Max, enableBgCol, cardRounding, ImDrawFlags_RoundCornersBottomLeft);
 
-        // Draw status text centered in bottom area
         ImVec2 statusTextSize = ImGui::CalcTextSize(statusText);
-        ImVec2 bottomCenter = bottomRect.GetCenter();
-        draw_list->AddText(ImVec2(bottomCenter.x - statusTextSize.x * 0.5f, bottomCenter.y - statusTextSize.y * 0.5f), bottomTextCol, statusText);
+        ImVec2 enableCenter = enableRect.GetCenter();
+        draw_list->AddText(ImVec2(enableCenter.x - statusTextSize.x * 0.5f, enableCenter.y - statusTextSize.y * 0.5f), enableTextCol, statusText);
 
-        // --- 5. Draw Final Outer Border ---
-        // drawn last to overlay everything nicely
+        // --- 5. Draw Settings Button (Right) ---
+        // Slightly lighter gray than card bg, or highlighted if hovered
+        ImU32 settingsBgCol = settingsActive ? IM_COL32(70, 70, 75, 255) : (settingsHovered ? IM_COL32(60, 60, 65, 255) : IM_COL32(45, 45, 50, 255));
+
+        // ROUNDING: Only Bottom Right corner
+        draw_list->AddRectFilled(settingsRect.Min, settingsRect.Max, settingsBgCol, cardRounding, ImDrawFlags_RoundCornersBottomRight);
+
+        // Draw Gear/Settings Text or Icon
+        const char* settingsIcon = "..."; // Use or specific icon font if available
+        ImVec2 iconSize = ImGui::CalcTextSize(settingsIcon);
+        ImVec2 settingsCenter = settingsRect.GetCenter();
+        draw_list->AddText(ImVec2(settingsCenter.x - iconSize.x * 0.5f, settingsCenter.y - iconSize.y * 0.5f), IM_COL32(200, 200, 200, 255), settingsIcon);
+
+        // --- 6. Draw Vertical Separator Line ---
+        // Optional: Draw a line between Enable and Settings buttons
+        draw_list->AddLine(settingsRect.Min, ImVec2(settingsRect.Min.x, settingsRect.Max.y), IM_COL32(30, 30, 35, 100), 1.0f);
+
+        // --- 7. Draw Final Outer Border ---
         draw_list->AddRect(totalRect.Min, totalRect.Max, borderColor, cardRounding, 0, 1.5f);
 
-        // Advance cursor space so the next item doesn't overlap
+        // Advance cursor
         ImGui::SetCursorScreenPos(p_max);
-        // Add a little padding below the card
         ImGui::Dummy(ImVec2(0, 10));
     }
 
-    void DrawModCard(Module* mod, float width, float height) {
-        ImGui::PushID(mod->getName().c_str());
-
-        // -- Style Colors for this card --
-        ImVec4 bgCol = ImVec4(0.18f, 0.18f, 0.18f, 1.0f);        // Dark Card Background
-        ImVec4 btnColEnv = ImVec4(0.26f, 0.59f, 0.28f, 1.0f);    // Green (Enabled)
-        ImVec4 btnColDis = ImVec4(0.60f, 0.20f, 0.20f, 1.0f);    // Red (Disabled)
-        ImVec4 hoverCol = ImVec4(0.22f, 0.22f, 0.22f, 1.0f);     // Card Hover
-
-        // -- Background Group --
-        ImGui::BeginGroup();
-
-        // Draw Card Background
-        ImDrawList* drawList = ImGui::GetWindowDrawList();
-        ImVec2 p = ImGui::GetCursorScreenPos();
-        drawList->AddRectFilled(p, ImVec2(p.x + width, p.y + height), ImGui::GetColorU32(bgCol), 8.0f);
-
-        // -- 1. Icon Area (Top 60% of card) --
-        // Since we don't have textures, we simulate an "Icon" with large text or a shape
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 25.0f); // Padding top
-
-        // Center the fake icon text
-        float fontScale = 2.0f; // Make fake icon big
-        ImGui::SetWindowFontScale(fontScale);
-        float textWidth = ImGui::CalcTextSize(mod->getName().c_str()).x;
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - textWidth) * 0.5f);
-        ImGui::TextColored(ImVec4(1, 1, 1, 0.9f), "%s", mod->getName().c_str());
-        ImGui::SetWindowFontScale(1.0f); // Reset scale
-
-        // Draw Real Name below icon
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.0f);
-        float nameWidth = ImGui::CalcTextSize(mod->getName().c_str()).x;
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - nameWidth) * 0.5f - (width * 0.05f)); // rough center reset
-        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "%s", mod->getName().c_str());
-
-        // -- 2. Action Bar (Bottom of card) --
-        // We manually position the cursor to the bottom area
-        float bottomBarHeight = 35.0f;
-        ImGui::SetCursorScreenPos(ImVec2(p.x + 5, p.y + height - bottomBarHeight - 5));
-
-        // 'Enabled' Toggle Button (Takes up 75% width)
-        float toggleWidth = (width - 15) * 0.75f;
-
-        if (mod->enabled) {
-            ImGui::PushStyleColor(ImGuiCol_Button, btnColEnv);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.65f, 0.3f, 1.0f));
-        }
-        else {
-            ImGui::PushStyleColor(ImGuiCol_Button, btnColDis);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.65f, 0.25f, 0.25f, 1.0f));
-        }
-
-        if (ImGui::Button(mod->enabled ? "ENABLED" : "DISABLED", ImVec2(toggleWidth, bottomBarHeight))) {
-            mod->enabled = !mod->enabled;
-        }
-        ImGui::PopStyleColor(2);
-
-        // Settings Button (Takes up remaining width)
-        ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.12f, 0.12f, 0.12f, 1.0f)); // Darker grey for settings
-        if (ImGui::Button("*", ImVec2((width - 15) * 0.25f, bottomBarHeight))) {
-            // Open Settings Logic Here
-        }
-        ImGui::PopStyleColor();
-
-        ImGui::EndGroup();
-        ImGui::PopID();
-    }
-
     virtual void render() override;
-};
+};*/

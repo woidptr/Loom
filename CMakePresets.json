@@ -7,9 +7,6 @@
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
-            // "cacheVariables": {
-                // "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-            // },
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -36,19 +33,19 @@
         },
         {
             "name": "x64-debug-msvc",
-            "displayName": "x64 Debug (MSVC)",
+            "displayName": "Debug (MSVC)",
             "inherits": "cl-base",
             "architecture": {
                 "value": "x64",
                 "strategy": "external"
             },
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         },
         {
             "name": "x64-release-msvc",
-            "displayName": "x64 Release (MSVC)",
+            "displayName": "Release (MSVC)",
             "inherits": "x64-debug-msvc",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
@@ -56,19 +53,19 @@
         },
         {
             "name": "x64-debug-clang-cl",
-            "displayName": "x64 Debug (clang-cl)",
+            "displayName": "Debug (clang-cl)",
             "inherits": "clang-cl-base",
             "architecture": {
                 "value": "x64",
                 "strategy": "external"
             },
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         },
         {
             "name": "x64-release-clang-cl",
-            "displayName": "x64 Release (clang-cl)",
+            "displayName": "Release (clang-cl)",
             "inherits": "x64-debug-clang-cl",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"

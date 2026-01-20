@@ -6,6 +6,8 @@ Module::~Module() {
     for (Setting* setting : settings) {
         delete setting;
     }
+
+    listeners.clear();
 }
 
 std::string Module::getName() {

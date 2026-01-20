@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include <core/Logger.hpp>
 
-void CustomizationScreen::render() {
+/*void CustomizationScreen::render() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 center = viewport->GetCenter();
 
@@ -37,4 +37,4 @@ void CustomizationScreen::render() {
 
     ImGui::PopStyleVar(1);
     ImGui::PopStyleColor(3);
-}
+}*/

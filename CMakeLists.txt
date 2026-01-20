@@ -7,33 +7,42 @@ if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
     message(FATAL_ERROR "This project requires 64-bit Windows (x64)")
 endif()
 
-# Enable Hot Reload for MSVC compilers if supported.
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
+set(GENERATED_IMPORTS "${CMAKE_CURRENT_SOURCE_DIR}/import.def")
+set(ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+set(SIGNATURES_FILE "${CMAKE_CURRENT_SOURCE_DIR}/signatures.json")
 
 add_compile_definitions(NOMINMAX)
 
-if (MSVC)
-    add_compile_options(/EHsc)
-    add_compile_options(/D_ITERATOR_DEBUG_LEVEL=0)
-endif()
-
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
-# set(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
-
-add_compile_definitions(
-    _ITERATOR_DEBUG_LEVEL=0
-    _HAS_ITERATOR_DEBUGGING=0
-)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE ENTT_PRETTY_FUNCTION=__FUNCSIG__)
-
 target_include_directories(${PROJECT_NAME} PRIVATE src)
+
+set(IS_MSVC "$<CXX_COMPILER_ID:MSVC>")
+set(IS_CLANG "$<CXX_COMPILER_ID:Clang>")
+set(IS_RELEASE "$<OR:$<CONFIG:Release>,$<CONFIG:MinSizeRel>>")
+
+target_compile_options(${PROJECT_NAME} PRIVATE
+    # Disable rtti
+    $<$<BOOL:${IS_MSVC}>:/GR->
+    $<$<BOOL:${IS_CLANG}>:/clang:-fno-rtti>
+
+    # MSVC
+    # Disable exceptions for release
+    $<$<AND:${IS_MSVC},${IS_RELEASE}>:/EHs-c->
+    $<$<AND:${IS_MSVC},$<NOT:${IS_RELEASE}>>:/EHsc>
+
+    # Clang / clang-cl / GCC
+    # Disable exceptions for release
+    $<$<AND:${IS_CLANG},${IS_RELEASE}>:/clang:-fno-exceptions>
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Release>:_HAS_EXCEPTIONS=0>
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:_HAS_EXCEPTIONS=0>)
 
 set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM.cmake")
 
@@ -49,22 +58,18 @@ endif ()
 include(${CPM_DOWNLOAD_LOCATION})
 
 CPMAddPackage("gh:BasedInc/libhat@0.9.0")
+CPMAddPackage("gh:ocornut/imgui@1.92.5")
 CPMAddPackage("gh:cursey/safetyhook@0.6.9")
 CPMAddPackage("gh:nlohmann/json@3.12.0")
 CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
 CPMAddPackage("gh:superPuero/kawa_core#a04c1012a9e32bb1472d2fc92fcf2efb51b84793")
-# CPMAddPackage("gh:corrosion-rs/corrosion@0.6.0")
+CPMAddPackage("gh:corrosion-rs/corrosion@0.6.0")
 CPMAddPackage(
     URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
     OPTIONS
         "KIERO_INCLUDE_D3D11 ON"
         "KIERO_INCLUDE_D3D12 ON"
         "KIERO_BUILD_EXAMPLES OFF"
-)
-CPMAddPackage(
-    NAME imgui
-    GITHUB_REPOSITORY ocornut/imgui
-    GIT_TAG v1.92.5
 )
 
 if (NOT TARGET imgui)
@@ -90,37 +95,18 @@ if (NOT TARGET imgui)
     target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
 endif ()
 
-# corrosion_import_crate(MANIFEST_PATH utils/config)
+corrosion_import_crate(
+    MANIFEST_PATH ${CMAKE_SOURCE_DIR}/utils/linker/Cargo.toml
+)
+corrosion_set_env_vars(linker "RUST_ASSETS_DIR=${ASSETS_DIR}")
+corrosion_set_env_vars(linker "RUST_SIGNATURES_FILE=${SIGNATURES_FILE}")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT nlohmann_json kawa_core imgui Dbghelp)
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json linker)
 
-function(ADD_RESOURCES out_var)
-    set(result)
-    foreach (in_f ${ARGN})
-        file(RELATIVE_PATH src_f ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${in_f})
-        set(out_f "${PROJECT_BINARY_DIR}/${in_f}.o")
-        add_custom_command(OUTPUT ${out_f}
-            COMMAND ld.exe -r -b binary -o ${out_f} ${src_f}
-            DEPENDS ${in_f}
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMENT "Building object ${out_f}"
-            VERBATIM
-        )
-        list(APPEND result ${out_f})
-    endforeach()
-    set(${out_var} "${result}" PARENT_SCOPE)
-endfunction()
-
-file(GLOB_RECURSE RESOURCES RELATIVE ${CMAKE_CURRENT_LIST_DIR} CONFIGURE_DEPENDS "assets/*")
-add_resources(EMBEDDED_RESOURCES ${RESOURCES})
-add_resources(SIGNATURES signatures.json)
-
-target_sources(${PROJECT_NAME} PRIVATE ${EMBEDDED_RESOURCES})
-target_sources(${PROJECT_NAME} PRIVATE ${SIGNATURES})
-
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib
-    COMMAND lib /DEF:${CMAKE_CURRENT_SOURCE_DIR}/import.def /OUT:${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib /MACHINE:x64
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/import.def
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib
+    COMMAND lib /DEF:${GENERATED_IMPORTS} /OUT:${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib /MACHINE:x64
+    DEPENDS ${GENERATED_IMPORTS}
 )
 
 add_custom_target(RefLibGen DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib)

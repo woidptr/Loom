@@ -5,11 +5,11 @@
 #include <filesystem>
 
 Logger::Logger() {
-#ifndef NDEBUG
+//#ifndef NDEBUG
     AllocConsole();
     SetConsoleTitleA("Loom");
     freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-#endif
+//#endif
 
     fs::path logFilePath = FileManager::getLogsFolder() / "latest.log";
 
@@ -68,9 +68,9 @@ void Logger::processLogs() {
             logQueue.pop();
             lock.unlock();
 
-#ifndef NDEBUG
+// #ifndef NDEBUG
             std::print("{}", msg);
-#endif
+// #endif
 
             writeToFile(msg);
 

@@ -1,8 +1,5 @@
 #pragma once
-#include <client/hooks/input/WindowProcHook.hpp>
-#include <client/hooks/render/SetupAndRenderHook.hpp>
-#include <client/hooks/render/DirectX.hpp>
-#include "elements/ToastNotification.hpp"
+/*#include "elements/ToastNotification.hpp"
 #include "screen/ScreenManager.hpp"
 #include "screen/CustomizationScreen.hpp"
 #include "screen/StartScreen.hpp"
@@ -15,6 +12,12 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 $load_asset(fonts_Arimo_Medium_ttf);
+$load_asset(fonts_Montserrat_Medium_ttf);
+$load_asset(fonts_Montserrat_SemiBold_ttf);
+
+struct ImGuiFonts {
+    static inline ImFont* Montserrat = nullptr;
+};
 
 class RenderCore {
 private:
@@ -35,4 +38,4 @@ public:
     void renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2);
     void executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList);
     void resizeBuffersHandler();
-};
+};*/

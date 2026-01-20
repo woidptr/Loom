@@ -5,6 +5,16 @@
 
 using json = nlohmann::json;
 
+#define $json_intrusive(type, ...) NLOHMANN_DEFINE_TYPE_INTRUSIVE(type, __VA_ARGS__)
+#define $json_non_intrusive(type, ...) NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(type, __VA_ARGS__)
+
+struct Profile {
+    std::string name;
+    bool active;
+
+    $json_intrusive(Profile, name, active)
+};
+
 class ISetting {
 protected:
     std::string name;
@@ -57,7 +67,7 @@ struct ModuleSetting {
     bool enabled;
     json settings;
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ModuleSetting, enabled, settings);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ModuleSetting, enabled, settings)
 };
 
 struct RootSettings {

@@ -10,12 +10,7 @@ A playground for testing Minecraft Bedrock Edition native modding
 ## Signatures
 Signatures are not included in the source. You can find them yourself.
 They are loaded from the file `signatures.json` in the root directory.
-The contents look like this:
-```json
-{
-    "ClassName::function_name": "byte pattern"
-}
-```
+Rename the current `signatures.json.example` to `signatures.json` and fill in the blank spaces with the corresponding signatures.
 
 ## Building
 

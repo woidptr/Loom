@@ -12,7 +12,6 @@
 #define $get_signature(signature) SignatureRegistry::getSignature(signature)
 
 #define $get_address(signature) SignatureRegistry::getSignature(signature)->getAddress()
-// #define $get_offset(signature) *(int32_t*)$get_address(signature)
 #define $get_offset(signature) Memory::GetOffset($get_address(signature))
 #define $get_index(signature) $get_offset(signature) / 8
 
@@ -37,20 +36,6 @@ public: \
 	__declspec(property(get = get_##name, put = set_##name)) type name;
 
 #define $field(type, name) $build_access(type, name, $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*this)>>()) + "->" + #name));
-
-#define $_arg_expansion(...) __VA_ARGS__
-
-#define $virtual_function(return_type, function_name, index) \
-	return_type function_name() { \
-		using CurrentClass = std::remove_reference_t<decltype(*this)>; \
-		return Memory::CallVirtual<decltype(&CurrentClass::function_name)>(index, *this); \
-	}
-
-#define $virtual_function_args(return_type, function_name, index, args_decl, args_pass) \
-	return_type function_name args_decl { \
-		using CurrentClass = std::remove_reference_t<decltype(*this)>; \
-		return Memory::CallVirtual<decltype(&CurrentClass::function_name)>(index, *this, $_arg_expansion args_pass); \
-	}
 
 namespace Memory {
 	namespace _internal {
@@ -123,6 +108,11 @@ namespace Memory {
 
 		// 4. Call it
 		return reinterpret_cast<Fn>(funcAddress)(thisptr, args...);
+	}
+
+	template <typename T>
+	uintptr_t GetFuncAddress(T memberPtr) {
+		return std::bit_cast<uintptr_t>(memberPtr);
 	}
 
 	int32_t GetOffset(uintptr_t addr);

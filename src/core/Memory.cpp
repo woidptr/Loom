@@ -1,5 +1,4 @@
 #include "Memory.hpp"
-#include <print>
 
 int32_t Memory::GetOffset(uintptr_t addr) {
 	ZydisDecoder decoder;
@@ -45,8 +44,6 @@ uintptr_t Memory::ResolveAddress(const char* mangledName) {
 	DWORD flags = UNDNAME_NAME_ONLY;
 
 	UnDecorateSymbolName(mangledName, buffer, sizeof(buffer), flags);
-	
-	std::println("Undecorated symbol name: {}", std::string(buffer));
 
 	return $get_address(std::string(buffer));
 }

@@ -1,4 +1,4 @@
-#include "RenderCore.hpp"
+/*#include "RenderCore.hpp"
 
 #include <client/Client.hpp>
 #include <imgui_internal.h>
@@ -7,63 +7,63 @@
 #include <sdk/mc/client/gui/screens/SceneFactory.hpp>
 
 RenderCore::RenderCore() {
-    Hooks::windowProcHook->registerReturnCallback(
-        [&](CallbackContext& cbCtx, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> std::optional<LRESULT> {
-            ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-
-            switch (msg) {
-            case WM_KEYDOWN:
-                keyboardCallback((int16_t)wParam, true);
-
-                break;
-            case WM_KEYUP:
-                keyboardCallback((int16_t)wParam, false);
-
-                break;
-            }
-
-            if ((msg >= WM_KEYDOWN && msg <= WM_KEYLAST) && (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST)) {
-                if (ScreenManager::getCurrentScreen()) {
-                    return 1;
-                    // cbCtx.cancel();
-                }
-            }
-
-            return std::nullopt;
-            // Logger::info(std::format("Window proc message: {}", msg));
-        }
-    );
-
-    Hooks::presentHook->registerCallbackBeforeOriginal(
-        [&](CallbackContext& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
-            renderCallback(swapChain, a1, a2);
-        }
-    );
-
-    Hooks::executeCommandListHook->registerCallbackBeforeOriginal(
-        [&](CallbackContext& cbCtx, ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList) {
-            executeCommandListCallback(commandQueue, a1, commandList);
-        }
-    );
-
-    resizeBuffersHandler();
-
-    Hooks::setupAndRenderHook->registerCallbackBeforeOriginal(
-        [&](CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
-            setupAndRenderCallback(cbCtx, screenView, renderCtx);
-        }
-    );
+    // Hooks::windowProcHook->registerReturnCallback(
+    //     [&](CallbackContext& cbCtx, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> std::optional<LRESULT> {
+    //         ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+    //
+    //         switch (msg) {
+    //         case WM_KEYDOWN:
+    //             keyboardCallback((int16_t)wParam, true);
+    //
+    //             break;
+    //         case WM_KEYUP:
+    //             keyboardCallback((int16_t)wParam, false);
+    //
+    //             break;
+    //         }
+    //
+    //         if ((msg >= WM_KEYDOWN && msg <= WM_KEYLAST) && (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST)) {
+    //             if (ScreenManager::getCurrentScreen()) {
+    //                 return 1;
+    //                 // cbCtx.cancel();
+    //             }
+    //         }
+    //
+    //         return std::nullopt;
+    //         // Logger::info(std::format("Window proc message: {}", msg));
+    //     }
+    // );
+    //
+    // Hooks::presentHook->registerCallbackBeforeOriginal(
+    //     [&](CallbackContext& cbCtx, IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
+    //         renderCallback(swapChain, a1, a2);
+    //     }
+    // );
+    //
+    // Hooks::executeCommandListHook->registerCallbackBeforeOriginal(
+    //     [&](CallbackContext& cbCtx, ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList) {
+    //         executeCommandListCallback(commandQueue, a1, commandList);
+    //     }
+    // );
+    //
+    // resizeBuffersHandler();
+    //
+    // Hooks::setupAndRenderHook->registerCallbackBeforeOriginal(
+    //     [&](CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
+    //         setupAndRenderCallback(cbCtx, screenView, renderCtx);
+    //     }
+    // );
 }
 
 void RenderCore::loadFonts() {
     ImGuiIO& io = ImGui::GetIO();
     const Asset arimoFont = $get_asset(fonts_Arimo_Medium_ttf);
+    const Asset montserratMedium = $get_asset(fonts_Montserrat_SemiBold_ttf);
 
-    io.Fonts->AddFontFromMemoryTTF(
-        (void*)arimoFont.begin(),
-        arimoFont.size(),
-        16.0f
-    );
+    // io.Fonts->AddFontFromMemoryTTF((void*)arimoFont.begin(), arimoFont.size(), 16.0f);
+    ImGuiFonts::Montserrat = io.Fonts->AddFontFromMemoryTTF((void*)montserratMedium.begin(), montserratMedium.size(), 16.0f);
+
+    io.Fonts->Build();
 }
 
 void RenderCore::registerImGuiDrawCallback(ImGuiDrawCallback&& fn) {
@@ -83,10 +83,10 @@ void RenderCore::keyboardCallback(int16_t key, bool isDown) {
     if (key == VK_SHIFT && !isDown) {
         // $log_debug("Check: 0x{:X}", $get_address("SceneFactory::createPauseScreen"));
         /*auto* mic = GameContext::localPlayer->mEntityContext.tryGetComponent<MoveInputComponent>();
-        mic->mInputState.mSprintDown = true;*/
-        ToastManager::addToast("Test", 3.0f);
-        std::string name = GameContext::clientInstance->getTopScreenName();
-        $log_debug("Screen name: {}", name);
+        mic->mInputState.mSprintDown = true;
+        // ToastManager::addToast("Test", 3.0f);
+        // std::string name = GameContext::clientInstance->getTopScreenName();
+        // $log_debug("Screen name: {}", name);
     }
 
     if (key == VK_ESCAPE && !isDown) {
@@ -95,14 +95,14 @@ void RenderCore::keyboardCallback(int16_t key, bool isDown) {
 }
 
 void RenderCore::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx) {
-    /*ResourceLocation rl("C:\\Users\\firel\\Downloads\\test.png", ResourceFileSystem::Raw);
+    // ResourceLocation rl("textures/items/diamond_sword", ResourceFileSystem::UserPackage);
 
-    mce::TexturePtr texture = renderCtx->getTexture(rl, true);
+    // mce::TexturePtr texture = renderCtx->getTexture(rl, false);
 
-    $log_debug("Status: {}", (bool)texture.mClientTexture.get()->mIsMissingTexture);
+    // $log_debug("Status: {}", (bool)texture.mClientTexture.get()->mIsMissingTexture);
 
-    renderCtx->drawImage(texture, Vec2(50, 50), Vec2(50, 50), Vec2(0, 0), Vec2(50, 50), 0);
-    renderCtx->flushImages(mce::Color(1.f, 1.f, 1.f, 1.f), 1.f, HashedString::HashedString("ui_flush"));*/
+    // renderCtx->drawImage(texture, Vec2(50, 50), Vec2(50, 50), Vec2(0, 0), Vec2(50, 50), 0);
+    // renderCtx->flushImages(mce::Color(1.f, 1.f, 1.f, 1.f), 1.f, HashedString::HashedString("ui_texture"));
 
     // $log_debug("ScreenContext->tessellator offset: {}", $get_offset("ScreenContext->tessellator"));
 
@@ -112,7 +112,7 @@ void RenderCore::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* scre
         if (true) {
             ScreenManager::setScreen(std::make_unique<StartScreen>());
         }
-    }*/
+    }
 
     if (ScreenManager::getCurrentScreen()) {
         cbCtx.cancel();
@@ -120,40 +120,43 @@ void RenderCore::setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* scre
 }
 
 void RenderCore::renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2) {
-    if (!renderer) {
-        ID3D12Device5* d3d12Device5 = nullptr;
-        ID3D11Device* d3d11Device = nullptr;
-        if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
-            renderer = std::make_unique<ImGuiDX12>();
-            d3d12Device5->Release();
-            // d3d12Device5->RemoveDevice();
-        } else if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
-            renderer = std::make_unique<ImGuiDX11>();
-            d3d11Device->Release();
-        }
+    //if (!renderer) {
+    //    ID3D12Device5* d3d12Device5 = nullptr;
+    //    ID3D11Device* d3d11Device = nullptr;
+    //    if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
+    //        renderer = std::make_unique<ImGuiDX12>();
+    //        d3d12Device5->Release();
+    //        // d3d12Device5->RemoveDevice();
+    //    } else if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
+    //        renderer = std::make_unique<ImGuiDX11>();
+    //        d3d11Device->Release();
+    //    }
 
-        if (renderer) {
-            if (!renderer->Init(swapChain, cmdQueue)) {
-                renderer.reset();
-                $log_error("Failed to init renderer");
-            }
-        }
-    }
+    //    if (renderer) {
+    //        if (!renderer->Init(swapChain, cmdQueue)) {
+    //            renderer.reset();
+    //            $log_error("Failed to init renderer");
+    //            return;
+    //        }
+    //    }
 
-    if (renderer) {
-        renderer->NewFrame(swapChain);
-        ImGui::NewFrame();
+    //    loadFonts();
+    //}
 
-        for (ImGuiDrawCallback& cb : imguiDrawCallbacks) {
-            cb();
-        }
+    //if (renderer) {
+    //    renderer->NewFrame(swapChain);
+    //    ImGui::NewFrame();
 
-        ToastManager::renderToasts();
-        ScreenManager::render();
+    //    for (ImGuiDrawCallback& cb : imguiDrawCallbacks) {
+    //        cb();
+    //    }
 
-        ImGui::Render();
-        renderer->RenderDrawData(swapChain);
-    }
+    //    ToastManager::renderToasts();
+    //    ScreenManager::render();
+
+    //    ImGui::Render();
+    //    renderer->RenderDrawData(swapChain);
+    //}
 }
 
 void RenderCore::executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList) {
@@ -174,4 +177,4 @@ void RenderCore::resizeBuffersHandler() {
             renderer->OnResizePost(swapChain);
         }
     );
-}
+}*/

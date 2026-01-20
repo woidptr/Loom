@@ -4,6 +4,7 @@
 #include <sdk/mc/common/client/renderer/helpers/MeshHelpers.hpp>
 #include <sdk/GameContext.hpp>
 
+static mce::TexturePtr texturePtr;
 static Tessellator* tessellator;
 
 IMGUI_IMPL_API bool ImGui_ImplMC_Init(MinecraftUIRenderContext* renderCtx) {
@@ -20,7 +21,7 @@ IMGUI_IMPL_API bool ImGui_ImplMC_Init(MinecraftUIRenderContext* renderCtx) {
     int width, height, bytesPerPixel;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytesPerPixel);
 
-    mce::TexturePtr texturePtr = renderCtx->getTexture(ResourceLocation("textures/items/diamond_sword"), true);
+    texturePtr = renderCtx->getTexture(ResourceLocation("textures/items/diamond_sword"), true);
     io.Fonts->TexID = (void*)&texturePtr;
 
     return true;
@@ -65,13 +66,17 @@ IMGUI_IMPL_API void ImGui_ImplMC_RenderDrawData(ImDrawData* drawData, MinecraftU
                 tessellator->vertexUV(Vec3(v2.pos.x / scale, v2.pos.y / scale, 0.0f), Vec2(v2.uv.x, v2.uv.y));
             }
 
-            // renderCtx->saveCurrentClippingRectangle();
-            // RectangleArea rect{ cmd.ClipRect.x / scale, cmd.ClipRect.z / scale, cmd.ClipRect.y / scale, cmd.ClipRect.w / scale };
-            // renderCtx->setClippingRectangle(rect);
+            renderCtx->saveCurrentClippingRectangle();
+            RectangleArea rect{ cmd.ClipRect.x / scale, cmd.ClipRect.z / scale, cmd.ClipRect.y / scale, cmd.ClipRect.w / scale };
+            renderCtx->setClippingRectangle(rect);
 
-            MeshHelpers::renderMeshImmediately(*renderCtx->screenContext, *renderCtx->screenContext->tessellator, *GameContext::materialPtr);
+            mce::Mesh mesh = tessellator->end(Tessellator::UploadMode::Buffered, "imgui", Tessellator::SupplementaryFieldAutoGenerationMode::idk);
 
-            // renderCtx->restoreSavedClippingRectangle();
+            // mesh.renderMesh(*renderCtx->screenContext->meshContext(), *GameContext::materialPtr, texturePtr);
+
+            // MeshHelpers::renderMeshImmediately(*renderCtx->screenContext, *renderCtx->screenContext->tessellator, *GameContext::materialPtr);
+
+            renderCtx->restoreSavedClippingRectangle();
         }
     }
 }

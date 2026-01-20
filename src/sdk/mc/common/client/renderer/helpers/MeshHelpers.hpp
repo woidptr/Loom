@@ -1,10 +1,10 @@
 #pragma once
+#include <sdk/Predefine.hpp>
 #include <sdk/mc/client/gui/screens/ScreenContext.hpp>
-#include <sdk/mc/client/render/Tessellator.hpp>
-#include <sdk/mc/deps/renderer/MaterialPtr.hpp>
+
+class Tessellator;
+namespace mce { class MaterialPtr; }
 
 namespace MeshHelpers {
-    void renderMeshImmediately(ScreenContext& screenContext, Tessellator& tessellator, MaterialPtr const& material) {
-
-    }
+    MCAPI void renderMeshImmediately(ScreenContext& screenContext, Tessellator& tessellator, mce::MaterialPtr const& material);
 }

@@ -3,4 +3,6 @@
 
 void ISceneStack::pushScreen(std::shared_ptr<AbstractScene> scene, bool flush) {
     return Memory::CallVFunc<void, std::shared_ptr<AbstractScene>, bool>(20, this, scene, flush);
+
+    // return Memory::CallVirtual<decltype(&ISceneStack::pushScreen)>(20, *this, scene, flush);
 }

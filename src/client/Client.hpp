@@ -1,28 +1,13 @@
 #pragma once
 #include <vector>
 
-// hooks
-#include "hooks/input/WindowProcHook.hpp"
-#include "hooks/world/GetFovHook.hpp"
-#include "hooks/world/GetGammaHook.hpp"
-#include "hooks/world/GetTimeOfDayHook.hpp"
-#include "hooks/world/LevelTickHook.hpp"
-#include "hooks/render/SetupAndRenderHook.hpp"
-#include "hooks/render/RenderMeshHook.hpp"
-#include "hooks/render/DirectX.hpp"
-
 // ui
 #include "ui/RenderCore.hpp"
 
 // modules
 #include "modules/Module.hpp"
 #include "modules/movement/ToggleSprint.hpp"
-#include "modules/world/Fullbright.hpp"
-#include "modules/world/TimeChanger.hpp"
-#include "modules/gui/FPSCounter.hpp"
-#include "modules/gui/Zoom.hpp"
-
-#include <client/hooks/HookRegistry.hpp>
+#include "modules/misc/Replay.hpp"
 
 #define $get_modules() Client::getInstance()->getModules()
 
@@ -30,7 +15,7 @@ class Client {
 private:
     static inline Client* instance = nullptr;
 private:
-    RenderCore* uiRender = nullptr;
+    // RenderCore* uiRender = nullptr;
 
     // modules
     std::vector<Module*> modules{};
@@ -42,7 +27,7 @@ public:
     static void destruct();
     static Client* getInstance();
 
-    RenderCore* getUIRender();
+    // RenderCore* getUIRender();
 
     void initModules();
     const std::vector<Module*> getModules();

@@ -1,12 +1,11 @@
 #pragma once
 #include "../Module.hpp"
-#include <client/hooks/world/LevelTickHook.hpp>
-#include <client/hooks/render/SetupAndRenderHook.hpp>
-#include <client/hooks/render/DirectX.hpp>
+#include <hooks/impl/render/SetupAndRenderHook.hpp>
 
 class ToggleSprint : public Module {
 public:
     ToggleSprint();
 
+    void onRender(SetupAndRenderEvent& event);
     void renderCallback(MinecraftUIRenderContext* renderCtx);
 };

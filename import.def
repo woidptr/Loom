@@ -1,5 +1,28 @@
 LIBRARY mcapi.dll
 EXPORTS
+	; Tessellator::begin
+	?begin@Tessellator@@QEAAXW4PrimitiveMode@mce@@H_N@Z
+
+	; Tessellator::vertex
+	?vertex@Tessellator@@QEAAXMMM@Z
+
+	; Tessellator::end
+	?end@Tessellator@@QEAA?AVMesh@mce@@W4UploadMode@1@V?$basic_string_view@DU?$char_traits@D@std@@@std@@W4SupplementaryFieldAutoGenerationMode@1@@Z
+
+	; mce::Mesh::renderMesh
+	?renderMesh@Mesh@mce@@QEBAXAEBVMeshContext@2@AEBVMaterialPtr@2@AEBV?$variant@Umonostate@std@@VTexturePtr@mce@@VClientTexture@4@VServerTexture@4@@std@@@Z
+
+	; MeshHelpers::renderMeshImmediately
+	?renderMeshImmediately@MeshHelpers@@YAXAEAVScreenContext@@AEAVTessellator@@AEBVMaterialPtr@mce@@@Z
+
+	; SceneFactory::createHudScreen
 	?createHudScreen@SceneFactory@@QEAA?AV?$shared_ptr@VAbstractScene@@@std@@XZ
+
+	; SceneFactory::createPauseScreen
 	?createPauseScreen@SceneFactory@@QEAA?AV?$shared_ptr@VAbstractScene@@@std@@XZ
+
+	; MinecraftPackets::createPacket
 	?createPacket@MinecraftPackets@@SA?AV?$shared_ptr@VPacket@@@std@@W4MinecraftPacketIds@@@Z
+
+	; Dimension::getTimeOfDay
+	?getTimeOfDay@Dimension@@UEBAMHM@Z

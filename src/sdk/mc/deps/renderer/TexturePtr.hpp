@@ -11,5 +11,6 @@ namespace mce {
 		std::shared_ptr<ResourceLocation> mResourceLocation;
 	public:
 		TexturePtr(const ResourceLocation& resourceLocation);
+		TexturePtr() {}
 	};
 }

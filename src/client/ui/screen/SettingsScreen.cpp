@@ -1,6 +1,6 @@
 #include "SettingsScreen.hpp"
 
-void SettingsScreen::render() {
+/*void SettingsScreen::render() {
     // Styling the window to match the reference dark theme
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.08f, 0.08f, 0.08f, 1.00f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
@@ -23,16 +23,38 @@ void SettingsScreen::render() {
 
     ImGui::Begin("MINECRAFT MODS WINDOW", nullptr, windowFlags);
 
-    ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, 1.f), "MINECRAFT MODS");
-    float closeBtnWidth = 30.f;
-    ImGui::SameLine();
-    ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - closeBtnWidth);
+    // --- Header Configuration ---
+    float headerHeight = 50.0f;
+    float startY = ImGui::GetCursorPosY(); // Save the starting Y position
+
+    // 1. Draw Title (Vertically Centered)
+    // Calculate Y offset: (TargetHeight - TextHeight) / 2
+    const char* titleText = "MINECRAFT MODS";
+    float textHeight = ImGui::GetTextLineHeight();
+    float textOffset = (headerHeight - textHeight) * 0.5f;
+
+    ImGui::SetCursorPosY(startY + textOffset);
+    ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, 1.f), titleText);
+
+    // 2. Draw Close Button (Right Aligned & Vertically Centered)
+    float btnSize = 30.0f; // Square button looks better
+    float btnOffset = (headerHeight - btnSize) * 0.5f;
+
+    // Move cursor to the Right side and correct Y position
+    ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMax().x - btnSize, startY + btnOffset));
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-    if (ImGui::Button("X", ImVec2(closeBtnWidth, 0))) {
+    // Optional: Add hover color so it's not invisible when interacting
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
+
+    if (ImGui::Button("X", ImVec2(btnSize, btnSize))) {
         ScreenManager::setScreen(nullptr);
     }
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(2);
+
+    // 3. Advance the cursor past the header
+    // This ensures the next elements (tabs) start AFTER the 50px header area
+    ImGui::SetCursorPosY(startY + headerHeight);
 
     ImGui::Spacing();
 
@@ -78,29 +100,25 @@ void SettingsScreen::render() {
     int columnCount = (int)(panelWidth / (cardWidth + padding));
     if (columnCount < 1) columnCount = 1;
 
-    ImGui::BeginChild("GridArea", ImVec2(0, 0), false);
+    ImGui::BeginTable("GridArea", columnCount, ImGuiTableFlags_PadOuterX);
 
     int shownCount = 0;
     for (Module* mod : $get_modules()) {
         // 1. Filter by Tab
         // if (currentTab != 0 && mod.category != categories[currentTab]) continue;
 
-        // 2. Filter by Search
         if (searchBuf[0] != 0 && mod->getName().find(searchBuf) == std::string::npos) continue;
 
-        // 3. Grid Logic
-        if (shownCount % columnCount != 0) ImGui::SameLine(0.0f, padding);
+        ImGui::TableNextColumn();
 
-        // 4. Draw the Card
         DrawModuleItem(mod);
-        // DrawModCard(mod, cardWidth, cardHeight);
 
         shownCount++;
     }
 
-    ImGui::EndChild();
+    ImGui::EndTable();
 
     ImGui::End();
     ImGui::PopStyleVar(3);
     ImGui::PopStyleColor(2);
-}
+}*/

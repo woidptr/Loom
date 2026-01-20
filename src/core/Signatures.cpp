@@ -1,4 +1,5 @@
 #include "Signatures.hpp"
+#include <fstream>
 #include <core/Memory.hpp>
 
 Signature::Signature(std::string signature) {
@@ -36,7 +37,7 @@ void SignatureRegistry::registerSignatures() {
     * Signatures marked with `->` are sigs to the field offsets
     */
 
-    const Asset sigs = $get_signatures();
+    Asset sigs = Asset("signatures.json");
 
     json data = json::parse(sigs.str());
 

@@ -38,3 +38,22 @@ fs::path FileManager::getSettingsFolder() {
 
     return settingsPath;
 }
+
+fs::path FileManager::getMainSettingsFile() {
+    fs::path mainSettingsFilePath = getSettingsFolder() / "settings.json";
+
+    if (!fs::exists(mainSettingsFilePath)) {
+        std::ofstream file(mainSettingsFilePath);
+        file.close();
+    }
+}
+
+fs::path FileManager::getProfileFolder(std::string profileName) {
+    fs::path profilePath = getSettingsFolder() / profileName;
+
+    if (!fs::exists(profilePath)) {
+        fs::create_directories(profilePath);
+    }
+
+    return profilePath;
+}

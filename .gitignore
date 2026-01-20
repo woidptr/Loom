@@ -368,3 +368,6 @@ FodyWeavers.xsd
 assets/
 signatures.json
 settings.json
+
+# Rust related things
+utils/target/

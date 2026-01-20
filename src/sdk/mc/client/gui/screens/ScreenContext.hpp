@@ -1,6 +1,12 @@
 #pragma once
+#include <sdk/Predefine.hpp>
 #include <sdk/mc/client/gui/GuiData.hpp>
-#include <sdk/mc/client/render/Tessellator.hpp>
+
+namespace mce {
+	class MeshContext;
+}
+
+class Tessellator;
 
 class ScreenContext {
 public:
@@ -9,9 +15,6 @@ public:
 	GuiData* guiData;
 
 	// $field(GuiData*, guiData);
+	$build_access(mce::MeshContext*, meshContext, 0x10);
 	$field(Tessellator*, tessellator);
-
-	// $padding(0x8);
-
-	// Tessellator* tessellator;
 };

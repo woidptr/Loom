@@ -6,51 +6,20 @@
 #include <sdk/GameContext.hpp>
 
 Client::Client() {
-    kiero::init(kiero::RenderType::Auto);
-
-    // hooks
-    Hooks::windowProcHook = std::make_unique<WindowProcHook>();
-    Hooks::getTimeOfDayHook = std::make_unique<GetTimeOfDayHook>();
-    // Client::getFovHook = std::make_unique<GetFovHook>();
-    // Client::levelTickHook = std::make_unique<LevelTickHook>();
-    Hooks::getGammaHook = std::make_unique<GetGammaHook>();
-    Hooks::setupAndRenderHook = std::make_unique<SetupAndRenderHook>();
-    // Client::renderMeshHook = std::make_unique<RenderMeshHook>();
-    /*Client::renderMeshHook->registerCallback(
-        [](CallbackContext& cbCtx, ScreenContext* screenContext, Tessellator* tess, MaterialPtr* material) {
-            static bool init = false;
-
-            if (!init) {
-                GameContext::materialPtr = material;
-
-                init = true;
-            }
-        }
-    );*/
-    Hooks::presentHook = std::make_unique<PresentHook>();
-
-    if (kiero::getRenderType() == kiero::RenderType::D3D12) {
-        Hooks::executeCommandListHook = std::make_unique<ExecuteCommandListHook>();
-    }
-
-    Hooks::resizeBuffersHook = std::make_unique<ResizeBuffersHook>();
-
     // ui
-    uiRender = new RenderCore();
+    // uiRender = new RenderCore();
 
     initModules();
 
-    ToastManager::addToast("Client loaded", 3);
+    // ToastManager::addToast("Client loaded", 3);
 }
 
 Client::~Client() {
-    delete uiRender;
+    // delete uiRender;
 
     for (Module* mod : modules) {
         delete mod;
     }
-
-    kiero::shutdown();
 }
 
 void Client::construct() {
@@ -69,16 +38,13 @@ Client* Client::getInstance() {
     return instance;
 }
 
-RenderCore* Client::getUIRender() {
-    return uiRender;
-}
+// RenderCore* Client::getUIRender() {
+//     return uiRender;
+// }
 
 void Client::initModules() {
     modules.push_back(new ToggleSprint());
-    modules.push_back(new TimeChanger());
-    modules.push_back(new FPSCounter());
-    modules.push_back(new Fullbright());
-    // modules.push_back(new Zoom(Client::getFovHook.get()));
+    modules.push_back(new Replay());
 }
 
 const std::vector<Module*> Client::getModules() {
