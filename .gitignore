@@ -370,4 +370,4 @@ signatures.json
 settings.json
 
 # Rust related things
-utils/target/
+target/
