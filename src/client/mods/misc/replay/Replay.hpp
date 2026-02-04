@@ -1,5 +1,5 @@
 #pragma once
-#include "../Module.hpp"
+#include "../../Module.hpp"
 #include <events/network/IncomingPacketEvent.hpp>
 
 class Replay : public Module {

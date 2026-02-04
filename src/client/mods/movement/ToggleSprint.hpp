@@ -1,7 +1,7 @@
 #pragma once
 #include "../Module.hpp"
 #include <events/render/SetupAndRenderEvent.hpp>
-#include <hooks/impl/input/WindowProcHook.hpp>
+#include <events/input/KeyboardEvent.hpp>
 
 class ToggleSprint : public Module {
 public:

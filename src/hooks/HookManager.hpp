@@ -1,10 +1,8 @@
 #pragma once
 #include <vector>
+#include <safetyhook.hpp>
 #include <sdk/GameContext.hpp>
 #include <events/EventHandler.hpp>
-
-#include "impl/input/WindowProcHook.hpp"
-#include <safetyhook.hpp>
 
 #include <hooks/impl/RenderHooks.hpp>
 #include <hooks/impl/InputHooks.hpp>

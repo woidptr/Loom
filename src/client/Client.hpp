@@ -5,9 +5,9 @@
 #include "ui/RenderCore.hpp"
 
 // modules
-#include "modules/Module.hpp"
-#include "modules/movement/ToggleSprint.hpp"
-#include "modules/misc/Replay.hpp"
+#include "mods/Module.hpp"
+#include "mods/movement/ToggleSprint.hpp"
+#include "mods/misc/replay/Replay.hpp"
 
 #define $get_modules() Client::getInstance()->getModules()
 

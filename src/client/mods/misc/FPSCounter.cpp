@@ -21,4 +21,8 @@ void FPSCounter::onHudElementRender(HudElementRenderEvent& event) {
     drawList->AddRectFilled(p_min, p_max, ImU32(1234), borderRadius);
     drawList->AddRect(p_min, p_max, ImU32(1234), borderRadius);
     // drawList->AddText(text_pos, IM_COL32(255, 255, 255, 255), fpsText.c_str());
+
+    if (event.isInEditMode) {
+        drawList->AddRectFilled(p_min, p_max, ImU32(9999), borderRadius);
+    }
 }
