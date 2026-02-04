@@ -1,19 +1,29 @@
 #pragma once
 #include <vector>
-// #include "Hook.hpp"
+#include <sdk/GameContext.hpp>
+#include <events/EventHandler.hpp>
 
-#include "impl/render/SetupAndRenderHook.hpp"
-#include "impl/network/IncomingPacketsHook.hpp"
+#include "impl/input/WindowProcHook.hpp"
 #include <safetyhook.hpp>
+
+#include <hooks/impl/RenderHooks.hpp>
+#include <hooks/impl/InputHooks.hpp>
+#include <hooks/impl/NetworkHooks.hpp>
 
 class HookManager {
 private:
-    // std::vector<Hook> hooks;
-    static inline SetupAndRenderHook* renderHook = nullptr;
-    static inline IncomingPacketsHook* packetsHook = nullptr;
-    static inline std::vector<SafetyHookInline> inlineHooks;
-    static inline std::vector<SafetyHookMid> midHooks;
+    static inline std::vector<SafetyHookInline*> inlineHooks;
+    static inline std::vector<SafetyHookMid*> midHooks;
 public:
     static void construct();
     static void destruct();
+
+    static void createInlineHook(SafetyHookInline& hook, void* target, void* destination) {
+        hook = safetyhook::create_inline(target, destination);
+        inlineHooks.emplace_back(&hook);
+    }
+
+    //void createMidHook(SafetyHookMid& hook, void* target) {
+    //    // hook = safetyhook::create_mid(target, )
+    //}
 };

@@ -1,10 +1,14 @@
 #include "HookManager.hpp"
-#include "impl/render/SetupAndRenderHook.hpp"
 
 void HookManager::construct() {
     // hooks.emplace_back(new SetupAndRenderHook());
-    renderHook = new SetupAndRenderHook();
+    /*renderHook = new SetupAndRenderHook();
     packetsHook = new IncomingPacketsHook();
+    windowProcHook = new WindowProcHook();*/
+
+    InputHooks::init();
+    RenderHooks::init();
+    NetworkHooks::init();
 }
 
 void HookManager::destruct() {
@@ -12,6 +16,10 @@ void HookManager::destruct() {
         delete hook;
     }*/
 
-    delete renderHook;
+    /*delete renderHook;
     delete packetsHook;
+    delete windowProcHook;*/
+
+    inlineHooks.clear();
+    midHooks.clear();
 }

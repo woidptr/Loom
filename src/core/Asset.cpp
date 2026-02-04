@@ -9,7 +9,7 @@ extern "C" {
     RawAsset get_asset(const char* name);
 }
 
-Asset::Asset(std::string_view name) {
+Asset::Asset(std::string name) {
     RawAsset asset = get_asset(name.data());
 
     mData = asset.data;

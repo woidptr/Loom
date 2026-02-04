@@ -17,13 +17,21 @@
 #include <sdk/mc/world/level/dimension/Dimension.hpp>
 #include <sdk/mc/client/gui/screens/ScreenView.hpp>
 
-class GameContext {
-public:
-	static inline MinecraftUIRenderContext* renderCtx = nullptr;
-	static inline IClientInstance* clientInstance = nullptr;
-	static inline Tessellator* tessellator = nullptr;
-	static inline mce::MaterialPtr* materialPtr = nullptr;
-	static inline LocalPlayer* localPlayer = nullptr;
+// containers
+#include <sdk/mc/world/Container.hpp>
+#include <sdk/mc/world/SimpleContainer.hpp>
 
-	static void registerRenderContext(MinecraftUIRenderContext* renderCtx);
+// components
+#include <sdk/mc/entity/components/ActorEquipmentComponent.hpp>
+#include <sdk/mc/entity/components/MoveInputComponent.hpp>
+
+class GameContext {
+private:
+	static inline std::once_flag clientInstanceInitializer;
+public:
+	static inline IClientInstance* clientInstance = nullptr;
+	static inline SceneFactory* sceneFactory = nullptr;
+	static inline ISceneStack* sceneStack = nullptr;
+
+	static void registerClientInstance(IClientInstance* clientInstance);
 };

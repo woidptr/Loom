@@ -3,6 +3,7 @@
 #include <memory>
 #include <libhat/scanner.hpp>
 #include <nlohmann/json.hpp>
+#include <simdjson.h>
 #include <core/Asset.hpp>
 #include <core/Logger.hpp>
 

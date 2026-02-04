@@ -17,4 +17,5 @@ public:
 public:
     MCAPI std::shared_ptr<AbstractScene> createHudScreen();
     MCAPI std::shared_ptr<AbstractScene> createPauseScreen();
+    MCAPI std::shared_ptr<AbstractScene> createDeathScreen();
 };

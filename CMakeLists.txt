@@ -61,6 +61,7 @@ CPMAddPackage("gh:BasedInc/libhat@0.9.0")
 CPMAddPackage("gh:ocornut/imgui@1.92.5")
 CPMAddPackage("gh:cursey/safetyhook@0.6.9")
 CPMAddPackage("gh:nlohmann/json@3.12.0")
+CPMAddPackage("gh:simdjson/simdjson@4.2.4")
 CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
 CPMAddPackage("gh:superPuero/kawa_core#a04c1012a9e32bb1472d2fc92fcf2efb51b84793")
 CPMAddPackage("gh:corrosion-rs/corrosion@0.6.0")
@@ -101,7 +102,7 @@ corrosion_import_crate(
 corrosion_set_env_vars(linker "RUST_ASSETS_DIR=${ASSETS_DIR}")
 corrosion_set_env_vars(linker "RUST_SIGNATURES_FILE=${SIGNATURES_FILE}")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json linker)
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json simdjson linker)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib

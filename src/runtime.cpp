@@ -17,8 +17,10 @@ DWORD WINAPI Runtime::init(LPVOID lpParam) {
     FakeImports::construct({
         .dll_name = "mcapi.dll",
         .resolve = Memory::ResolveAddress,
-        });
+    });
     FakeImports::load_all_imports();
+
+    kiero::init(kiero::RenderType::Auto);
 
     HookManager::construct();
 
@@ -30,5 +32,6 @@ DWORD WINAPI Runtime::init(LPVOID lpParam) {
 void Runtime::shutdown() {
     Client::destruct();
     HookManager::destruct();
+    kiero::shutdown();
     Logger::shutdown();
 }

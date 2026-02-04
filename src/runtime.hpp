@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include <kiero.hpp>
 #include <core/Logger.hpp>
 #include <core/FakeImports.hpp>
 #include <hooks/HookManager.hpp>

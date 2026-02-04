@@ -7,15 +7,15 @@
 
 Client::Client() {
     // ui
-    // uiRender = new RenderCore();
+    uiRender = new RenderCore();
 
     initModules();
 
-    // ToastManager::addToast("Client loaded", 3);
+    ToastManager::addToast("Client loaded", 3);
 }
 
 Client::~Client() {
-    // delete uiRender;
+    delete uiRender;
 
     for (Module* mod : modules) {
         delete mod;

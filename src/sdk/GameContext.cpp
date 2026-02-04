@@ -1,6 +1,9 @@
 #include "GameContext.hpp"
 
-void GameContext::registerRenderContext(MinecraftUIRenderContext* renderCtx) {
-	GameContext::renderCtx = renderCtx;
-	// GameContext::clientInstance = renderCtx->getClientInstance();
+void GameContext::registerClientInstance(IClientInstance* clientInstance) {
+	std::call_once(clientInstanceInitializer, [&](){
+		GameContext::clientInstance = clientInstance;
+		GameContext::sceneFactory = clientInstance->getSceneFactory();
+		GameContext::sceneStack = clientInstance->getClientSceneStack().value;
+	});
 }

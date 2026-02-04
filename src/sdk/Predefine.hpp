@@ -7,9 +7,9 @@
 #include <cstdint>
 #include <concepts>
 #include <variant>
+#include <vector>
 
 #include <libhat/fixed_string.hpp>
 #include <core/Memory.hpp>
 
 #define MCAPI __declspec(dllimport)
-#define MCVIRTUAL __declspec(dllimport)

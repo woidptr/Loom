@@ -8,7 +8,6 @@ crate-type = ["staticlib"]
 
 [profile.release]
 lto = true
-panic = "abort"
 strip = true
 
 [dependencies]

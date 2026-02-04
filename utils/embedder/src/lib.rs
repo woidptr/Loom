@@ -1,5 +1,3 @@
-#![no_std]
-
 struct AssetEntry {
     name: &'static [u8],
     data: &'static [u8],

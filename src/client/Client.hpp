@@ -15,7 +15,7 @@ class Client {
 private:
     static inline Client* instance = nullptr;
 private:
-    // RenderCore* uiRender = nullptr;
+    RenderCore* uiRender = nullptr;
 
     // modules
     std::vector<Module*> modules{};

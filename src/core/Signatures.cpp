@@ -41,6 +41,10 @@ void SignatureRegistry::registerSignatures() {
 
     json data = json::parse(sigs.str());
 
+    // simdjson::dom::parser parser;
+
+    // simdjson::dom::element data = parser.parse(sigs.str());
+
     for (const auto& [name, pattern] : data.items()) {
         signatures.insert(std::make_pair(name, std::make_unique<Signature>(pattern)));
     }

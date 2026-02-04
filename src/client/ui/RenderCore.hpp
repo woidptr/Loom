@@ -1,8 +1,15 @@
 #pragma once
-/*#include "elements/ToastNotification.hpp"
-#include "screen/ScreenManager.hpp"
-#include "screen/CustomizationScreen.hpp"
-#include "screen/StartScreen.hpp"
+#include "elements/ToastNotification.hpp"
+#include "gui/ScreenManager.hpp"
+#include "gui/screen/HudEditorScreen.hpp"
+#include "gui/screen/StartScreen.hpp"
+#include <events/EventHandler.hpp>
+#include <events/render/PresentEvent.hpp>
+#include <events/render/ResizeBuffersEvent.hpp>
+#include <events/render/ExecuteCommandListsEvent.hpp>
+#include <events/input/WindowProcessEvent.hpp>
+#include <events/input/KeyboardEvent.hpp>
+#include <events/input/MouseEvent.hpp>
 #include <core/Asset.hpp>
 #include <mutex>
 #include <imgui.h>
@@ -10,10 +17,6 @@
 #include "utils/ImGuiUtils.hpp"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-$load_asset(fonts_Arimo_Medium_ttf);
-$load_asset(fonts_Montserrat_Medium_ttf);
-$load_asset(fonts_Montserrat_SemiBold_ttf);
 
 struct ImGuiFonts {
     static inline ImFont* Montserrat = nullptr;
@@ -26,6 +29,7 @@ private:
     ID3D12CommandQueue* cmdQueue = nullptr;
     std::unique_ptr<IImguiRenderer> renderer = nullptr;
     std::vector<ImGuiDrawCallback> imguiDrawCallbacks;
+    std::vector<entt::scoped_connection> listeners;
 public:
     RenderCore();
 
@@ -33,9 +37,12 @@ public:
 
     void registerImGuiDrawCallback(ImGuiDrawCallback&& fn);
 
-    void keyboardCallback(int16_t key, bool isDown);
-    void setupAndRenderCallback(CallbackContext& cbCtx, ScreenView* screenView, MinecraftUIRenderContext* renderCtx);
-    void renderCallback(IDXGISwapChain3* swapChain, UINT a1, UINT a2);
-    void executeCommandListCallback(ID3D12CommandQueue* commandQueue, UINT a1, ID3D12CommandList* const* commandList);
-    void resizeBuffersHandler();
-};*/
+    // void keyboardCallback(int16_t key, bool isDown);
+    // void setupAndRenderCallback(ScreenView* screenView, MinecraftUIRenderContext* renderCtx);
+    void onKey(KeyboardEvent& event) {}
+    void onMouse(MouseEvent& event);
+    void onWindowProcess(WindowProcessEvent& event);
+    void onPresentFrame(PresentEvent&);
+    void onExecuteCommandLists(ExecuteCommandListsEvent& event);
+    void onResizeBuffers(ResizeBuffersEvent& event);
+};
