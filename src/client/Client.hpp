@@ -8,6 +8,7 @@
 #include "mods/Module.hpp"
 #include "mods/movement/ToggleSprint.hpp"
 #include "mods/misc/replay/Replay.hpp"
+#include "mods/misc/FPSCounter.hpp"
 
 #define $get_modules() Client::getInstance()->getModules()
 

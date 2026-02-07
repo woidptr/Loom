@@ -1,10 +1,18 @@
-//#include "CustomizationScreen.hpp"
-//#include "SettingsScreen.hpp"
-//#include "ScreenManager.hpp"
-//#include <imgui.h>
-//#include <core/Logger.hpp>
+#include "HudEditorScreen.hpp"
+#include "SettingsScreen.hpp"
+#include <client/ui/gui/ScreenManager.hpp>
+#include <imgui.h>
+#include <core/Logger.hpp>
+#include <events/EventHandler.hpp>
+#include <events/render/HudElementRenderEvent.hpp>
 
-/*void CustomizationScreen::render() {
+void HudEditorScreen::render() {
+    HudElementRenderEvent event{
+        .isInEditMode = true,
+    };
+
+    EventHandler::emit(event);
+
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 center = viewport->GetCenter();
 
@@ -29,7 +37,7 @@
         ImGui::SetWindowFontScale(2.0f);
 
         if (ImGui::Button("Settings", ImVec2(200, 70))) {
-            ScreenManager::setScreen(std::make_unique<SettingsScreen>());
+            // ScreenManager::setScreen(std::make_unique<SettingsScreen>());
         }
 
         ImGui::End();
@@ -37,4 +45,4 @@
 
     ImGui::PopStyleVar(1);
     ImGui::PopStyleColor(3);
-}*/
+}

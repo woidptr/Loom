@@ -9,5 +9,5 @@ private:
 public:
     FPSCounter();
 
-    void onHudElementRender(HudElementRenderEvent& event);
+    void onHudElementRender(HudElementRenderEvent* event);
 };

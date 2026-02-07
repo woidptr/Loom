@@ -6,5 +6,5 @@ class Replay : public Module {
 public:
     Replay();
 
-    void onPacketReceived(IncomingPacketEvent& event);
+    void onPacketReceived(IncomingPacketEvent* event);
 };

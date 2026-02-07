@@ -7,7 +7,7 @@ class ToggleSprint : public Module {
 public:
     ToggleSprint();
 
-    void onRender(SetupAndRenderEvent& event);
-    void onKey(KeyboardEvent& event);
+    void onRender(SetupAndRenderEvent* event);
+    void onKey(KeyboardEvent* event);
     void renderCallback(MinecraftUIRenderContext* renderCtx);
 };

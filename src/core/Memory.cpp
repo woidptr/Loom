@@ -28,11 +28,19 @@ uintptr_t Memory::ResolveInstructionTarget(uintptr_t addr) {
 	ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
 
 	if (ZYAN_SUCCESS(ZydisDecoderDecodeFull(&decoder, (void*)addr, 15, &instruction, operands))) {
-		if (instruction.attributes & ZYDIS_ATTRIB_IS_RELATIVE) {
+		for (int i = 0; i < instruction.operand_count; i++) {
+	        if (operands[i].type == ZYDIS_OPERAND_TYPE_MEMORY) {
+				uintptr_t absoluteAddress = 0;
+				if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&instruction, &operands[i], addr, &absoluteAddress))) {
+					return absoluteAddress;
+				}
+			}
+		}
+		/*if (instruction.attributes & ZYDIS_ATTRIB_IS_RELATIVE) {
 			uintptr_t absoluteAddress = 0;
 			ZydisCalcAbsoluteAddress(&instruction, operands, addr, &absoluteAddress);
 			return absoluteAddress;
-		}
+		}*/
 	}
 
 	return addr;

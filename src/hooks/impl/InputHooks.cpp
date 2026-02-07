@@ -14,8 +14,6 @@ namespace InputHooks {
 
         EventHandler::emit(event);
 
-        $log_debug("Key is pressed");
-
         if (event.isCancelled()) {
             return;
         } else {
@@ -35,11 +33,7 @@ namespace InputHooks {
             .forceMotionlessPointer = forceMotionlessPointer,
         };
 
-        $log_debug("Hook Event Addr: {}", (void*)&event);
-
         EventHandler::emit(event);
-
-        $log_debug("Is cancelled: {}", event.isCancelled());
 
         if (event.isCancelled()) {
             return;

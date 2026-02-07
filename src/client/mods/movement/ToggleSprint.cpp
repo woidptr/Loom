@@ -14,14 +14,14 @@ ToggleSprint::ToggleSprint() : Module("Toggle Sprint") {
     $add_listener(KeyboardEvent, &ToggleSprint::onKey);
 }
 
-void ToggleSprint::onRender(SetupAndRenderEvent& event) {
-    void** vtable = *(void***)event.renderCtx;
+void ToggleSprint::onRender(SetupAndRenderEvent* event) {
+    void** vtable = *(void***)event->renderCtx;
     uintptr_t staticVtable = reinterpret_cast<uintptr_t>(vtable) - reinterpret_cast<uintptr_t>(GetModuleHandle(NULL));
     // Logger::info(std::format("MinecraftUIRenderContext vtable address: 0x{:X}", staticVtable));
     // Logger::info(std::format("Text alpha: {}", renderCtx->getTextAlpha()));
     static bool initTest = false;
     if (!initTest) {
-        uintptr_t* vtable = *(uintptr_t**)event.renderCtx->mClient;
+        uintptr_t* vtable = *(uintptr_t**)event->renderCtx->mClient;
         uintptr_t funcRuntimeAddr = vtable[$get_index("IClientInstance$$getSceneFactory")];
         uintptr_t moduleBase = (uintptr_t)GetModuleHandle(nullptr);
         uintptr_t funcAddr = funcRuntimeAddr - moduleBase;
@@ -70,10 +70,10 @@ void ToggleSprint::onRender(SetupAndRenderEvent& event) {
 
     // $log_debug("Current screen name: {}", event.renderCtx->mClient->getTopScreenName());
 
-    renderCallback(event.renderCtx);
+    renderCallback(event->renderCtx);
 }
 
-void ToggleSprint::onKey(KeyboardEvent& event) {
+void ToggleSprint::onKey(KeyboardEvent* event) {
     /*SceneFactory* sceneFactory = GameContext::clientInstance->getSceneFactory();
     ISceneStack* sceneStack = GameContext::clientInstance->getClientSceneStack().value;
     sceneStack->pushScreen(sceneFactory->createDeathScreen(), false);*/

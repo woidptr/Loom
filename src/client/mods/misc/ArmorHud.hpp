@@ -6,5 +6,5 @@ class ArmorHud : public Module {
 public:
     ArmorHud();
 
-    void onRender(SetupAndRenderEvent& event);
+    void onRender(SetupAndRenderEvent* event);
 };

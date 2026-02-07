@@ -5,10 +5,12 @@
 #include <sdk/GameContext.hpp>
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
 #include <sdk/mc/client/gui/screens/SceneFactory.hpp>
+#include "gui/screen/HudEditorScreen.hpp"
 
 RenderCore::RenderCore() {
-    listeners.reserve(4);
+    listeners.reserve(5);
 
+    $add_listener(MouseEvent, &RenderCore::onMouse);
     $add_listener(WindowProcessEvent, &RenderCore::onWindowProcess);
     $add_listener(PresentEvent, &RenderCore::onPresentFrame);
     $add_listener(ExecuteCommandListsEvent, &RenderCore::onExecuteCommandLists);
@@ -30,8 +32,20 @@ void RenderCore::registerImGuiDrawCallback(ImGuiDrawCallback&& fn) {
     imguiDrawCallbacks.emplace_back(std::forward<ImGuiDrawCallback>(fn));
 }
 
-void RenderCore::onWindowProcess(WindowProcessEvent& event) {
-    ImGui_ImplWin32_WndProcHandler(event.hWnd, event.msg, event.wParam, event.lParam);
+void RenderCore::onWindowProcess(WindowProcessEvent* event) {
+    ImGui_ImplWin32_WndProcHandler(event->hWnd, event->msg, event->wParam, event->lParam);
+}
+
+void RenderCore::onKey(KeyboardEvent* event) {
+    if (event->key == 'L' && !event->isDown) {
+        if (GameContext::clientInstance->getTopScreenName() == "hud_screen" && !ScreenManager::getCurrentScreen()) {
+            GameContext::sceneStack->pushScreen(GameContext::sceneFactory->createPauseScreen(), false);
+            ScreenManager::setScreen(std::make_unique<HudEditorScreen>());
+        }
+    }
+    else if (event->key == VK_ESCAPE && !event->isDown) {
+        ScreenManager::setScreen(nullptr);
+    }
 }
 
 //void RenderCore::keyboardCallback(int16_t key, bool isDown) {
@@ -83,33 +97,27 @@ void RenderCore::onWindowProcess(WindowProcessEvent& event) {
 //    }
 //}
 
-void RenderCore::onMouse(MouseEvent& event) {
+void RenderCore::onMouse(MouseEvent* event) {
     /*if (!ScreenManager::getCurrentScreen()) {
         event.cancel();
     }*/
-
-    $log_debug("Hook Event Addr: {}", (void*)&event);
-
-    event.cancel();
-
-    $log_debug("Is cancelled: {}", event.isCancelled());
 }
 
-void RenderCore::onPresentFrame(PresentEvent& event) {
+void RenderCore::onPresentFrame(PresentEvent* event) {
     if (!renderer) {
         ID3D12Device5* d3d12Device5 = nullptr;
         ID3D11Device* d3d11Device = nullptr;
-        if (SUCCEEDED(event.swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
+        if (SUCCEEDED(event->swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
             renderer = std::make_unique<ImGuiDX12>();
             d3d12Device5->Release();
             // d3d12Device5->RemoveDevice();
-        } else if (SUCCEEDED(event.swapChain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
+        } else if (SUCCEEDED(event->swapChain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
             renderer = std::make_unique<ImGuiDX11>();
             d3d11Device->Release();
         }
 
         if (renderer) {
-            if (!renderer->Init(event.swapChain, cmdQueue)) {
+            if (!renderer->Init(event->swapChain, cmdQueue)) {
                 renderer.reset();
                 $log_error("Failed to init renderer");
                 return;
@@ -120,7 +128,7 @@ void RenderCore::onPresentFrame(PresentEvent& event) {
     }
 
     if (renderer) {
-        renderer->NewFrame(event.swapChain);
+        renderer->NewFrame(event->swapChain);
         ImGui::NewFrame();
 
         for (ImGuiDrawCallback& cb : imguiDrawCallbacks) {
@@ -131,20 +139,20 @@ void RenderCore::onPresentFrame(PresentEvent& event) {
         ScreenManager::render();
 
         ImGui::Render();
-        renderer->RenderDrawData(event.swapChain);
+        renderer->RenderDrawData(event->swapChain);
     }
 }
 
-void RenderCore::onExecuteCommandLists(ExecuteCommandListsEvent& event) {
+void RenderCore::onExecuteCommandLists(ExecuteCommandListsEvent* event) {
     if (!cmdQueue) {
-        cmdQueue = event.cmdQueue;
+        cmdQueue = event->cmdQueue;
     }
 }
 
-void RenderCore::onResizeBuffers(ResizeBuffersEvent& event) {
-    if (event.before) {
-        renderer->OnResizePre(event.swapChain);
+void RenderCore::onResizeBuffers(ResizeBuffersEvent* event) {
+    if (event->before) {
+        renderer->OnResizePre(event->swapChain);
     } else {
-        renderer->OnResizePost(event.swapChain);
+        renderer->OnResizePost(event->swapChain);
     }
 }

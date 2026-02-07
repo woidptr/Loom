@@ -9,11 +9,11 @@
 struct BaseEventContext {};
 
 struct CancellableEventContext : public BaseEventContext {
-private:
+public:
     bool cancelFlag = false;
 public:
-    bool isCancelled() const { return cancelFlag; }
-    void cancel() { cancelFlag = true; }
+    bool isCancelled() const { return this->cancelFlag; }
+    void cancel() { this->cancelFlag = true; }
 };
 
 template <typename T>
@@ -30,16 +30,16 @@ private:
 public:
     template <typename TEvent, auto Candidate>
     static entt::scoped_connection subscribe() {
-        return dispatcher.sink<TEvent>().template connect<Candidate>();
+        return dispatcher.sink<TEvent*>().template connect<Candidate>();
     }
 
     template <typename TEvent, auto Candidate, typename Type>
     static entt::scoped_connection subscribe(Type& instance) {
-        return dispatcher.sink<TEvent>().template connect<Candidate>(instance);
+        return dispatcher.sink<TEvent*>().template connect<Candidate>(instance);
     }
 
     template <typename TEvent>
     static void emit(TEvent& event) {
-        dispatcher.trigger(event);
+        dispatcher.trigger<TEvent*>(&event);
     }
 };

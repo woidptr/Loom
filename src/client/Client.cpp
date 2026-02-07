@@ -44,6 +44,7 @@ Client* Client::getInstance() {
 
 void Client::initModules() {
     modules.push_back(new ToggleSprint());
+    modules.push_back(new FPSCounter());
     modules.push_back(new Replay());
 }
 

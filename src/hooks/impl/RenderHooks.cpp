@@ -19,7 +19,12 @@ namespace RenderHooks {
 
         EventHandler::emit(event);
 
-        return _ScreenView_setupAndRender_hook.call(screenView, renderCtx);
+        if (event.isCancelled()) {
+            return;
+        }
+        else {
+            return _ScreenView_setupAndRender_hook.call(screenView, renderCtx);
+        }
     }
 
     InlineHook<HRESULT(IDXGISwapChain3*, UINT, UINT)> _present_hook;

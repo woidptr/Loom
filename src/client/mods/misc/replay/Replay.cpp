@@ -6,8 +6,8 @@ Replay::Replay() : Module("Replay") {
     $add_listener(IncomingPacketEvent, &Replay::onPacketReceived);
 }
 
-void Replay::onPacketReceived(IncomingPacketEvent& event) {
-    $log_debug("Received packet with id: {}", static_cast<int>(event.packetId));
+void Replay::onPacketReceived(IncomingPacketEvent* event) {
+    // $log_debug("Received packet with id: {}", static_cast<int>(event.packetId));
 
     // BinaryStream binaryStream = BinaryStream();
 

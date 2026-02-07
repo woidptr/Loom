@@ -1,7 +1,6 @@
 #pragma once
 #include "elements/ToastNotification.hpp"
 #include "gui/ScreenManager.hpp"
-#include "gui/screen/HudEditorScreen.hpp"
 #include "gui/screen/StartScreen.hpp"
 #include <events/EventHandler.hpp>
 #include <events/render/PresentEvent.hpp>
@@ -39,10 +38,10 @@ public:
 
     // void keyboardCallback(int16_t key, bool isDown);
     // void setupAndRenderCallback(ScreenView* screenView, MinecraftUIRenderContext* renderCtx);
-    void onKey(KeyboardEvent& event) {}
-    void onMouse(MouseEvent& event);
-    void onWindowProcess(WindowProcessEvent& event);
-    void onPresentFrame(PresentEvent&);
-    void onExecuteCommandLists(ExecuteCommandListsEvent& event);
-    void onResizeBuffers(ResizeBuffersEvent& event);
+    void onKey(KeyboardEvent* event);
+    void onMouse(MouseEvent* event);
+    void onWindowProcess(WindowProcessEvent* event);
+    void onPresentFrame(PresentEvent*);
+    void onExecuteCommandLists(ExecuteCommandListsEvent* event);
+    void onResizeBuffers(ResizeBuffersEvent* event);
 };

@@ -5,21 +5,25 @@
 
 using json = nlohmann::json;
 
-class SettingsManager {
-private:
-    void* config;
-public:
-    SettingsManager() {}
-
-    void get() {}
-    void set() {}
-    void save() {}
+struct RootConfig {
+    std::unordered_map<std::string, json> mods;
 };
 
-class Settings {
+class SettingsManager {
+private:
+    static inline RootConfig rootConfig;
+    static inline std::string rawJsonPath;
 public:
-    Settings();
-    ~Settings();
+    static inline void load();
 
-    void loadSettings();
+    template <typename T>
+    std::optional<T> getMod(const std::string& name) {
+        auto it = rootConfig.mods.find(name);
+
+        if (it == rootConfig.mods.end()) {
+            return std::nullopt;
+        }
+
+        return it->second.get<T>();
+    }
 };

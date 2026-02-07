@@ -1,9 +1,9 @@
 #pragma once
-/*#include "IScreen.hpp"
+#include "../IScreen.hpp"
 
-class CustomizationScreen : public IScreen {
+class HudEditorScreen : public IScreen {
 public:
-    CustomizationScreen() : IScreen("CustomizationScreen") {}
+    HudEditorScreen() : IScreen("CustomizationScreen") {}
 
     virtual void render() override;
-};*/
+};

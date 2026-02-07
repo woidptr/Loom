@@ -22,7 +22,10 @@ Signature::Signature(std::string signature) {
     uintptr_t res = (uintptr_t)result.get();
 
     if (res != 0) {
+        $log_debug("Address after scan: 0x{:X}", res);
         this->address = Memory::ResolveInstructionTarget(res);
+
+        $log_debug("Address after zydis: 0x{:X}", this->address);
     }
 }
 

@@ -2,6 +2,8 @@
 #include <sdk/Predefine.hpp>
 
 class ReadOnlyBinaryStream {
+protected:
+    uintptr_t vtable;
 public:
     std::string mOwnedBuffer;
     std::string_view mView;
@@ -15,7 +17,7 @@ public:
                 mView = mOwnedBuffer;
             }
         }
-public:
-    virtual ~ReadOnlyBinaryStream() {}
-    virtual void read(void* target, uint64_t num) {}
+
+    /*virtual ~ReadOnlyBinaryStream() = 0;
+    virtual void read() = 0;*/
 };
