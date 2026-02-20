@@ -40,6 +40,10 @@ void SignatureRegistry::registerSignatures() {
     * Signatures marked with `->` are sigs to the field offsets
     */
 
+    constexpr unsigned char test[] = {
+        #embed "C:\\Users\\firel\\source\\repos\\Loom\\signatures.json"
+    };
+
     Asset sigs = Asset("signatures.json");
 
     json data = json::parse(sigs.str());
@@ -48,7 +52,8 @@ void SignatureRegistry::registerSignatures() {
 
     // simdjson::dom::element data = parser.parse(sigs.str());
 
-    for (const auto& [name, pattern] : data.items()) {
+    for (const auto& [name, entry] : data.items()) {
+        std::string pattern = entry.at("signature").get<std::string>();
         signatures.insert(std::make_pair(name, std::make_unique<Signature>(pattern)));
     }
 }

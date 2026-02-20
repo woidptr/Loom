@@ -3,10 +3,10 @@
 ArmorHud::ArmorHud() : Module("Armor HUD") {
     listeners.reserve(1);
 
-    listeners.emplace_back(EventHandler::subscribe<SetupAndRenderEvent, &ArmorHud::onRender>(*this));
+    $add_listener(HudElementRenderEvent, &ArmorHud::onHudElementRender);
 }
 
-void ArmorHud::onRender(SetupAndRenderEvent* event) {
+void ArmorHud::onHudElementRender(HudElementRenderEvent* event) {
     /*if (LocalPlayer* lp = event.renderCtx->mClient->getLocalPlayer()) {
         ActorEquipmentComponent* equipment = lp->mEntityContext.tryGetComponent<ActorEquipmentComponent>();
 

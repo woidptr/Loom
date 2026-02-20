@@ -7,9 +7,20 @@ if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
     message(FATAL_ERROR "This project requires 64-bit Windows (x64)")
 endif()
 
-set(GENERATED_IMPORTS "${CMAKE_CURRENT_SOURCE_DIR}/import.def")
+set(SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
+set(GENERATED_IMPORTS "${CMAKE_CURRENT_BINARY_DIR}/import.def")
 set(ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 set(SIGNATURES_FILE "${CMAKE_CURRENT_SOURCE_DIR}/signatures.json")
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+add_custom_command(
+    OUTPUT ${GENERATED_IMPORTS}
+    COMMAND "${Python3_EXECUTABLE}" "${SCRIPTS_DIR}/funcs.py" "${SIGNATURES_FILE}" "${GENERATED_IMPORTS}"
+    DEPENDS "${SCRIPTS_DIR}/funcs.py"
+    COMMENT "Generating sdk functions"
+    VERBATIM
+)
 
 add_compile_definitions(NOMINMAX)
 
@@ -36,6 +47,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     # Clang / clang-cl / GCC
     # Disable exceptions for release
     $<$<AND:${IS_CLANG},${IS_RELEASE}>:/clang:-fno-exceptions>
+
+    # Enable #embed directive support in clang
+    $<$<BOOL:${IS_CLANG}>:/clang:-Wc23-extensions>
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE

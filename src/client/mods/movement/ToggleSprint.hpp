@@ -2,6 +2,7 @@
 #include "../Module.hpp"
 #include <events/render/SetupAndRenderEvent.hpp>
 #include <events/input/KeyboardEvent.hpp>
+#include <events/render/HudElementRenderEvent.hpp>
 
 class ToggleSprint : public Module {
 public:
@@ -9,5 +10,5 @@ public:
 
     void onRender(SetupAndRenderEvent* event);
     void onKey(KeyboardEvent* event);
-    void renderCallback(MinecraftUIRenderContext* renderCtx);
+    void onHudElementRender(HudElementRenderEvent* event);
 };

@@ -7,11 +7,24 @@
 #include <events/render/HudElementRenderEvent.hpp>
 
 void HudEditorScreen::render() {
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+    ImGui::Begin("##hud_overlay_edit", nullptr,
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoInputs |
+        ImGuiWindowFlags_NoBackground |
+        ImGuiWindowFlags_AlwaysAutoResize |
+        ImGuiWindowFlags_NoSavedSettings);
+
     HudElementRenderEvent event{
         .isInEditMode = true,
     };
 
     EventHandler::emit(event);
+
+    ImGui::End();
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 center = viewport->GetCenter();

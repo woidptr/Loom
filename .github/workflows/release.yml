@@ -1,0 +1,41 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+    
+      - name: Setup MSVC Dev Environment
+        uses: ilammy/msvc-dev-cmd@v1
+      
+      - name: Check clang-cl
+        run: clang-cl --version
+        shell: cmd
+      
+      - name: Recreate secret json
+        run: echo %SIGNATURES_JSON% > secret.json
+        shell: cmd
+        env:
+          SIGNATURES_JSON: ${{ secrets.SIGNATURES_JSON }}
+      
+      - name: Configure
+        run: cmake --preset x64-release-clang-cl
+      
+      - name: Build
+        run: cmake --build --preset x64-release-clang-cl
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/build/x64-release-clang-cl/Loom.dll

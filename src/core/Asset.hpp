@@ -14,3 +14,12 @@ public:
     size_t size() const noexcept;
     std::string_view str() const noexcept;
 };
+
+class Resource {
+private:
+    const unsigned char* data;
+    size_t size;
+public:
+    const unsigned char* begin() const;
+    const unsigned char* end() const;
+};

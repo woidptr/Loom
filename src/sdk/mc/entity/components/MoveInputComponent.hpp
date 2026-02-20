@@ -62,6 +62,7 @@ public:
     };
 public:
     static constexpr hat::fixed_string type_name = "struct MoveInputComponent";
+    // static constexpr hat::fixed_string type_name = __FUNCSIG__;
 public:
     MoveInputState mInputState;
     MoveInputState mRawInputState;

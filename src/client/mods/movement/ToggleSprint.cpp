@@ -12,6 +12,7 @@ ToggleSprint::ToggleSprint() : Module("Toggle Sprint") {
 
     $add_listener(SetupAndRenderEvent, &ToggleSprint::onRender);
     $add_listener(KeyboardEvent, &ToggleSprint::onKey);
+    $add_listener(HudElementRenderEvent, &ToggleSprint::onHudElementRender);
 }
 
 void ToggleSprint::onRender(SetupAndRenderEvent* event) {
@@ -47,46 +48,7 @@ void ToggleSprint::onRender(SetupAndRenderEvent* event) {
         initTest = true;
     }
 
-    // $logDebug("Screen name: {}", screenView->mVisualTree->name);
-
-    /*ImGui_ImplMC_NewFrame(renderCtx);
-    ImGui::NewFrame();
-
-    ImGui::ShowDemoWindow();
-
-    ImGui::Render();
-    ImGui_ImplMC_RenderDrawData(ImGui::GetDrawData(), renderCtx);*/
-
-    // $logDebug("Gui scale: {}", renderCtx->screenContext->guiData->mScreenSizeData.totalScreenSize.x);
-
-    // ResourceLocation resLoc("textures/items/potato_baked");
-
-    // mce::TexturePtr texture = renderCtx->getTexture(resLoc, true);
-    // ResourceLocation resLoc("C:\\Users\\firel\\source\\repos\\Loom\\assets\\test.png");
-    // $logDebug("String size: {}", resLoc.mFullHash);
-    // mce::TexturePtr texturePtr = mce::TexturePtr(resLoc);
-    // renderCtx->drawImage(texture, Vec2{ 50, 50 }, Vec2{ 200, 200 }, Vec2{ 0, 0 }, Vec2{ 100, 100 }, 0);
-    // renderCtx->flushImages(mce::Color(1.f, 1.f, 1.f, 0.f), 1.f, HashedString("test_material"));
-
-    // $log_debug("Current screen name: {}", event.renderCtx->mClient->getTopScreenName());
-
-    renderCallback(event->renderCtx);
-}
-
-void ToggleSprint::onKey(KeyboardEvent* event) {
-    /*SceneFactory* sceneFactory = GameContext::clientInstance->getSceneFactory();
-    ISceneStack* sceneStack = GameContext::clientInstance->getClientSceneStack().value;
-    sceneStack->pushScreen(sceneFactory->createDeathScreen(), false);*/
-
-    $log_debug("Current screen name: {}", GameContext::clientInstance->getTopScreenName());
-}
-
-void ToggleSprint::renderCallback(MinecraftUIRenderContext* renderCtx) {
-    // if (!enabled) {
-    //     return;
-    // }
-
-    if (LocalPlayer* lp = renderCtx->mClient->getLocalPlayer()) {
+    if (LocalPlayer* lp = event->renderCtx->mClient->getLocalPlayer()) {
         MoveInputComponent* mic = lp->mEntityContext.tryGetComponent<MoveInputComponent>();
 
         if (mic) {
@@ -95,4 +57,16 @@ void ToggleSprint::renderCallback(MinecraftUIRenderContext* renderCtx) {
             mic->mFlagValues.set(static_cast<size_t>(MoveInputComponent::Flag::Sprinting), true);
         }
     }
+}
+
+void ToggleSprint::onKey(KeyboardEvent* event) {
+    // std::shared_ptr<AbstractScene> scene = GameContext::sceneFactory->createPauseScreen();
+    // $log_debug("Scene id: {}", scene.get()->mSceneId);
+    GameContext::sceneStack->pushScreen(GameContext::sceneFactory->createPauseScreen(), false);
+
+    // $log_debug("Current screen name: {}", GameContext::clientInstance->getTopScreenName());
+}
+
+void ToggleSprint::onHudElementRender(HudElementRenderEvent* event) {
+
 }
