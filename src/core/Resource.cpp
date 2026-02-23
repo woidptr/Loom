@@ -3,16 +3,16 @@
 
 namespace {
 
-constexpr uint8_t asset_0[] = {
+constexpr unsigned char asset_0[] = {
     #embed "C:/Users/firel/source/repos/Loom/assets/fonts/Arimo_Medium.embed.ttf"
 };
-constexpr uint8_t asset_1[] = {
+constexpr unsigned char asset_1[] = {
     #embed "C:/Users/firel/source/repos/Loom/assets/fonts/Montserrat_Medium.embed.ttf"
 };
-constexpr uint8_t asset_2[] = {
+constexpr unsigned char asset_2[] = {
     #embed "C:/Users/firel/source/repos/Loom/assets/icons/close.embed.png"
 };
-constexpr uint8_t asset_3[] = {
+constexpr unsigned char asset_3[] = {
     #embed "C:/Users/firel/source/repos/Loom/signatures.embed.json"
 };
 

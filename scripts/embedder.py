@@ -50,7 +50,7 @@ def main() -> None:
     cpp_content.append("namespace {\n")
 
     for i, (rel_path, full_path) in enumerate(files_to_embed):
-        cpp_content.append(f"constexpr uint8_t asset_{i}[] = {{")
+        cpp_content.append(f"constexpr unsigned char asset_{i}[] = {{")
         cpp_content.append(f'    #embed "{full_path}"')
         cpp_content.append("};")
     
