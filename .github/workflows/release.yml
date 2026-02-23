@@ -22,7 +22,7 @@ jobs:
         run: clang-cl --version
         shell: cmd
       
-      - name: Recreate secret json
+      - name: Recreate signatures json
         run: echo %SIGNATURES_JSON% > signatures.json
         shell: cmd
         env:
