@@ -6,7 +6,6 @@
 #include <sdk/GameContext.hpp>
 
 Client::Client() {
-    // ui
     uiRender = new RenderCore();
 
     initModules();

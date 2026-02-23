@@ -28,8 +28,6 @@ public:
     static void destruct();
     static Client* getInstance();
 
-    // RenderCore* getUIRender();
-
     void initModules();
     const std::vector<Module*> getModules();
 };

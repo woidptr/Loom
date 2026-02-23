@@ -22,12 +22,25 @@ add_custom_command(
     VERBATIM
 )
 
-add_compile_definitions(NOMINMAX)
+add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Resource.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Resource.cpp"
+    COMMAND "${Python3_EXECUTABLE}" "${SCRIPTS_DIR}/embedder.py" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Resource.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Resource.cpp"
+    DEPENDS "${SCRIPTS_DIR}/embedder.py" "${ASSETS_DIR}"
+    COMMENT "Embedding resources"
+    VERBATIM
+)
+
+add_compile_definitions(
+    WIN32_LEAN_AND_MEAN
+    NOMINMAX
+    NOKANJI
+    NOHELP
+)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Resource.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Resource.hpp")
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 set(IS_MSVC "$<CXX_COMPILER_ID:MSVC>")
@@ -49,7 +62,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<AND:${IS_CLANG},${IS_RELEASE}>:/clang:-fno-exceptions>
 
     # Enable #embed directive support in clang
-    $<$<BOOL:${IS_CLANG}>:/clang:-Wc23-extensions>
+    $<$<BOOL:${IS_CLANG}>:/clang:-Wno-c23-extensions>
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE

@@ -28,10 +28,6 @@ void RenderCore::loadFonts() {
     io.Fonts->Build();
 }
 
-void RenderCore::registerImGuiDrawCallback(ImGuiDrawCallback&& fn) {
-    imguiDrawCallbacks.emplace_back(std::forward<ImGuiDrawCallback>(fn));
-}
-
 void RenderCore::onWindowProcess(WindowProcessEvent* event) {
     ImGui_ImplWin32_WndProcHandler(event->hWnd, event->msg, event->wParam, event->lParam);
 }
@@ -130,10 +126,6 @@ void RenderCore::onPresentFrame(PresentEvent* event) {
     if (renderer) {
         renderer->NewFrame(event->swapChain);
         ImGui::NewFrame();
-
-        for (ImGuiDrawCallback& cb : imguiDrawCallbacks) {
-            cb();
-        }
 
         ToastManager::renderToasts();
         ScreenManager::render();

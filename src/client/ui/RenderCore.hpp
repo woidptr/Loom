@@ -23,18 +23,13 @@ struct ImGuiFonts {
 
 class RenderCore {
 private:
-    using ImGuiDrawCallback = std::function<void()>;
-private:
     ID3D12CommandQueue* cmdQueue = nullptr;
     std::unique_ptr<IImguiRenderer> renderer = nullptr;
-    std::vector<ImGuiDrawCallback> imguiDrawCallbacks;
     std::vector<entt::scoped_connection> listeners;
 public:
     RenderCore();
 
     void loadFonts();
-
-    void registerImGuiDrawCallback(ImGuiDrawCallback&& fn);
 
     // void keyboardCallback(int16_t key, bool isDown);
     // void setupAndRenderCallback(ScreenView* screenView, MinecraftUIRenderContext* renderCtx);

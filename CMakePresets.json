@@ -74,7 +74,13 @@
     ],
     "buildPresets": [
         {
-            "name": "release",
+            "name": "x64-debug-clang-cl",
+            "displayName": "Debug (clang-cl)",
+            "configurePreset": "x64-debug-clang-cl"
+        },
+        {
+            "name": "x64-release-clang-cl",
+            "displayName": "Release (clang-cl)",
             "configurePreset": "x64-release-clang-cl"
         }
     ]

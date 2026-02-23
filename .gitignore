@@ -366,7 +366,7 @@ FodyWeavers.xsd
 
 # wip things
 assets/
-signatures.json
+signatures.embed.json
 settings.json
 
 # Rust related things

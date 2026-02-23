@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <simdjson.h>
 #include <core/Asset.hpp>
+#include <core/Resource.hpp>
 #include <core/Logger.hpp>
 
 using json = nlohmann::json;

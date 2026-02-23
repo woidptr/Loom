@@ -6,8 +6,6 @@
 #include <mutex>
 #include <string>
 #include <wtypes.h>
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
 #define NOGDICAPMASKS
 #define NOVIRTUALKEYCODES
 #define NOWINMESSAGES
@@ -30,7 +28,6 @@
 #define NOMB
 #define NOMEMMGR
 #define NOMETAFILE
-#define NOMINMAX
 #define NOMSG
 #define NOOPENFILE
 #define NOSCROLL
@@ -40,8 +37,6 @@
 #define NOWH
 #define NOWINOFFSETS
 #define NOCOMM
-#define NOKANJI
-#define NOHELP
 #define NOPROFILER
 #define NODEFERWINDOWPOS
 #define NOMCX
