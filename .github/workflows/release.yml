@@ -23,7 +23,7 @@ jobs:
         shell: cmd
       
       - name: Recreate secret json
-        run: echo %SIGNATURES_JSON% > secret.json
+        run: echo %SIGNATURES_JSON% > signatures.json
         shell: cmd
         env:
           SIGNATURES_JSON: ${{ secrets.SIGNATURES_JSON }}
