@@ -365,7 +365,6 @@ FodyWeavers.xsd
 .idea/
 
 # wip things
-assets/
 signatures.embed.json
 settings.json
 
