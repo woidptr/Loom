@@ -23,7 +23,9 @@ jobs:
         shell: cmd
       
       - name: Recreate signatures json
-        run: echo %SIGNATURES_JSON% > signatures.json
+        shell: pwsh
+        run: |
+          $env:SIGNATURES_JSON | Out-File -FilePath "$env:GITHUB_WORKSPACE\signatures.json" -Encoding utf8
         shell: cmd
         env:
           SIGNATURES_JSON: ${{ secrets.SIGNATURES_JSON }}
