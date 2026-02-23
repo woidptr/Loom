@@ -51,7 +51,7 @@ def main() -> None:
 
     for i, (rel_path, full_path) in enumerate(files_to_embed):
         cpp_content.append(f"constexpr unsigned char asset_{i}[] = {{")
-        cpp_content.append(f'    #embed "{full_path}"')
+        cpp_content.append(f'    static_cast<unsigned char>(#embed "{full_path}")')
         cpp_content.append("};")
     
     cpp_content.append("")

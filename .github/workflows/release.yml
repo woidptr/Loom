@@ -18,6 +18,11 @@ jobs:
       - name: Setup MSVC Dev Environment
         uses: ilammy/msvc-dev-cmd@v1
       
+      - name: Install Latest LLVM
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "21.1.6"
+      
       - name: Check clang-cl
         run: clang-cl --version
         shell: cmd

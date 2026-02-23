@@ -3,17 +3,17 @@
 
 namespace {
 
-constexpr unsigned char asset_0[] = {
+constexpr uint8_t asset_0[] = {
     #embed "C:/Users/firel/source/repos/Loom/assets/fonts/Arimo_Medium.embed.ttf"
 };
 constexpr unsigned char asset_1[] = {
-    #embed "C:/Users/firel/source/repos/Loom/assets/fonts/Montserrat_Medium.embed.ttf"
+    static_cast<unsigned char>(#embed "C:/Users/firel/source/repos/Loom/assets/fonts/Montserrat_Medium.embed.ttf")
 };
 constexpr unsigned char asset_2[] = {
-    #embed "C:/Users/firel/source/repos/Loom/assets/icons/close.embed.png"
+    static_cast<unsigned char>(#embed "C:/Users/firel/source/repos/Loom/assets/icons/close.embed.png")
 };
 constexpr unsigned char asset_3[] = {
-    #embed "C:/Users/firel/source/repos/Loom/signatures.embed.json"
+    static_cast<unsigned char>(#embed "C:/Users/firel/source/repos/Loom/signatures.embed.json")
 };
 
 struct EmbeddedResource {
