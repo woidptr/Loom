@@ -44,6 +44,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
-          body: ${{ github.event.head_commit.message }}
+          body: ${{ github.tag.message }}
+          prerelease: ${{ contains(github.ref_name, 'beta') }}
           files: |
             out/build/x64-release-clang-cl/Loom.dll
