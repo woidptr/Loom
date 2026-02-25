@@ -1,5 +1,4 @@
 #pragma once
-#include <core/Asset.hpp>
 #include <winrt/base.h>
 
 #include <d3d12.h>

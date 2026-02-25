@@ -94,7 +94,6 @@ CPMAddPackage("gh:nlohmann/json@3.12.0")
 CPMAddPackage("gh:simdjson/simdjson@4.2.4")
 CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
 CPMAddPackage("gh:superPuero/kawa_core#a04c1012a9e32bb1472d2fc92fcf2efb51b84793")
-# CPMAddPackage("gh:corrosion-rs/corrosion@0.6.0")
 CPMAddPackage(
     URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
     OPTIONS
@@ -125,12 +124,6 @@ if (NOT TARGET imgui)
 
     target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
 endif ()
-
-#[[ corrosion_import_crate(
-    MANIFEST_PATH ${CMAKE_SOURCE_DIR}/utils/linker/Cargo.toml
-)
-corrosion_set_env_vars(linker "RUST_ASSETS_DIR=${ASSETS_DIR}")
-corrosion_set_env_vars(linker "RUST_SIGNATURES_FILE=${SIGNATURES_FILE}") ]]
 
 target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json simdjson) # linker
 
