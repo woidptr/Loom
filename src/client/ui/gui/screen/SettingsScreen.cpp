@@ -1,6 +1,7 @@
 #include "SettingsScreen.hpp"
+#include <libhat/fixed_string.hpp>
 
-/*void SettingsScreen::render() {
+void SettingsScreen::render() {
     // Styling the window to match the reference dark theme
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.08f, 0.08f, 0.08f, 1.00f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
@@ -12,7 +13,16 @@
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 center = viewport->GetCenter();
 
-    ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
+    ImVec2 aspectRatio = ImVec2(800, 500);
+    ImVec2 maxAllowedSize = ImVec2(
+        viewport->WorkSize.x - (20.f * 2.f),
+        viewport->WorkSize.y - (20.f * 2.f)
+    );
+    ImVec2 scale = ImVec2(maxAllowedSize.x / aspectRatio.x, maxAllowedSize.y / aspectRatio.y);
+    float finalScale = std::min(1.f, std::min(scale.x, scale.y));
+    ImVec2 windowSize = ImVec2(aspectRatio.x * finalScale, aspectRatio.y * finalScale);
+    
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2(0.5f, 0.5f));
 
     ImGuiWindowFlags windowFlags =
@@ -121,4 +131,4 @@
     ImGui::End();
     ImGui::PopStyleVar(3);
     ImGui::PopStyleColor(2);
-}*/
+}

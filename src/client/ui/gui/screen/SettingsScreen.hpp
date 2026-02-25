@@ -1,10 +1,10 @@
 #pragma once
-/*#include <algorithm>
-#include "IScreen.hpp"
+#include <algorithm>
+#include <client/ui/gui/IScreen.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <core/Logger.hpp>
-#include <client/modules/Module.hpp>
+#include <client/mods/Module.hpp>
 #include <client/Client.hpp>
 
 class SettingsScreen : public IScreen {
@@ -155,4 +155,4 @@ public:
     }
 
     virtual void render() override;
-};*/
+};

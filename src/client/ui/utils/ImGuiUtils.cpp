@@ -1,4 +1,3 @@
-#pragma once
 #include "ImGuiUtils.hpp"
 #include <core/Logger.hpp>
 

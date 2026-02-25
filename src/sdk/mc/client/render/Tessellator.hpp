@@ -9,6 +9,13 @@ namespace mce {
 	class Mesh;
 }
 
+//class TessellatorWrapper {
+//private:
+//	Tessellator* tessellator;
+//public:
+//	Property<uint32_t, Tessellator, "mNextColor"> mNextColor;
+//};
+
 class Tessellator {
 public:
 	enum class UploadMode : int {

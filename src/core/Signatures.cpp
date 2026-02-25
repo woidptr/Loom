@@ -40,7 +40,7 @@ void SignatureRegistry::registerSignatures() {
     * Signatures marked with `->` are sigs to the field offsets
     */
 
-    Asset sigs = Asset("signatures.json");
+    Resource sigs = Resource("signatures.json");
 
     json data = json::parse(sigs.str());
 
