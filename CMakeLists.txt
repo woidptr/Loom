@@ -7,26 +7,16 @@ if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
     message(FATAL_ERROR "This project requires 64-bit Windows (x64)")
 endif()
 
-set(SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 set(GENERATED_IMPORTS "${CMAKE_CURRENT_BINARY_DIR}/import.def")
-set(ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
-set(SIGNATURES_FILE "${CMAKE_CURRENT_SOURCE_DIR}/signatures.json")
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 add_custom_command(
-    OUTPUT ${GENERATED_IMPORTS}
-    COMMAND "${Python3_EXECUTABLE}" "${SCRIPTS_DIR}/funcs.py" "${SIGNATURES_FILE}" "${GENERATED_IMPORTS}"
-    DEPENDS "${SCRIPTS_DIR}/funcs.py"
-    COMMENT "Generating sdk functions"
-    VERBATIM
-)
-
-add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.hpp" "${CMAKE_CURRENT_BINARY_DIR}/Resource.cpp"
-    COMMAND "${Python3_EXECUTABLE}" "${SCRIPTS_DIR}/embedder.py" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.hpp" "${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.cpp"
-    DEPENDS "${SCRIPTS_DIR}/embedder.py" "${ASSETS_DIR}"
-    COMMENT "Embedding resources"
+    OUTPUT ${GENERATED_IMPORTS} "${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.hpp" "${CMAKE_CURRENT_BINARY_DIR}/Resource.cpp"
+    COMMAND "${Python3_EXECUTABLE}" "-m" "builder" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMENT "Invoking build scripts"
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     VERBATIM
 )
 

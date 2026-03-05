@@ -33,6 +33,7 @@
         },
         {
             "name": "x64-debug-msvc",
+            "hidden": true,
             "displayName": "Debug (MSVC)",
             "inherits": "cl-base",
             "architecture": {
@@ -45,6 +46,7 @@
         },
         {
             "name": "x64-release-msvc",
+            "hidden": true,
             "displayName": "Release (MSVC)",
             "inherits": "x64-debug-msvc",
             "cacheVariables": {

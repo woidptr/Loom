@@ -36,8 +36,8 @@ def collect_files_to_embed(embed_path: Path) -> list[tuple[str, str]]:
 
 
 def generate_files_content(embed_path: Path, resource_files: ResourceFiles, files_to_embed: list) -> ResourceFilesContent:
-    header_template_path = embed_path / "scripts" / "templates" / "Resource.hpp.template"
-    source_template_path = embed_path / "scripts" / "templates" / "Resource.cpp.template"
+    header_template_path = embed_path / "builder" / "templates" / "Resource.hpp.template"
+    source_template_path = embed_path / "builder" / "templates" / "Resource.cpp.template"
 
     header_template_text = header_template_path.read_text()
     source_template_text = source_template_path.read_text()
@@ -66,10 +66,11 @@ def write_files_safely(resource_files: ResourceFiles, files_content: ResourceFil
         resource_files.source.write_text(files_content.source)
 
 
-def main() -> None:
-    embed_path = Path(sys.argv[1])
-    header_path = Path(sys.argv[2])
-    cpp_path = Path(sys.argv[3])
+def embed(current_source_dir: Path, current_binary_dir: Path) -> None:
+    embed_path = current_source_dir
+
+    header_path = current_binary_dir / "embedder" / "Resource.hpp"
+    cpp_path = current_binary_dir / "embedder" / "Resource.cpp"
 
     resource_files = ResourceFiles(
         header=header_path,
@@ -83,7 +84,3 @@ def main() -> None:
     files_content = generate_files_content(embed_path, resource_files, files_to_embed)
 
     write_files_safely(resource_files, files_content)
-
-
-if __name__ == "__main__":
-    main()

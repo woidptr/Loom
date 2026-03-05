@@ -2,7 +2,6 @@
 This script defines all the virtual functions
 from index signatures in the actual c++ code
 """
-import sys
 import json
 import ctypes
 from ctypes import wintypes
@@ -54,13 +53,9 @@ def fill_in_virtual_funcs(vfuncs: dict) -> None:
     pass
 
 
-def main() -> None:
-    if len(sys.argv) < 2:
-        print("Error: No signatures file provided")
-        sys.exit(1)
-    
-    signatures_path = Path(sys.argv[1])
-    output_path = Path(sys.argv[2])
+def generate_funcs(current_source_dir: Path, current_binary_dir: Path) -> None:
+    signatures_path = current_source_dir / "signatures.embed.json"
+    output_path = current_binary_dir / "import.def"
 
     with open(signatures_path, "r") as file:
         data = json.load(file)
@@ -103,7 +98,3 @@ def main() -> None:
     #     for path in sdk_dir.rglob("*.cpp"):
     #         if path.name == target_file:
     #             print(f"Found: {path}")
-
-
-if __name__ == "__main__":
-    main()
