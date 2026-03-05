@@ -32,7 +32,14 @@ void Client::loadSettings() {
     std::ifstream file(FileManager::getMainSettingsFile());
 
     nlohmann::json config;
-    file >> config;
+
+    if (file.peek() != std::ifstream::traits_type::eof()) {
+        $log_debug("It's fine!");
+        file >> config;
+    } else {
+        $log_debug("Not fine!");
+        config = nlohmann::json::object();
+    }
 
     for (Module* mod : modules) {
         std::string mod_name = mod->getId();

@@ -46,6 +46,8 @@ fs::path FileManager::getMainSettingsFile() {
         std::ofstream file(mainSettingsFilePath);
         file.close();
     }
+
+    return mainSettingsFilePath;
 }
 
 fs::path FileManager::getProfileFolder(std::string profileName) {
