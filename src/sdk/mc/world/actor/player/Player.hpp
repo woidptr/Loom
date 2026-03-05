@@ -6,4 +6,6 @@
 class Player : public Mob {
 public:
     // $field(std::unique_ptr<SerializedSkin>, mSkin);
+
+    std::string getXuid() const;
 };

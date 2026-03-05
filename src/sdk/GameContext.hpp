@@ -16,6 +16,7 @@
 #include <sdk/mc/network/IPacketHandlerDispatcher.hpp>
 #include <sdk/mc/world/level/dimension/Dimension.hpp>
 #include <sdk/mc/client/gui/screens/ScreenView.hpp>
+#include <sdk/mc/world/effect/MobEffectInstance.hpp>
 
 // containers
 #include <sdk/mc/world/Container.hpp>
@@ -24,6 +25,7 @@
 // components
 #include <sdk/mc/entity/components/ActorEquipmentComponent.hpp>
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
+#include <sdk/mc/entity/components/MobEffectsComponent.hpp>
 
 class GameContext {
 private:

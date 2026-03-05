@@ -1,6 +1,6 @@
 #include "Replay.hpp"
 
-Replay::Replay() : Module("Replay") {
+Replay::Replay() : Module("Replay", "replay") {
     listeners.reserve(1);
 
     $add_listener(IncomingPacketEvent, &Replay::onPacketReceived);

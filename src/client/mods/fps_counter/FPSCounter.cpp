@@ -2,7 +2,7 @@
 #include <format>
 #include <cmath>
 
-FPSCounter::FPSCounter() : Module("FPS Counter") {
+FPSCounter::FPSCounter() : Module("FPS Counter", "fps_counter") {
     listeners.reserve(1);
 
     $add_listener(HudElementRenderEvent, &FPSCounter::onHudElementRender);

@@ -1,5 +1,4 @@
 #include "runtime.hpp"
-// #include <core/embedder.hpp>
 
 DWORD WINAPI Runtime::init(LPVOID lpParam) {
     HMODULE hModule = static_cast<HMODULE>(lpParam);

@@ -37,19 +37,28 @@ public: \
 
 #define $field(type, name) $build_access(type, name, $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*this)>>()) + "->" + #name));
 
-// template <typename T, typename Owner, hat::fixed_string Name>
-// class Property {
-// public:
-// 	operator T() const {
-// 		int32_t offset = $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*Owner)>>()) + "->" + Name.str());
-// 		return hat::member_at<T>(Owner, offset);
-// 	}
-//
-// 	Property& operator=(T value) {
-// 		int32_t offset = $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*Owner)>>()) + "->" + Name.str());
-// 		hat::member_at<T>(Owner, offset) = value;
-// 	}
-// };
+#define $virtual_func(ret, name, ...) \
+ret name args { \
+	return Memory::CallVFunc<decltype(&CI::name)>(31, *this); \
+}
+
+template <typename T, typename Owner, size_t offset>
+class property {
+public:
+	/*operator T() const {
+		int32_t offset = $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*Owner)>>()) + "->" + Name.str());
+ 		return hat::member_at<T>(Owner, offset);
+ 	}
+
+ 	Property& operator=(T value) {
+ 		int32_t offset = $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*Owner)>>()) + "->" + Name.str());
+ 		hat::member_at<T>(Owner, offset) = value;
+ 	}*/
+
+	/*T& get(Owner* self) {
+		return int32_t offset = $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(self)>>()) + "->" + );
+	}*/
+};
 
 namespace Memory {
 	namespace _internal {

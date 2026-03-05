@@ -19,8 +19,8 @@ RenderCore::RenderCore() {
 
 void RenderCore::loadFonts() {
     ImGuiIO& io = ImGui::GetIO();
-    const Resource arimoFont = Resource(std::string_view("assets/fonts/Arimo_Medium.ttf"));
-    const Resource montserratMedium = Resource(std::string_view("assets/fonts/Arimo_SemiBold.ttf"));
+    const Resource arimoFont = Resource("assets/fonts/Arimo_Medium.ttf");
+    const Resource montserratMedium = Resource("assets/fonts/Arimo_SemiBold.ttf");
 
     // io.Fonts->AddFontFromMemoryTTF((void*)arimoFont.begin(), arimoFont.size(), 16.0f);
     ImGuiFonts::Montserrat = io.Fonts->AddFontFromMemoryTTF((void*)montserratMedium.data(), montserratMedium.size(), 16.0f);

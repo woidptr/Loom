@@ -1,6 +1,6 @@
 #include "ArmorHud.hpp"
 
-ArmorHud::ArmorHud() : Module("Armor HUD") {
+ArmorHud::ArmorHud() : Module("Armor HUD", "armor_hud") {
     listeners.reserve(1);
 
     $add_listener(HudElementRenderEvent, &ArmorHud::onHudElementRender);

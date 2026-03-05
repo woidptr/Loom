@@ -7,7 +7,7 @@
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
 #include <events/render/SetupAndRenderEvent.hpp>
 
-ToggleSprint::ToggleSprint() : Module("Toggle Sprint") {
+ToggleSprint::ToggleSprint() : Module("Toggle Sprint", "toggle_sprint") {
     listeners.reserve(2);
 
     $add_listener(SetupAndRenderEvent, &ToggleSprint::onRender);
@@ -46,6 +46,10 @@ void ToggleSprint::onRender(SetupAndRenderEvent* event) {
         // ImGui_ImplMC_Init(renderCtx);
 
         initTest = true;
+    }
+
+    if (!enabled) {
+        return;
     }
 
     if (LocalPlayer* lp = event->renderCtx->mClient->getLocalPlayer()) {

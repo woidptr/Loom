@@ -1,7 +1,9 @@
 #pragma once
-#include "../Module.hpp"
 #include <imgui.h>
+#include <client/mods/Module.hpp>
 #include <events/render/HudElementRenderEvent.hpp>
+
+#include "client/Client.hpp"
 
 class FPSCounter : public Module {
 private:
@@ -11,3 +13,5 @@ public:
 
     void onHudElementRender(HudElementRenderEvent* event);
 };
+
+$register_module(FPSCounter);

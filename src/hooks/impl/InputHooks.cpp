@@ -1,8 +1,17 @@
 #include "InputHooks.hpp"
+#include <GameInput.h>
 #include <hooks/HookManager.hpp>
 #include <hooks/InlineHook.hpp>
 #include <events/input/KeyboardEvent.hpp>
 #include <events/input/MouseEvent.hpp>
+
+typedef HRESULT(WINAPI* PFN_GAME_INPUT_CREATE)(IGameInput** gameInput);
+
+// Typedef for the function we want to hook (GetCurrentReading)
+typedef HRESULT(WINAPI* GetCurrentReading_t)(IGameInput* pThis,
+    GameInputKind inputKind,
+    IGameInputDevice* device,
+    IGameInputReading** reading);
 
 namespace InputHooks {
     InlineHook<void(int16_t, bool)> _keyboard_feed_hook;
@@ -60,9 +69,48 @@ namespace InputHooks {
         return _window_process_hook.call(hwnd, msg, wParam, lParam);
     }
 
+    InlineHook<HRESULT(IGameInput*, GameInputKind, IGameInputDevice*, IGameInputReading**)> _reading_hook;
+    HRESULT WINAPI _reading_detour(IGameInput* pThis, GameInputKind inputKind, IGameInputDevice* device, IGameInputReading** reading)
+    {
+        // Call original to let the OS populate the input
+        // HRESULT hr = oGetCurrentReading(pThis, inputKind, device, reading);
+
+        // Now *reading contains the input data! 
+        // You can read it here (or hook the reading's vtable if you need to spoof it).
+
+        // return hr;
+
+        $log_debug("Test");
+
+        return _reading_hook.call(pThis, inputKind, device, reading);
+    }
+
     void init() {
+        HMODULE hGameInput = GetModuleHandleA("gameinput.dll");
+
+        if (!hGameInput) {
+            $log_debug("hGameInput not found!");
+            return;
+        }
+
+        PFN_GAME_INPUT_CREATE pGameInputCreate = (PFN_GAME_INPUT_CREATE)GetProcAddress(hGameInput, "GameInputCreate");
+        if (!pGameInputCreate) {
+            $log_debug("pGameInputCreate not found!");
+            return;
+        }
+
+        IGameInput* dummyInput = nullptr;
+        if (FAILED(pGameInputCreate(&dummyInput))) return;
+
+        void** vTable = *(void***)dummyInput;
+
+        void* pGetCurrentReading = vTable[3];
+
+        dummyInput->Release();
+
         HookManager::createInlineHook(_mouse_device_feed_hook.getHook(), (void*)$get_address("MouseDevice::feed"), &_mouse_device_feed_detour);
         // HookManager::createInlineHook(_keyboard_feed_hook.getHook(), (void*)$get_address("Keyboard::feed"), &_keyboard_feed_detour);
         HookManager::createInlineHook(_window_process_hook.getHook(), (void*)$get_address("MainWindow::_windowProc"), &_window_process_detour);
+        HookManager::createInlineHook(_reading_hook.getHook(), pGetCurrentReading, &_reading_detour);
     }
 }

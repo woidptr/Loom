@@ -1,34 +1,30 @@
 #pragma once
 #include <vector>
-
-// ui
 #include "ui/RenderCore.hpp"
-
-// modules
 #include "mods/Module.hpp"
-#include "mods/movement/ToggleSprint.hpp"
-#include "mods/misc/replay/Replay.hpp"
-#include "mods/misc/FPSCounter.hpp"
-#include <libhat/fixed_string.hpp>
 
-#define $get_modules() Client::getInstance()->getModules()
+#define $get_modules() Client::getModules()
+
+#define $register_module(module_class) \
+    static_assert(std::is_base_of_v<Module, module_class>, "Error: " #module_class " does not inherit from Module!"); \
+    static module_class g_##module_class##_instance; \
+    static bool g_##module_class##_registered = []() { \
+        Client::registerModule(&g_##module_class##_instance); \
+        return true; \
+    }()
 
 class Client {
 private:
-    static inline Client* instance = nullptr;
-private:
-    RenderCore* uiRender = nullptr;
-
-    // modules
-    std::vector<Module*> modules{};
+    static inline RenderCore* uiRender = nullptr;
+    static inline std::vector<Module*> modules{};
 public:
-    Client();
-    ~Client();
-
     static void construct();
     static void destruct();
-    static Client* getInstance();
 
-    void initModules();
-    const std::vector<Module*> getModules();
+    static void registerModule(Module* mod);
+    static const std::vector<Module*> getModules();
+private:
+    static void loadSettings();
+public:
+    static void saveSettings();
 };

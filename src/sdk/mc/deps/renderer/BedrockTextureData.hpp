@@ -1,9 +1,10 @@
 #pragma once
 #include <core/Memory.hpp>
+#include <sdk/mc/deps/core_graphics/TextureDescription.hpp>
 #include <sdk/mc/deps/renderer/IsMissingTexture.hpp>
 #include <sdk/mc/deps/renderer/TextureLoadState.hpp>
 
-class BedrockTextureData {
+struct BedrockTextureData {
 public:
     $padding(88);
 

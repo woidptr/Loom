@@ -1,0 +1,44 @@
+#include "Resource.hpp"
+#include <array>
+
+namespace {
+{%- for rel_path, full_path in files %}
+    constexpr uint8_t asset_{{ loop.index0 }}[] = {
+        #embed "{{ full_path }}"
+    };
+{%- endfor %}
+
+    struct EmbeddedResource {
+        uint64_t path_hash;
+        const uint8_t* data;
+        size_t size;
+    };
+
+    constexpr std::array<EmbeddedResource, {{ files|length }}> resources = {{ "{" }}{{ "{" }}
+    {%- for rel_path, full_path in files %}
+        {HashedString::computeHash("{{ rel_path }}"), asset_{{ loop.index0 }}, sizeof(asset_{{ loop.index0 }})},
+    {%- endfor %}
+    {{ "}" }}{{ "}" }};
+}
+
+Resource::Resource(HashedPath hashed_path) {
+    for (const auto& entry : resources) {
+        if (entry.path_hash == hashed_path.value) {
+            m_data = entry.data;
+            m_size = entry.size;
+            return;
+        }
+    }
+}
+
+const uint8_t* Resource::data() const {
+    return m_data;
+}
+
+size_t Resource::size() const {
+    return m_size;
+}
+
+std::string_view Resource::str() const {
+    return std::string_view(reinterpret_cast<const char*>(m_data), m_size);
+}

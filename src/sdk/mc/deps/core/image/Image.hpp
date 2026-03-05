@@ -6,9 +6,9 @@
 namespace mce {
     struct Image {
         mce::ImageFormat imageFormat;
-        unsigned int mWidth;
-        unsigned int mHeight;
-        unsigned int mDepth;
+        uint32_t mWidth;
+        uint32_t mHeight;
+        uint32_t mDepth;
         mce::ImageUsage mUsage;
     };
 }
