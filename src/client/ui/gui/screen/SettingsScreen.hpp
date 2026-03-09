@@ -69,7 +69,7 @@ public:
         // 2. Enable Button Interaction (Left)
         ImGui::SetCursorScreenPos(enableRect.Min);
         if (ImGui::InvisibleButton(("##" + mod->getName() + "_enable_btn").c_str(), enableRect.GetSize())) {
-            mod->enabled = !mod->enabled;
+            mod->toggle();
         }
         bool enableHovered = ImGui::IsItemHovered();
         bool enableActive = ImGui::IsItemActive();
@@ -112,7 +112,7 @@ public:
         ImU32 enableTextCol = IM_COL32(255, 255, 255, 255);
         const char* statusText;
 
-        if (mod->enabled) {
+        if (mod->isEnabled()) {
             enableBgCol = enableActive ? IM_COL32(35, 130, 75, 255) : IM_COL32(46, 174, 98, 255);
             statusText = "ENABLED";
         }

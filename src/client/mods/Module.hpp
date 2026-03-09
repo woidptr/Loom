@@ -1,20 +1,19 @@
 #pragma once
-#include "ISetting.hpp"
 #include <string>
 #include <vector>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <events/EventHandler.hpp>
 #include <sdk/GameContext.hpp>
+#include <core/settings/Configurable.hpp>
 
-class Module {
+#include "core/settings/Setting.hpp"
+
+class Module : public Configurable {
 protected:
     std::string name;
     std::string id;
-    std::vector<ISetting*> settings;
     std::vector<entt::scoped_connection> listeners;
-public:
-    bool enabled = false;
 public:
     Module(std::string name, std::string id);
     ~Module();
@@ -22,7 +21,6 @@ public:
     std::string getName() const;
     std::string getId() const;
 
-    void registerSetting(ISetting* setting);
-    nlohmann::json saveSettings() const;
-    void loadSettings(const nlohmann::json& j);
+    virtual bool isEnabled() const = 0;
+    virtual void toggle() = 0;
 };

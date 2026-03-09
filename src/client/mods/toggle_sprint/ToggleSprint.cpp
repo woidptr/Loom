@@ -10,9 +10,23 @@
 ToggleSprint::ToggleSprint() : Module("Toggle Sprint", "toggle_sprint") {
     listeners.reserve(2);
 
-    $add_listener(SetupAndRenderEvent, &ToggleSprint::onRender);
-    $add_listener(KeyboardEvent, &ToggleSprint::onKey);
-    $add_listener(HudElementRenderEvent, &ToggleSprint::onHudElementRender);
+    enabled.setCallback([&](bool isEnabled) -> void {
+        if (isEnabled) {
+            $add_listener(SetupAndRenderEvent, &ToggleSprint::onRender);
+            $add_listener(KeyboardEvent, &ToggleSprint::onKey);
+            $add_listener(HudElementRenderEvent, &ToggleSprint::onHudElementRender);
+        } else {
+            listeners.clear();
+        }
+    });
+}
+
+bool ToggleSprint::isEnabled() const {
+    return enabled;
+}
+
+void ToggleSprint::toggle() {
+    enabled = !enabled;
 }
 
 void ToggleSprint::onRender(SetupAndRenderEvent* event) {

@@ -32,8 +32,11 @@ def make_fake_import_lib(symbols: list[tuple[str, str]], output_path: Path) -> N
         lines.append(f"    {symbol[1]}\n")
     
     lib_text = "\n".join(lines)
-    
-    output_path.write_text(lib_text)
+
+    original_text = output_path.read_text()
+
+    if original_text != lib_text:
+        output_path.write_text(lib_text)
 
 
 def undecorate_symbol(symbol: str):
@@ -47,10 +50,6 @@ def undecorate_symbol(symbol: str):
     )
 
     return buffer.value.decode("ascii")
-
-
-def fill_in_virtual_funcs(vfuncs: dict) -> None:
-    pass
 
 
 def generate_funcs(current_source_dir: Path, current_binary_dir: Path) -> None:
@@ -73,28 +72,3 @@ def generate_funcs(current_source_dir: Path, current_binary_dir: Path) -> None:
                 symbol_pairs.append((key, symbol))
     
     make_fake_import_lib(symbol_pairs, output_path)
-    
-    # classes = dict(classes)
-
-    # print(classes)
-
-    # sdk_dir = Path("../src/sdk")
-
-    # for path in sdk_dir.rglob("*.cpp"):
-    #     class_name = path.stem
-
-    #     if class_name in classes:
-    #         functions = classes[class_name]
-
-    #         with open(path, "a", encoding="utf-8") as f:
-    #             for func in functions:
-    #                 f.write(f"\nvoid {class_name}::{func}() {{\n")
-    #                 f.write(f'    return Memory::CallVirtual<decltype(&{class_name}::{func})>($get_index("{class_name}$${func}"), *this);\n')
-    #                 f.write("}\n")
-
-    # for class_name in classes:
-    #     target_file = f"{class_name}.cpp"
-
-    #     for path in sdk_dir.rglob("*.cpp"):
-    #         if path.name == target_file:
-    #             print(f"Found: {path}")

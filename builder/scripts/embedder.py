@@ -1,4 +1,3 @@
-import sys
 from jinja2 import Template
 from dataclasses import dataclass
 from pathlib import Path

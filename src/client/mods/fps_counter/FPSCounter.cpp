@@ -5,7 +5,21 @@
 FPSCounter::FPSCounter() : Module("FPS Counter", "fps_counter") {
     listeners.reserve(1);
 
-    $add_listener(HudElementRenderEvent, &FPSCounter::onHudElementRender);
+    enabled.setCallback([&](bool isEnabled) -> void {
+        if (isEnabled) {
+            $add_listener(HudElementRenderEvent, &FPSCounter::onHudElementRender);
+        } else {
+            listeners.clear();
+        }
+    });
+}
+
+bool FPSCounter::isEnabled() const {
+    return enabled;
+}
+
+void FPSCounter::toggle() {
+    enabled = !enabled;
 }
 
 void FPSCounter::onHudElementRender(HudElementRenderEvent* event) {

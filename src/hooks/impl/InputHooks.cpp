@@ -1,9 +1,12 @@
 #include "InputHooks.hpp"
+
+#include <dxgi.h>
 #include <GameInput.h>
 #include <hooks/HookManager.hpp>
 #include <hooks/InlineHook.hpp>
 #include <events/input/KeyboardEvent.hpp>
 #include <events/input/MouseEvent.hpp>
+#include <GameInput.h>
 
 typedef HRESULT(WINAPI* PFN_GAME_INPUT_CREATE)(IGameInput** gameInput);
 
@@ -86,25 +89,29 @@ namespace InputHooks {
     }
 
     void init() {
-        HMODULE hGameInput = GetModuleHandleA("gameinput.dll");
+        HMODULE hGameInput = GetModuleHandleA("GameInputRedist.dll");
 
         if (!hGameInput) {
             $log_debug("hGameInput not found!");
             return;
         }
 
-        PFN_GAME_INPUT_CREATE pGameInputCreate = (PFN_GAME_INPUT_CREATE)GetProcAddress(hGameInput, "GameInputCreate");
-        if (!pGameInputCreate) {
+        void* GameInputCreate = GetProcAddress(hGameInput, "GameInputCreate");
+        if (!GameInputCreate) {
             $log_debug("pGameInputCreate not found!");
             return;
         }
 
         IGameInput* dummyInput = nullptr;
-        if (FAILED(pGameInputCreate(&dummyInput))) return;
+        if (((long(__stdcall*)(IGameInput** gameInput))(GameInputCreate))(&dummyInput) < 0) {
+            $log_debug("Dummy input creation failed!");
+            return;
+        }
 
         void** vTable = *(void***)dummyInput;
 
-        void* pGetCurrentReading = vTable[3];
+        void* pGetCurrentReading = vTable[10];
+        $log_debug("GetCurrentReading: {:P}", pGetCurrentReading);
 
         dummyInput->Release();
 

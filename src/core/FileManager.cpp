@@ -1,6 +1,12 @@
 #include "FileManager.hpp"
 #include "Logger.hpp"
 
+void FileManager::ensureExists(fs::path path) {
+    if (!fs::exists(path)) {
+        fs::create_directories(path);
+    }
+}
+
 fs::path FileManager::getRootFolder() {
     PWSTR path = nullptr;
 
@@ -8,10 +14,7 @@ fs::path FileManager::getRootFolder() {
 
     if (SUCCEEDED(hr)) {
         fs::path rootPath = fs::path(path) / ".loom";
-
-        if (!fs::exists(rootPath)) {
-            fs::create_directories(rootPath);
-        }
+        ensureExists(rootPath);
 
         return rootPath;
     }
@@ -21,20 +24,14 @@ fs::path FileManager::getRootFolder() {
 
 fs::path FileManager::getLogsFolder() {
     fs::path logsPath = getRootFolder() / "logs";
-
-    if (!fs::exists(logsPath)) {
-        fs::create_directories(logsPath);
-    }
+    ensureExists(logsPath);
 
     return logsPath;
 }
 
 fs::path FileManager::getSettingsFolder() {
     fs::path settingsPath = getRootFolder() / "settings";
-
-    if (!fs::exists(settingsPath)) {
-        fs::create_directories(settingsPath);
-    }
+    ensureExists(settingsPath);
 
     return settingsPath;
 }
@@ -50,12 +47,9 @@ fs::path FileManager::getMainSettingsFile() {
     return mainSettingsFilePath;
 }
 
-fs::path FileManager::getProfileFolder(std::string profileName) {
-    fs::path profilePath = getSettingsFolder() / profileName;
+fs::path FileManager::getProfileSettingFile(const std::string& profile) {
+    fs::path profilesPath = getSettingsFolder() / "profiles";
+    ensureExists(profilesPath);
 
-    if (!fs::exists(profilePath)) {
-        fs::create_directories(profilePath);
-    }
-
-    return profilePath;
+    fs::path settingProfilePath = profilesPath / profile;
 }
