@@ -32,8 +32,8 @@ void FPSCounter::onHudElementRender(HudElementRenderEvent* event) {
 
     std::string fpsText = std::format("FPS: {}", fps);
 
-    drawList->AddRectFilled(p_min, p_max, IM_COL32(0, 0, 0, 200), borderRadius);
-    drawList->AddRect(p_min, p_max, IM_COL32(0, 0, 0, 255), borderRadius, ImDrawFlags_None, 2.f);
+    drawList->AddRectFilled(p_min, p_max, IM_COL32(0, 0, 0, 200), border_radius);
+    drawList->AddRect(p_min, p_max, IM_COL32(0, 0, 0, 255), border_radius, ImDrawFlags_None, 2.f);
 
     ImVec2 boxSize = ImVec2(p_max.x - p_min.x, p_max.y - p_min.y);
     ImVec2 originalTextSize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, fpsText.c_str());
@@ -48,6 +48,6 @@ void FPSCounter::onHudElementRender(HudElementRenderEvent* event) {
     drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize() * finalScale, p_min, IM_COL32(255, 255, 255, 255), fpsText.c_str());
 
     if (event->isInEditMode) {
-        drawList->AddRectFilled(p_min, p_max, ImU32(9999), borderRadius);
+        drawList->AddRectFilled(p_min, p_max, ImU32(9999), border_radius);
     }
 }

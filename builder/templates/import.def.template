@@ -1,0 +1,6 @@
+LIBRARY mcapi.dll
+EXPORTS
+{%- for symbol in symbols %}
+    ; {{ symbol.qualified_name }}
+    {{ symbol.mangled_name }}
+{% endfor %}

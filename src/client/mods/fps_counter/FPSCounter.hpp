@@ -8,9 +8,16 @@
 
 class FPSCounter : public Module {
 private:
+    // general settings
     BoolSetting<"enabled"> enabled{this, false};
 
-    float borderRadius = 10.f;
+    // hud settings
+    Vec2Setting<"position", "hud"> position{this, ImVec2(0.5f, 0.5f)};
+    BoolSetting<"show_hud", "hud"> show_hud{this, true};
+    ColorSetting<"hud_color", "hud"> hud_color{this, ImColor(0.f, 0.f, 0.f, 0.8f)};
+    FloatSetting<"border_width", "hud"> border_width{this, 0.f};
+    FloatSetting<"border_radius", "hud"> border_radius{this, 0.f};
+    ColorSetting<"border_color", "hud"> border_color{this, ImColor(0.f, 0.f, 0.f, 0.8f)};
 public:
     FPSCounter();
 

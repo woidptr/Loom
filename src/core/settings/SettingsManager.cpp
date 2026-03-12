@@ -3,6 +3,10 @@
 #include "client/Client.hpp"
 #include "client/mods/Module.hpp"
 
+void SettingsManager::registerConfigurable(Configurable *configurable) {
+    configurables.emplace_back(configurable);
+}
+
 void SettingsManager::loadProfile(const std::string &profile) {
     std::ifstream file(FileManager::getProfileSettingFile(profile));
 

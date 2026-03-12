@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <core/settings/SettingsManager.hpp>
 #include "ui/RenderCore.hpp"
 #include "mods/Module.hpp"
 
@@ -10,6 +11,7 @@
     static module_class g_##module_class##_instance; \
     static bool g_##module_class##_registered = []() { \
         Client::registerModule(&g_##module_class##_instance); \
+        SettingsManager::registerConfigurable(&g_##module_class##_instance); \
         return true; \
     }()
 
@@ -23,8 +25,4 @@ public:
 
     static void registerModule(Module* mod);
     static const std::vector<Module*> getModules();
-private:
-    static void loadSettings();
-public:
-    static void saveSettings();
 };

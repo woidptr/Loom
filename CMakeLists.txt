@@ -2,6 +2,10 @@
 project(Loom)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CPM_SOURCE_CACHE "${CMAKE_SOURCE_DIR}/.cpmcache")
+set(CPM_USE_LOCAL_PACKAGES ON)
 
 if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
     message(FATAL_ERROR "This project requires 64-bit Windows (x64)")
@@ -56,6 +60,8 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 
     # Enable #embed directive support in clang
     $<$<BOOL:${IS_CLANG}>:/clang:-Wno-c23-extensions>
+    # Disable warnings for unused private fields in clang
+    $<$<BOOL:${IS_CLANG}>:/clang:-Wno-unused-private-field>
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -79,11 +85,16 @@ include(${CPM_DOWNLOAD_LOCATION})
 
 CPMAddPackage("gh:BasedInc/libhat@0.9.0")
 CPMAddPackage("gh:ocornut/imgui@1.92.5")
-CPMAddPackage("gh:cursey/safetyhook@0.6.9")
+CPMAddPackage("gh:zyantific/zydis@4.1.1")
 CPMAddPackage("gh:nlohmann/json@3.12.0")
 CPMAddPackage("gh:simdjson/simdjson@4.2.4")
 CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
 CPMAddPackage("gh:superPuero/kawa_core#a04c1012a9e32bb1472d2fc92fcf2efb51b84793")
+CPMAddPackage(
+    URI "gh:cursey/safetyhook@0.6.9"
+    OPTIONS
+        "SAFETYHOOK_FETCH_ZYDIS OFF"
+)
 CPMAddPackage(
     URI "gh:BasedInc/kiero#269860311ac04b0ee89e68f68bca55abd02a3390"
     OPTIONS
@@ -92,7 +103,7 @@ CPMAddPackage(
         "KIERO_BUILD_EXAMPLES OFF"
 )
 
-if (NOT TARGET imgui)
+if(NOT TARGET imgui)
     add_library(imgui STATIC)
 
     target_sources(imgui PRIVATE
@@ -113,7 +124,7 @@ if (NOT TARGET imgui)
     )
 
     target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
-endif ()
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json simdjson) # linker
 

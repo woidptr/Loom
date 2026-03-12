@@ -364,6 +364,8 @@ FodyWeavers.xsd
 
 .idea/
 
+.cpmcache/
+
 # wip things
 signatures.embed.json
 settings.json
