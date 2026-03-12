@@ -5,7 +5,9 @@ A playground for testing Minecraft Bedrock Edition native modding
 ## Requirements
 
 - Microsoft Visual Studio Build Tools
+- clang-cl compiler
 - CMake
+- Python
 
 ## Signatures
 Signatures are not included in the source. You can find them yourself.
@@ -14,21 +16,18 @@ Rename the current `signatures.json.example` to `signatures.json` and fill in th
 
 ## Building
 
-Build with Visual Studio by pressing `Ctrl+Shift+B` or can build with cmake commands (don't forget to set the msvc compiler path)
-
 ### Debug
 ```sh
-cmake --preset x64-debug-msvc
-cmake --build --preset x64-debug-msvc
+cmake --preset x64-debug-clang-cl
+cmake --build --preset x64-debug-clang-cl
 ```
 
 ### Release
 ```sh
-cmake --preset x64-release-msvc
-cmake --build --preset x64-release-msvc
+cmake --preset x64-release-clang-cl
+cmake --build --preset x64-release-clang-cl
 ```
 
 ## Logs
 
-When compiled in debug mode and injected, you will see the console pop up and all the information will be printed there.
-When compiled in release mode, all the logs are stored at `%appdata%/.loom/logs`.
+Logs are located at the `%appdata%/.loom/logs`. In debug mode, the debug console will be available to you.
