@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <events/EventHandler.hpp>
 #include <sdk/GameContext.hpp>
 #include <core/settings/Configurable.hpp>
@@ -19,7 +19,7 @@ public:
     ~Module();
 
     std::string getName() const;
-    std::string getId() const;
+    virtual std::string getId() const override;
 
     virtual bool isEnabled() const = 0;
     virtual void toggle() = 0;

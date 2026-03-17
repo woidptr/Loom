@@ -47,9 +47,23 @@ fs::path FileManager::getMainSettingsFile() {
     return mainSettingsFilePath;
 }
 
+fs::path FileManager::getProfilesFile() {
+    fs::path profilesFilePath = getSettingsFolder() / "profiles.json";
+    return profilesFilePath;
+}
+
 fs::path FileManager::getProfileSettingFile(const std::string& profile) {
     fs::path profilesPath = getSettingsFolder() / "profiles";
     ensureExists(profilesPath);
 
     fs::path settingProfilePath = profilesPath / profile;
+}
+
+fs::path FileSystem::getAppDataPath() {
+    fs::path rootPath;
+
+    const char* appData = getenv("APPDATA");
+    rootPath = fs::path(appData);
+
+    return rootPath / ".myraclient";
 }

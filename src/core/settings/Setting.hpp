@@ -2,7 +2,7 @@
 #include <string>
 #include <core/settings/Configurable.hpp>
 #include "ISetting.hpp"
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <libhat/fixed_string.hpp>
 #include <imgui.h>
 
@@ -20,6 +20,8 @@ public:
 
     void setCallback(std::function<void(const T&)> callback) {
         onChangeCallback = callback;
+
+        onChangeCallback(value);
     }
 
     operator T&() { return value; }

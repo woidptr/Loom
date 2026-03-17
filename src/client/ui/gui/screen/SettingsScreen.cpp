@@ -1,9 +1,9 @@
 #include "SettingsScreen.hpp"
-#include <libhat/fixed_string.hpp>
+#include <client/ui/elements/screens/SettingsScreen.hpp>
 
 void SettingsScreen::render() {
     // Styling the window to match the reference dark theme
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.08f, 0.08f, 0.08f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.08f, 0.08f, 0.08f, 0.90f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
@@ -13,120 +13,136 @@ void SettingsScreen::render() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 center = viewport->GetCenter();
 
-    ImVec2 aspectRatio = ImVec2(800, 500);
     ImVec2 maxAllowedSize = ImVec2(
-        viewport->WorkSize.x - (20.f * 2.f),
-        viewport->WorkSize.y - (20.f * 2.f)
+        viewport->WorkSize.x * windowSizePercentage,
+        viewport->WorkSize.y * windowSizePercentage
     );
-    ImVec2 scale = ImVec2(maxAllowedSize.x / aspectRatio.x, maxAllowedSize.y / aspectRatio.y);
-    float finalScale = std::min(1.f, std::min(scale.x, scale.y));
-    ImVec2 windowSize = ImVec2(aspectRatio.x * finalScale, aspectRatio.y * finalScale);
+
+    float scale_x = maxAllowedSize.x / windowAspectRatio.x;
+    float scale_y = maxAllowedSize.y / windowAspectRatio.y;
+
+    float final_scale = std::min(scale_x, scale_y);
+
+    ImVec2 windowSize = ImVec2(windowAspectRatio.x * final_scale, windowAspectRatio.y * final_scale);
     
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
     ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2(0.5f, 0.5f));
 
     ImGuiWindowFlags windowFlags =
         ImGuiWindowFlags_NoTitleBar |
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove;
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoScrollWithMouse;
 
     ImGui::Begin("MINECRAFT MODS WINDOW", nullptr, windowFlags);
 
-    // --- Header Configuration ---
-    float headerHeight = 50.0f;
-    float startY = ImGui::GetCursorPosY(); // Save the starting Y position
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    // 1. Draw Title (Vertically Centered)
-    // Calculate Y offset: (TargetHeight - TextHeight) / 2
-    const char* titleText = "MINECRAFT MODS";
-    float textHeight = ImGui::GetTextLineHeight();
-    float textOffset = (headerHeight - textHeight) * 0.5f;
-
-    ImGui::SetCursorPosY(startY + textOffset);
-    ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, 1.f), titleText);
-
-    // 2. Draw Close Button (Right Aligned & Vertically Centered)
-    float btnSize = 30.0f; // Square button looks better
-    float btnOffset = (headerHeight - btnSize) * 0.5f;
-
-    // Move cursor to the Right side and correct Y position
-    ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMax().x - btnSize, startY + btnOffset));
-
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-    // Optional: Add hover color so it's not invisible when interacting
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
-
-    if (ImGui::Button("X", ImVec2(btnSize, btnSize))) {
+    const std::function<void()> on_window_close = [&]() -> void {
         ScreenManager::setScreen(nullptr);
-    }
-    ImGui::PopStyleColor(2);
+    };
 
-    // 3. Advance the cursor past the header
-    // This ensures the next elements (tabs) start AFTER the 50px header area
-    ImGui::SetCursorPosY(startY + headerHeight);
+    UI::Elements::SettingsScreen::DrawTitleBar(window, draw_list, on_window_close);
 
-    ImGui::Spacing();
+    UI::Elements::SettingsScreen::DrawNavBar(window, draw_list);
 
-    // --- Top Bar (Tabs & Search) ---
-    static const char* categories[] = { "ALL", "NEW", "HUD", "WORLD", "VISUAL" };
-    static int currentTab = 0;
-
-    for (int i = 0; i < 5; i++) {
-        if (i > 0) ImGui::SameLine();
-
-        // Use a different color for the active tab (Blueish)
-        if (i == currentTab) {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.4f, 0.75f, 1.0f));
-        }
-        else {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.15f, 0.15f, 1.0f));
-        }
-
-        if (ImGui::Button(categories[i], ImVec2(70, 30))) {
-            currentTab = i;
-        }
-        ImGui::PopStyleColor();
-    }
-
-    // Search Bar (Right Aligned)
-    static char searchBuf[128] = "";
-    float searchWidth = 200.0f;
-    ImGui::SameLine();
-    ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - searchWidth);
-    ImGui::PushItemWidth(searchWidth);
-    ImGui::InputTextWithHint("##Search", "Search...", searchBuf, IM_ARRAYSIZE(searchBuf));
-    ImGui::PopItemWidth();
-
-    ImGui::Separator();
-    ImGui::Spacing();
-
-    // --- Grid Area ---
-    float cardWidth = 160.0f;
-    float cardHeight = 180.0f;
-    float padding = 15.0f;
-
-    float panelWidth = ImGui::GetContentRegionAvail().x;
-    int columnCount = (int)(panelWidth / (cardWidth + padding));
-    if (columnCount < 1) columnCount = 1;
-
-    ImGui::BeginTable("GridArea", columnCount, ImGuiTableFlags_PadOuterX);
-
-    int shownCount = 0;
-    for (Module* mod : $get_modules()) {
-        // 1. Filter by Tab
-        // if (currentTab != 0 && mod.category != categories[currentTab]) continue;
-
-        if (searchBuf[0] != 0 && mod->getName().find(searchBuf) == std::string::npos) continue;
-
-        ImGui::TableNextColumn();
-
-        DrawModuleItem(mod);
-
-        shownCount++;
-    }
-
-    ImGui::EndTable();
+    // // --- Header Configuration ---
+    // float headerHeight = 50.0f;
+    // float startY = ImGui::GetCursorPosY(); // Save the starting Y position
+    //
+    // // 1. Draw Title (Vertically Centered)
+    // // Calculate Y offset: (TargetHeight - TextHeight) / 2
+    // const char* titleText = "MINECRAFT MODS";
+    // float textHeight = ImGui::GetTextLineHeight();
+    // float textOffset = (headerHeight - textHeight) * 0.5f;
+    //
+    // ImGui::SetCursorPosY(startY + textOffset);
+    // ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, 1.f), titleText);
+    //
+    // // 2. Draw Close Button (Right Aligned & Vertically Centered)
+    // float btnSize = 30.0f; // Square button looks better
+    // float btnOffset = (headerHeight - btnSize) * 0.5f;
+    //
+    // // Move cursor to the Right side and correct Y position
+    // ImGui::SetCursorPos(ImVec2(ImGui::GetWindowContentRegionMax().x - btnSize, startY + btnOffset));
+    //
+    // ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    // // Optional: Add hover color so it's not invisible when interacting
+    // ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
+    //
+    // if (ImGui::Button("X", ImVec2(btnSize, btnSize))) {
+    //     ScreenManager::setScreen(nullptr);
+    // }
+    // ImGui::PopStyleColor(2);
+    //
+    // // 3. Advance the cursor past the header
+    // // This ensures the next elements (tabs) start AFTER the 50px header area
+    // ImGui::SetCursorPosY(startY + headerHeight);
+    //
+    // ImGui::Spacing();
+    //
+    // // --- Top Bar (Tabs & Search) ---
+    // static const char* categories[] = { "ALL", "NEW", "HUD", "WORLD", "VISUAL" };
+    // static int currentTab = 0;
+    //
+    // for (int i = 0; i < 5; i++) {
+    //     if (i > 0) ImGui::SameLine();
+    //
+    //     // Use a different color for the active tab (Blueish)
+    //     if (i == currentTab) {
+    //         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.4f, 0.75f, 1.0f));
+    //     }
+    //     else {
+    //         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.15f, 0.15f, 1.0f));
+    //     }
+    //
+    //     if (ImGui::Button(categories[i], ImVec2(70, 30))) {
+    //         currentTab = i;
+    //     }
+    //     ImGui::PopStyleColor();
+    // }
+    //
+    // // Search Bar (Right Aligned)
+    // static char searchBuf[128] = "";
+    // float searchWidth = 200.0f;
+    // ImGui::SameLine();
+    // ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - searchWidth);
+    // ImGui::PushItemWidth(searchWidth);
+    // ImGui::InputTextWithHint("##Search", "Search...", searchBuf, IM_ARRAYSIZE(searchBuf));
+    // ImGui::PopItemWidth();
+    //
+    // ImGui::Separator();
+    // ImGui::Spacing();
+    //
+    // // --- Grid Area ---
+    // float cardWidth = 160.0f;
+    // float cardHeight = 180.0f;
+    // float padding = 15.0f;
+    //
+    // float panelWidth = ImGui::GetContentRegionAvail().x;
+    // int columnCount = (int)(panelWidth / (cardWidth + padding));
+    // if (columnCount < 1) columnCount = 1;
+    //
+    // ImGui::BeginTable("GridArea", columnCount, ImGuiTableFlags_PadOuterX);
+    //
+    // int shownCount = 0;
+    // for (Module* mod : $get_modules()) {
+    //     // 1. Filter by Tab
+    //     // if (currentTab != 0 && mod.category != categories[currentTab]) continue;
+    //
+    //     if (searchBuf[0] != 0 && mod->getName().find(searchBuf) == std::string::npos) continue;
+    //
+    //     ImGui::TableNextColumn();
+    //
+    //     DrawModuleItem(mod);
+    //
+    //     shownCount++;
+    // }
+    //
+    // ImGui::EndTable();
 
     ImGui::End();
     ImGui::PopStyleVar(3);

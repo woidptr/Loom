@@ -111,7 +111,7 @@ namespace InputHooks {
         void** vTable = *(void***)dummyInput;
 
         void* pGetCurrentReading = vTable[10];
-        $log_debug("GetCurrentReading: {:P}", pGetCurrentReading);
+        $log_debug("GetCurrentReading: {:p}", pGetCurrentReading);
 
         dummyInput->Release();
 

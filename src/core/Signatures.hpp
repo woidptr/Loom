@@ -2,8 +2,7 @@
 #include <unordered_map>
 #include <memory>
 #include <libhat/scanner.hpp>
-#include <nlohmann/json.hpp>
-#include <simdjson.h>
+#include <json.hpp>
 #include <Resource.hpp>
 #include <core/Logger.hpp>
 

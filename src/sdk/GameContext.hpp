@@ -27,10 +27,13 @@
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
 #include <sdk/mc/entity/components/MobEffectsComponent.hpp>
 
+#include <sdk/mc/deps/application/gamecore/Platform_GameCore.hpp>
+
 class GameContext {
 private:
 	static inline std::once_flag clientInstanceInitializer;
 public:
+	static inline Bedrock::Platform_GameCore* platformGameCore = nullptr;
 	static inline IClientInstance* clientInstance = nullptr;
 	static inline SceneFactory* sceneFactory = nullptr;
 	static inline ISceneStack* sceneStack = nullptr;

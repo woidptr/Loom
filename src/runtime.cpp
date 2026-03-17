@@ -1,36 +1,47 @@
 #include "runtime.hpp"
 
-DWORD WINAPI Runtime::init(LPVOID lpParam) {
-    HMODULE hModule = static_cast<HMODULE>(lpParam);
-
-    Logger::init();
-
+bool Runtime::performStartupSequence() {
+    Logger::construct();
     SignatureRegistry::registerSignatures();
 
     if (!SignatureRegistry::performHealthCheck()) {
         $log_critical("Signature healthcheck failed, silently ejecting...");
-
-        return 0;
+        return false;
     }
 
-    FakeImports::construct({
-        .dll_name = "mcapi.dll",
+    FakeImports::load_all_imports({
+        .dll_name = MCAPI_DLL_NAME,
         .resolve = Memory::ResolveAddress,
     });
-    FakeImports::load_all_imports();
 
     kiero::init(kiero::RenderType::Auto);
 
     HookManager::construct();
-
     Client::construct();
 
+    return true;
+}
+
+DWORD WINAPI Runtime::init(LPVOID lpParam) {
+    hModule = static_cast<HMODULE>(lpParam);
+
+    if (performStartupSequence()) {
+        ejectSignal.acquire();
+    }
+
+    shutdown();
+
+    FreeLibraryAndExitThread(hModule, 0);
     return 0;
+}
+
+void Runtime::eject() {
+    ejectSignal.release();
 }
 
 void Runtime::shutdown() {
     Client::destruct();
     HookManager::destruct();
     kiero::shutdown();
-    Logger::shutdown();
+    Logger::destruct();
 }

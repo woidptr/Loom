@@ -3,8 +3,7 @@
 #include "AbstractScene.hpp"
 
 class IClientInstance;
-
-class IMinecraftGame {};
+class IMinecraftGame;
 
 class SceneFactory {
 public:

@@ -14,5 +14,15 @@ public:
     static fs::path getLogsFolder();
     static fs::path getSettingsFolder();
     static fs::path getMainSettingsFile();
+    static fs::path getProfilesFile();
     static fs::path getProfileSettingFile(const std::string& profile);
+};
+
+class FileSystem {
+private:
+    fs::path basePath;
+
+    fs::path getAppDataPath();
+public:
+    FileSystem() = default;
 };

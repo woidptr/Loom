@@ -138,6 +138,17 @@ namespace Memory {
 		return std::bit_cast<uintptr_t>(memberPtr);
 	}
 
+	class AddressResolver {
+	private:
+		std::unordered_map<std::string, uintptr_t> addressMap;
+		ZydisDecoder* decoder = nullptr;
+	public:
+		AddressResolver();
+
+		uintptr_t getAddress(const std::string& id);
+		int32_t getPointer(const std::string& id);
+	};
+
 	int32_t GetOffset(uintptr_t addr);
 	uintptr_t ResolveInstructionTarget(uintptr_t addr);
 	uintptr_t ResolveAddress(const char* mangledName);

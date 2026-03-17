@@ -3,12 +3,33 @@
 #include "client/Client.hpp"
 #include "client/mods/Module.hpp"
 
-void SettingsManager::registerConfigurable(Configurable *configurable) {
-    configurables.emplace_back(configurable);
+void SettingsManager::construct() {
+    if (instance == nullptr) {
+        instance = new SettingsManager();
+    }
 }
 
-void SettingsManager::loadProfile(const std::string &profile) {
-    std::ifstream file(FileManager::getProfileSettingFile(profile));
+void SettingsManager::destruct() {
+    if (instance != nullptr) {
+        delete instance;
+        instance = nullptr;
+    }
+}
+
+SettingsManager &SettingsManager::get() {
+    return *instance;
+}
+
+void SettingsManager::registerConfigurable(Configurable *configurable) {
+    if (!instance) return;
+
+    instance->configurables.emplace_back(configurable);
+}
+
+void SettingsManager::load() {
+    if (!instance) return;
+
+    std::ifstream file(FileManager::getMainSettingsFile());
 
     nlohmann::json config;
 
@@ -18,22 +39,23 @@ void SettingsManager::loadProfile(const std::string &profile) {
         file >> config;
     }
 
-    for (Module* mod : Client::getModules()) {
-        std::string modId = mod->getId();
-
-        if (config.contains(modId)) {
-            mod->loadSettings(config[modId]);
+    for (Configurable* conf : instance->configurables) {
+        std::string config_id = std::string(conf->getId());
+        if (config.contains(config_id)) {
+            conf->loadSettings(config[config_id]);
         }
     }
 }
 
-void SettingsManager::saveProfile(const std::string& profile) {
+void SettingsManager::save() {
+    if (!instance) return;
+
     nlohmann::json config;
 
-    for (Module* mod : Client::getModules()) {
-        config[std::string(mod->getId())] = mod->saveSettings();
+    for (Configurable* conf : instance->configurables) {
+        config[std::string(conf->getId())] = conf->saveSettings();
     }
 
-    std::ofstream file(FileManager::getProfileSettingFile(profile));
+    std::ofstream file(FileManager::getMainSettingsFile());
     file << config.dump(4);
 }

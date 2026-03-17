@@ -1,7 +1,6 @@
 #pragma once
 #include "elements/ToastNotification.hpp"
 #include "gui/ScreenManager.hpp"
-#include "gui/screen/StartScreen.hpp"
 #include <events/EventHandler.hpp>
 #include <events/render/PresentEvent.hpp>
 #include <events/render/ResizeBuffersEvent.hpp>
@@ -17,10 +16,6 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-struct ImGuiFonts {
-    static inline ImFont* Montserrat = nullptr;
-};
-
 class RenderCore {
 private:
     ID3D12CommandQueue* cmdQueue = nullptr;
@@ -28,8 +23,6 @@ private:
     std::vector<entt::scoped_connection> listeners;
 public:
     RenderCore();
-
-    void loadFonts();
 
     // void keyboardCallback(int16_t key, bool isDown);
     // void setupAndRenderCallback(ScreenView* screenView, MinecraftUIRenderContext* renderCtx);

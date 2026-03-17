@@ -12,6 +12,8 @@ if (NOT (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8))
 endif()
 
 set(GENERATED_IMPORTS "${CMAKE_CURRENT_BINARY_DIR}/import.def")
+set(FAKE_IMPORTS_LIB_PATH "${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib")
+set(MCAPI_DLL_NAME "mcapi.dll")
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
@@ -65,11 +67,31 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
+    MCAPI_DLL_NAME="${MCAPI_DLL_NAME}"
+
+    $<$<NOT:${IS_RELEASE}>:DEBUG_MODE>
     $<$<CONFIG:Release>:_HAS_EXCEPTIONS=0>
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:_HAS_EXCEPTIONS=0>)
+# Include vendored nlohmann/json
+add_library(nlohmann_json INTERFACE)
+target_include_directories(nlohmann_json INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/vendors/nlohmann)
 
+# Include vendored imgui
+file(GLOB IMGUI_SOURCES
+    "vendors/imgui/*.cpp"
+    "vendors/imgui/backends/imgui_impl_win32.cpp"
+    "vendors/imgui/backends/imgui_impl_dx11.cpp"
+    "vendors/imgui/backends/imgui_impl_dx12.cpp"
+)
+add_library(imgui STATIC ${IMGUI_SOURCES})
+target_include_directories(imgui PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendors/imgui
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendors/imgui/backends
+)
+target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
+
+# Install CPM to be able to download dependencies
 set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM.cmake")
 
 if (NOT EXISTS ${CPM_DOWNLOAD_LOCATION})
@@ -83,11 +105,10 @@ endif ()
 
 include(${CPM_DOWNLOAD_LOCATION})
 
+# Handle online package pulling
 CPMAddPackage("gh:BasedInc/libhat@0.9.0")
-CPMAddPackage("gh:ocornut/imgui@1.92.5")
 CPMAddPackage("gh:zyantific/zydis@4.1.1")
-CPMAddPackage("gh:nlohmann/json@3.12.0")
-CPMAddPackage("gh:simdjson/simdjson@4.2.4")
+CPMAddPackage("gh:gabime/spdlog@1.17.0")
 CPMAddPackage("gh:skypjack/entt#fe8d7d78c4823e8a66a050bf86f5c6318cf76ce7")
 CPMAddPackage("gh:superPuero/kawa_core#a04c1012a9e32bb1472d2fc92fcf2efb51b84793")
 CPMAddPackage(
@@ -103,30 +124,7 @@ CPMAddPackage(
         "KIERO_BUILD_EXAMPLES OFF"
 )
 
-if(NOT TARGET imgui)
-    add_library(imgui STATIC)
-
-    target_sources(imgui PRIVATE
-        ${imgui_SOURCE_DIR}/imgui.cpp
-        ${imgui_SOURCE_DIR}/imgui_demo.cpp
-        ${imgui_SOURCE_DIR}/imgui_draw.cpp
-        ${imgui_SOURCE_DIR}/imgui_tables.cpp
-        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_dx12.cpp
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
-    )
-
-    target_include_directories(imgui PUBLIC
-        ${imgui_SOURCE_DIR}
-        ${imgui_SOURCE_DIR}/backends
-    )
-
-    target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
-endif()
-
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json simdjson) # linker
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json spdlog::spdlog)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib
@@ -141,4 +139,4 @@ add_dependencies(RefLib RefLibGen)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE RefLib)
 
-target_link_options(${PROJECT_NAME} PRIVATE "/DELAYLOAD:mcapi.dll")
+target_link_options(${PROJECT_NAME} PRIVATE "/DELAYLOAD:${MCAPI_DLL_NAME}")

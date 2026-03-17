@@ -6,26 +6,52 @@
 
 #include "core/settings/SettingsManager.hpp"
 
-void Client::construct() {
+void Client::startup() {
     uiRender = new RenderCore();
 
-    // SettingsManager::loadProfile("Default");
+    SettingsManager::construct();
+
+    for (Module* mod : getModuleRegistry()) {
+        modules.emplace_back(mod);
+        SettingsManager::registerConfigurable(mod);
+    }
 
     ToastManager::addToast("Client loaded", 3);
 }
 
-void Client::destruct() {
+void Client::cleanup() {
     delete uiRender;
 
     for (Module* mod : modules) {
         delete mod;
     }
+
+    SettingsManager::destruct();
+}
+
+void Client::construct() {
+    if (instance == nullptr) {
+        instance = new Client();
+        instance->startup();
+    }
+}
+
+void Client::destruct() {
+    if (instance != nullptr) {
+        instance->cleanup();
+        delete instance;
+        instance = nullptr;
+    }
 }
 
 void Client::registerModule(Module* mod) {
-    modules.emplace_back(mod);
+    if (!instance) return;
+
+    instance->modules.emplace_back(mod);
 }
 
 const std::vector<Module*> Client::getModules() {
-    return modules;
+    if (!instance) return{};
+
+    return instance->modules;
 }

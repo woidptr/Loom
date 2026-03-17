@@ -6,6 +6,7 @@
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
 #include <sdk/mc/client/gui/screens/SceneFactory.hpp>
 #include "gui/screen/HudEditorScreen.hpp"
+#include "theme/FontManager.hpp"
 
 RenderCore::RenderCore() {
     listeners.reserve(5);
@@ -15,17 +16,6 @@ RenderCore::RenderCore() {
     $add_listener(PresentEvent, &RenderCore::onPresentFrame);
     $add_listener(ExecuteCommandListsEvent, &RenderCore::onExecuteCommandLists);
     $add_listener(ResizeBuffersEvent, &RenderCore::onResizeBuffers);
-}
-
-void RenderCore::loadFonts() {
-    ImGuiIO& io = ImGui::GetIO();
-    const Resource arimoFont = Resource("assets/fonts/Arimo_Medium.ttf");
-    const Resource montserratMedium = Resource("assets/fonts/Arimo_SemiBold.ttf");
-
-    // io.Fonts->AddFontFromMemoryTTF((void*)arimoFont.begin(), arimoFont.size(), 16.0f);
-    ImGuiFonts::Montserrat = io.Fonts->AddFontFromMemoryTTF((void*)montserratMedium.data(), montserratMedium.size(), 16.0f);
-
-    io.Fonts->Build();
 }
 
 void RenderCore::onWindowProcess(WindowProcessEvent* event) {
@@ -105,8 +95,8 @@ void RenderCore::onPresentFrame(PresentEvent* event) {
         ID3D11Device* d3d11Device = nullptr;
         if (SUCCEEDED(event->swapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5)))) {
             renderer = std::make_unique<ImGuiDX12>();
-            d3d12Device5->Release();
-            // d3d12Device5->RemoveDevice();
+            // d3d12Device5->Release();
+            d3d12Device5->RemoveDevice();
         } else if (SUCCEEDED(event->swapChain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
             renderer = std::make_unique<ImGuiDX11>();
             d3d11Device->Release();
@@ -120,7 +110,7 @@ void RenderCore::onPresentFrame(PresentEvent* event) {
             }
         }
 
-        // loadFonts();
+        FontManager::construct();
     }
 
     if (renderer) {

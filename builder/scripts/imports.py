@@ -1,4 +1,5 @@
 import json
+import shlex
 from pathlib import Path
 from dataclasses import dataclass
 from jinja2 import Template
@@ -25,14 +26,14 @@ def get_fully_qualified_name(cursor: Cursor) -> str:
     return name
 
 
-def parse_functions(cursor: Cursor, seen_symbols: set) -> list[ExtractedSymbol]:
+def parse_functions(cursor: Cursor, seen_symbols: set, sdk_dir_str: str) -> list[ExtractedSymbol]:
     found_symbols: list[ExtractedSymbol] = []
 
-    # if cursor.location.file:
-    #     file_path = str(cursor.location.file.name).replace("\\", "/").lower()
+    if cursor.location.file:
+        file_path = str(cursor.location.file.name).replace("\\", "/").lower()
 
-    #     if sdk_dir_str not in file_path and "umbrella.cpp" not in file_path:
-    #         return []
+        if sdk_dir_str not in file_path and "umbrella.cpp" not in file_path:
+            return []
 
     if cursor.kind in (CursorKind.FUNCTION_DECL, CursorKind.CXX_METHOD):
         mcapi_func: bool = False
@@ -62,7 +63,7 @@ def parse_functions(cursor: Cursor, seen_symbols: set) -> list[ExtractedSymbol]:
     
     child_node: Cursor
     for child_node in cursor.get_children():
-        found_symbols.extend(parse_functions(child_node, seen_symbols))
+        found_symbols.extend(parse_functions(child_node, seen_symbols, sdk_dir_str))
     
     return found_symbols
 
@@ -74,6 +75,24 @@ def extract_cmake_flags(build_dir: Path) -> list[str]:
         db = json.load(f)
     
     command = db[0].get("command", "")
+
+    args = shlex.split(command, posix=False)
+
+    clang_args = []
+
+    for arg in args:
+        arg = arg.strip('"').strip("'")
+        if arg.startswith("-I"):
+            clang_args.append(arg)
+        elif arg.startswith("-imsvc"):
+            path = arg[:6]
+            clang_args.append(f"-isystem{path}")
+        elif arg.startswith("-D"):
+            if "SPDLOG_COMPILED_LIB" in arg or "ZYDIS_STATIC_BUILD" in arg:
+                pass 
+            clang_args.append(arg)
+    
+    return clang_args
 
 
 def generate_fake_imports(current_source_dir: Path, current_binary_dir: Path) -> None:
@@ -96,6 +115,8 @@ def generate_fake_imports(current_source_dir: Path, current_binary_dir: Path) ->
     
     umbrella_file.write_text("\n".join(includes))
 
+    cmake_args = extract_cmake_flags(current_binary_dir)
+
     clang_args = [
         "-x", "c++", 
         "-std=c++23", 
@@ -109,14 +130,14 @@ def generate_fake_imports(current_source_dir: Path, current_binary_dir: Path) ->
         
         # 3. Silence the #pragma once warning
         "-Wno-pragma-once-outside-header"
-    ]
+    ] + cmake_args
 
     tu: TranslationUnit = index.parse(str(umbrella_file), args=clang_args)
 
     for diag in tu.diagnostics:
         print(f"  Warning/Error: {diag.spelling}")
     
-    symbols: list[str] = parse_functions(tu.cursor, seen_symbols)
+    symbols: list[str] = parse_functions(tu.cursor, seen_symbols, sdk_dir.as_posix().lower())
 
     import_result: str = import_template.render(symbols=symbols)
 

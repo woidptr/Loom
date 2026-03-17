@@ -8,6 +8,9 @@
 #include <client/Client.hpp>
 
 class SettingsScreen : public IScreen {
+private:
+    static constexpr Vec2 windowAspectRatio{8, 5};
+    static constexpr float windowSizePercentage = 0.65f;
 public:
     SettingsScreen() : IScreen("SettingsScreen") {}
 
