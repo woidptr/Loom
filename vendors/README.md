@@ -14,6 +14,13 @@ Below is the manifest of all included libraries, their authors, and their respec
 * **Version:** v1.92.6
 * **Note:** Vendored directly as raw `.cpp` and `.h` files.
 
+### [GameInput v2 header](https://github.com/microsoftconnect/GameInput/blob/main/include/v2/GameInput.h)
+* **Author:** [microsoft](https://github.com/microsoftconnect)
+* **License:** MICROSOFT SOFTWARE LICENSE
+* **Description:** Handling input in games
+* **Version:** v2
+* **Note:** Vendored as raw `.h` file
+
 ---
 
 ### License Compliance

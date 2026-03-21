@@ -74,27 +74,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     $<$<NOT:${IS_RELEASE}>:DEBUG_MODE>
     $<$<CONFIG:Release>:_HAS_EXCEPTIONS=0>
 
-    $<$<BOOL:${IS_DEBUG}>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG>
-    $<$<NOT:$<BOOL:${IS_DEBUG}>>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
+    $<$<NOT:$<BOOL:${IS_RELEASE}>>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG>
+    $<$<BOOL:${IS_RELEASE}>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
 )
 
 # Include vendored nlohmann/json
 add_library(nlohmann_json INTERFACE)
 target_include_directories(nlohmann_json INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/vendors/nlohmann)
 
-# Include vendored imgui
-file(GLOB IMGUI_SOURCES
-    "vendors/imgui/*.cpp"
-    "vendors/imgui/backends/imgui_impl_win32.cpp"
-    "vendors/imgui/backends/imgui_impl_dx11.cpp"
-    "vendors/imgui/backends/imgui_impl_dx12.cpp"
-)
-add_library(imgui STATIC ${IMGUI_SOURCES})
-target_include_directories(imgui PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendors/imgui
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendors/imgui/backends
-)
-target_link_libraries(imgui PUBLIC d3d11 d3d12 dxgi)
+add_subdirectory(vendors)
 
 # Install CPM to be able to download dependencies
 set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM.cmake")
@@ -129,7 +117,18 @@ CPMAddPackage(
         "KIERO_BUILD_EXAMPLES OFF"
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT kawa_core imgui Dbghelp nlohmann_json spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    libhat::libhat
+    safetyhook::safetyhook
+    kiero::kiero
+    EnTT
+    kawa_core
+    ImGui::ImGui
+    Dbghelp
+    nlohmann_json
+    spdlog::spdlog
+    GameInput::v2
+)
 
 add_custom_command(
     OUTPUT ${FAKE_IMPORTS_LIB_PATH}

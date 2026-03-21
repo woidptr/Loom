@@ -6,135 +6,102 @@
 #include <hooks/InlineHook.hpp>
 #include <events/input/KeyboardEvent.hpp>
 #include <events/input/MouseEvent.hpp>
-#include <GameInput.h>
-
-#include "events/input/WindowProcessEvent.hpp"
-
-typedef HRESULT(WINAPI* PFN_GAME_INPUT_CREATE)(IGameInput** gameInput);
-
-// Typedef for the function we want to hook (GetCurrentReading)
-typedef HRESULT(WINAPI* GetCurrentReading_t)(IGameInput* pThis,
-    GameInputKind inputKind,
-    IGameInputDevice* device,
-    IGameInputReading** reading);
+#include <winrt/base.h>
+#include <kiero.hpp>
+#include <events/input/WindowProcessEvent.hpp>
 
 namespace InputHooks {
-    InlineHook<void(int16_t, bool)> _keyboard_feed_hook;
-    void _keyboard_feed_detour(int16_t key, bool isDown) {
-        KeyboardEvent event{
-            .key = key,
-            .isDown = isDown,
-        };
-
-        EventHandler::emit(event);
-
-        if (event.isCancelled()) {
-            return;
-        } else {
-            return _keyboard_feed_hook.call(key, isDown);
-        }
-    }
-
-    InlineHook<void(void*, char, char, short, short, short, short, bool)> _mouse_device_feed_hook;
-    void _mouse_device_feed_detour(void* mouseDevice, char actionButtonId, char buttonData, short x, short y, short dx, short dy, bool forceMotionlessPointer) {
-        MouseEvent event{
-            .actionButtonId = actionButtonId,
-            .buttonData = buttonData,
-            .x = x,
-            .y = y,
-            .dx = dx,
-            .dy = dy,
-            .forceMotionlessPointer = forceMotionlessPointer,
-        };
-
-        EventHandler::emit(event);
-
-        if (event.isCancelled()) {
-            return;
-        } else {
-            return _mouse_device_feed_hook.call(mouseDevice, actionButtonId, buttonData, x, y, dx, dy, forceMotionlessPointer);
-        }
-    }
-
     LONG_PTR _wnd_proc_hook;
-    // InlineHook<HRESULT(HWND, UINT, WPARAM, LPARAM)> _window_process_hook;
     LRESULT _wnd_proc_detour(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-        // if (msg == WM_KEYUP) {
-        //     UINT vk = static_cast<UINT>(wParam);
-        //
-        //     if (vk == VK_TAB) {
-        //         KeyboardEvent event{
-        //             .key = VK_TAB,
-        //             .isDown = false,
-        //         };
-        //
-        //         EventHandler::emit(event);
-        //     }
-        // }
+        {
+            WindowProcessEvent event{
+                .hWnd = hwnd,
+                .msg = msg,
+                .wParam = wParam,
+                .lParam = lParam,
+            };
 
-        WindowProcessEvent event{
-            .hWnd = hwnd,
-            .msg = msg,
-            .wParam = wParam,
-            .lParam = lParam,
+            EventHandler::emit(event);
+        }
+
+        // $log_info("Testing window proc message");
+        // $log_info("Window process message: {}", msg);
+
+        auto get_exact_key = [](WPARAM wParam, LPARAM lParam) -> uint32_t {
+            switch (const uint32_t key = static_cast<uint32_t>(wParam)) {
+                case VK_SHIFT: {
+                    const uint32_t scan_code = (lParam & 0x00FF0000) >> 16;
+                    return MapVirtualKey(scan_code, MAPVK_VSC_TO_VK_EX);
+                }
+                case VK_CONTROL: {
+                    const bool isExtended = (lParam & 0x01000000) != 0;
+                    return isExtended ? VK_RCONTROL : VK_LCONTROL;
+                }
+                case VK_MENU: {
+                    const bool isExtended = (lParam & 0x01000000) != 0;
+                    return isExtended ? VK_RMENU : VK_LMENU;
+                }
+                default:
+                    return key;
+            }
         };
 
-        EventHandler::emit(event);
+        if (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN || msg == WM_KEYUP || msg == WM_SYSKEYUP) {
+            const uint32_t key = get_exact_key(wParam, lParam);
+            const bool is_down = (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN) ? true : false;
+
+            KeyboardEvent event {
+                .key = key,
+                .isDown = is_down,
+            };
+
+            EventHandler::emit(event);
+
+            if (event.isCancelled()) {
+                return 0;
+            }
+        }
 
         return CallWindowProc(reinterpret_cast<WNDPROC>(_wnd_proc_hook), hwnd, msg, wParam, lParam);
-
-        // return _window_process_hook.call(hwnd, msg, wParam, lParam);
     }
 
-    InlineHook<HRESULT(IGameInput*, GameInputKind, IGameInputDevice*, IGameInputReading**)> _reading_hook;
-    HRESULT WINAPI _reading_detour(IGameInput* pThis, GameInputKind inputKind, IGameInputDevice* device, IGameInputReading** reading)
-    {
-        // Call original to let the OS populate the input
-        // HRESULT hr = oGetCurrentReading(pThis, inputKind, device, reading);
+    InlineHook<decltype(&GameInput::v2::IGameInputReading::GetMouseState)> _reading_hook;
+    bool _reading_detour(GameInput::v2::IGameInputReading* self, GameInput::v2::GameInputMouseState* mouseState) {
+        MouseEvent event {
+            .actionButtonId = mouseState->buttons,
+        };
 
-        // Now *reading contains the input data! 
-        // You can read it here (or hook the reading's vtable if you need to spoof it).
+        EventHandler::emit(event);
 
-        // return hr;
+        if (event.isCancelled()) {
+            return false;
+        }
 
-        $log_debug("Test");
-
-        return _reading_hook.call(pThis, inputKind, device, reading);
+        return _reading_hook.call(self, mouseState);
     }
 
     void init() {
-        HMODULE hGameInput = GetModuleHandleA("GameInputRedist.dll");
+        [&]() {
+            winrt::com_ptr<GameInput::v2::IGameInput> gameInput;
+            if (FAILED(GameInputCreate(gameInput.put()))) {
+                $log_error("Failed to create dummy IGameInput");
+                return;
+            }
 
-        if (!hGameInput) {
-            $log_debug("hGameInput not found!");
-            return;
-        }
+            winrt::com_ptr<GameInput::v2::IGameInputReading> gameInputReading;
+            if (FAILED(gameInput->GetCurrentReading(GameInput::v2::GameInputKind::GameInputKindMouse, nullptr, gameInputReading.put()))) {
+                $log_error("Failed to create dummy IGameInputReading");
+                return;
+            }
 
-        void* GameInputCreate = GetProcAddress(hGameInput, "GameInputCreate");
-        if (!GameInputCreate) {
-            $log_debug("pGameInputCreate not found!");
-            return;
-        }
+            // constexpr auto vtable_index = kiero::detail::magic_vft::vtable_index<&GameInput::v2::IGameInputReading::GetMouseState>();
+            constexpr size_t vtable_index = 14;
+            void** vtable = *reinterpret_cast<void***>(gameInputReading.get());
+            void* address = vtable[vtable_index];
 
-        IGameInput* dummyInput = nullptr;
-        if (((long(__stdcall*)(IGameInput** gameInput))(GameInputCreate))(&dummyInput) < 0) {
-            $log_debug("Dummy input creation failed!");
-            return;
-        }
-
-        void** vTable = *(void***)dummyInput;
-
-        void* pGetCurrentReading = vTable[10];
-        $log_debug("GetCurrentReading: {:p}", pGetCurrentReading);
-
-        dummyInput->Release();
-
-        // HookManager::createInlineHook(_mouse_device_feed_hook.getHook(), (void*)$get_address("MouseDevice::feed"), &_mouse_device_feed_detour);
-        // HookManager::createInlineHook(_keyboard_feed_hook.getHook(), (void*)$get_address("Keyboard::feed"), &_keyboard_feed_detour);
-        // HookManager::createInlineHook(_window_process_hook.getHook(), (void*)$get_address("MainWindow::_windowProc"), &_window_process_detour);
+            HookManager::createInlineHook(_reading_hook.getHook(), address, &_reading_detour);
+        }();
 
         _wnd_proc_hook = SetWindowLongPtrA(FindWindowA("Bedrock", "Minecraft"), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&_wnd_proc_detour));
-
-        HookManager::createInlineHook(_reading_hook.getHook(), pGetCurrentReading, &_reading_detour);
     }
 }

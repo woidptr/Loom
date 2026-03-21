@@ -23,7 +23,6 @@ private:
 public:
     RenderCore();
 
-    // void keyboardCallback(int16_t key, bool isDown);
     // void setupAndRenderCallback(ScreenView* screenView, MinecraftUIRenderContext* renderCtx);
     void onKey(KeyboardEvent* event);
     void onMouse(MouseEvent* event);

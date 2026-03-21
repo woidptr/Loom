@@ -120,4 +120,8 @@ namespace UI::Elements::SettingsScreen {
 
         ImGui::Dummy(ImVec2(0.f, 0.f));
     }
+
+    bool DrawModCard(const ImGuiWindow* window, ImDrawList* draw_list, const char* id, const char* name, Module* mod) {
+
+    }
 }

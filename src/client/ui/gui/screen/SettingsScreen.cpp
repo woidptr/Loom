@@ -47,6 +47,13 @@ void SettingsScreen::render() {
 
     UI::Elements::SettingsScreen::DrawNavBar(window, draw_list);
 
+    if (ImGui::BeginChild("##mods_area", ImVec2(0, 0), false, ImGuiWindowFlags_None)) {
+        if (ImGui::BeginTable("##mods_grid", 4, ImGuiTableFlags_None)) {
+            ImGui::EndTable();
+        }
+        ImGui::EndChild();
+    }
+
     // // --- Header Configuration ---
     // float headerHeight = 50.0f;
     // float startY = ImGui::GetCursorPosY(); // Save the starting Y position

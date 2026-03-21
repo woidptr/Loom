@@ -32,15 +32,20 @@ public:
     }
 };
 
-#define $specialize_member_hook(cv_ref_quals, self_ptr_type) \
+#define $impl_member_hook(cv_quals, noex_qual, self_ptr_type) \
     template <typename TReturn, typename ClassType, typename... Args> \
-    class InlineHook<TReturn(ClassType::*)(Args...) cv_ref_quals> \
-        : public InlineHookMemberImpl<TReturn, self_ptr_type, Args...> { \
-    };
+    class InlineHook<TReturn(ClassType::*)(Args...) cv_quals noex_qual> \
+        : public InlineHookMemberImpl<TReturn, self_ptr_type, Args...> {}
 
-$specialize_member_hook(, ClassType*)
-$specialize_member_hook(const, const ClassType*)
-$specialize_member_hook(volatile, volatile ClassType*)
-$specialize_member_hook(const volatile, const volatile ClassType*)
+#define $specialize_member_hook(cv_quals, self_ptr_type) \
+    $impl_member_hook(cv_quals, , self_ptr_type); \
+    $impl_member_hook(cv_quals, noexcept, self_ptr_type)
+
+
+$specialize_member_hook(, ClassType*);
+$specialize_member_hook(const, const ClassType*);
+$specialize_member_hook(volatile, volatile ClassType*);
+$specialize_member_hook(const volatile, const volatile ClassType*);
 
 #undef $specialize_member_hook
+#undef $impl_member_hook

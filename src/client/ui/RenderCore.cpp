@@ -6,6 +6,7 @@
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
 #include <sdk/mc/client/gui/screens/SceneFactory.hpp>
 #include "gui/screen/HudEditorScreen.hpp"
+#include "gui/screen/SettingsScreen.hpp"
 #include "theme/FontManager.hpp"
 
 RenderCore::RenderCore() {
@@ -23,11 +24,11 @@ void RenderCore::onWindowProcess(WindowProcessEvent* event) {
 }
 
 void RenderCore::onKey(KeyboardEvent* event) {
-    if (event->key == 'L' && !event->isDown) {
-        if (GameContext::clientInstance->getTopScreenName() == "hud_screen" && !ScreenManager::getCurrentScreen()) {
-            GameContext::sceneStack->pushScreen(GameContext::sceneFactory->createPauseScreen(), false);
-            ScreenManager::setScreen(std::make_unique<HudEditorScreen>());
-        }
+    if (event->key == 'L') {
+        // if (GameContext::clientInstance->getTopScreenName() == "hud_screen" && !ScreenManager::getCurrentScreen()) {
+        //     GameContext::sceneStack->pushScreen(GameContext::sceneFactory->createPauseScreen(), false);
+        // }
+        ScreenManager::setScreen(std::make_unique<SettingsScreen>());
     }
     else if (event->key == VK_ESCAPE && !event->isDown) {
         ScreenManager::setScreen(nullptr);

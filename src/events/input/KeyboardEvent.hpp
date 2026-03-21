@@ -3,6 +3,6 @@
 #include <events/EventHandler.hpp>
 
 struct KeyboardEvent : public CancellableEventContext {
-    int16_t key;
+    uint32_t key;
     bool isDown;
 };

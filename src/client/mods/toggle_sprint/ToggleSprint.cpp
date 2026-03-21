@@ -44,7 +44,7 @@ void ToggleSprint::onRender(SetupAndRenderEvent* event) {
 void ToggleSprint::onKey(KeyboardEvent* event) {
     // std::shared_ptr<AbstractScene> scene = GameContext::sceneFactory->createPauseScreen();
     // $log_debug("Scene id: {}", scene.get()->mSceneId);
-    GameContext::sceneStack->pushScreen(GameContext::sceneFactory->createPauseScreen(), false);
+    // GameContext::sceneStack->pushScreen(GameContext::sceneFactory->createPauseScreen(), false);
 
     // $log_debug("Current screen name: {}", GameContext::clientInstance->getTopScreenName());
 }
