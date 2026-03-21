@@ -13,22 +13,22 @@ void SettingsScreen::render() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 center = viewport->GetCenter();
 
-    ImVec2 maxAllowedSize = ImVec2(
+    const ImVec2 maxAllowedSize = ImVec2(
         viewport->WorkSize.x * windowSizePercentage,
         viewport->WorkSize.y * windowSizePercentage
     );
 
-    float scale_x = maxAllowedSize.x / windowAspectRatio.x;
-    float scale_y = maxAllowedSize.y / windowAspectRatio.y;
+    const float scale_x = maxAllowedSize.x / windowAspectRatio.x;
+    const float scale_y = maxAllowedSize.y / windowAspectRatio.y;
 
-    float final_scale = std::min(scale_x, scale_y);
+    const float final_scale = std::min(scale_x, scale_y);
 
-    ImVec2 windowSize = ImVec2(windowAspectRatio.x * final_scale, windowAspectRatio.y * final_scale);
+    const ImVec2 windowSize = ImVec2(windowAspectRatio.x * final_scale, windowAspectRatio.y * final_scale);
     
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
     ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2(0.5f, 0.5f));
 
-    ImGuiWindowFlags windowFlags =
+    constexpr ImGuiWindowFlags windowFlags =
         ImGuiWindowFlags_NoTitleBar |
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoResize |
@@ -36,16 +36,14 @@ void SettingsScreen::render() {
         ImGuiWindowFlags_NoScrollbar |
         ImGuiWindowFlags_NoScrollWithMouse;
 
-    ImGui::Begin("MINECRAFT MODS WINDOW", nullptr, windowFlags);
+    ImGui::Begin("##settings_window", nullptr, windowFlags);
 
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    const std::function<void()> on_window_close = [&]() -> void {
+    UI::Elements::SettingsScreen::DrawTitleBar(window, draw_list, [&]() -> void {
         ScreenManager::setScreen(nullptr);
-    };
-
-    UI::Elements::SettingsScreen::DrawTitleBar(window, draw_list, on_window_close);
+    });
 
     UI::Elements::SettingsScreen::DrawNavBar(window, draw_list);
 

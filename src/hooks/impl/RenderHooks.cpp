@@ -69,7 +69,7 @@ namespace RenderHooks {
     }
 
     void init() {
-        HookManager::createInlineHook(_ScreenView_setupAndRender_hook.getHook(), (void*)$get_address("ScreenView::setupAndRender"), &_ScreenView_setupAndRender_detour);
+        HookManager::createInlineHook(_ScreenView_setupAndRender_hook.getHook(), (void*)AddressResolver::get("ScreenView::setupAndRender"), &_ScreenView_setupAndRender_detour);
 
         // DirectX hooks
         HookManager::createInlineHook(_present_hook.getHook(), (void*)kiero::getMethod<&IDXGISwapChain3::Present>(), &_present_detour);

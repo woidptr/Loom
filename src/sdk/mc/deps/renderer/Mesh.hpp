@@ -10,6 +10,7 @@ namespace mce {
 
     class Mesh {
     public:
+        /// @sig {48 8B C4 53 56 57 48 81 EC ? ? ? ? 48 8B D9}
         MCAPI void renderMesh(
             const mce::MeshContext& meshContext,
             const mce::MaterialPtr& materialPtr,

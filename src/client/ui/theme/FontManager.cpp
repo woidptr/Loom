@@ -1,18 +1,18 @@
 #include "FontManager.hpp"
-#include <Resource.hpp>
+#include <core/Resource.hpp>
 
 void FontManager::construct() {
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO& io = ImGui::GetIO();
 
     io.Fonts->AddFontDefault();
 
     ImFontConfig fontConfig;
     fontConfig.FontDataOwnedByAtlas = false;
 
-    Resource res = Resource("assets/fonts/Montserrat-ExtraBold.ttf");
+    const Resource res_logo_font("assets/fonts/Montserrat-ExtraBold.ttf");
     montserrat_extra_bold = io.Fonts->AddFontFromMemoryTTF(
-        (void*)res.data(),
-        res.size(),
+        const_cast<uint8_t*>(res_logo_font.data()),
+        static_cast<int>(res_logo_font.size()),
         256.f,
         &fontConfig
     );

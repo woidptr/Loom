@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.14)
-project(Loom)
+project(Myra)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -17,15 +17,6 @@ set(MCAPI_DLL_NAME "mcapi.dll")
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-add_custom_command(
-    OUTPUT ${GENERATED_IMPORTS} "${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.hpp" "${CMAKE_CURRENT_BINARY_DIR}/Resource.cpp"
-    COMMAND "${Python3_EXECUTABLE}" "-m" "builder" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMENT "Invoking build scripts"
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    VERBATIM
-)
-
 add_compile_definitions(${PROJECT_NAME} PRIVATE
     WIN32_LEAN_AND_MEAN
     NOMINMAX
@@ -36,11 +27,22 @@ add_compile_definitions(${PROJECT_NAME} PRIVATE
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.hpp)
-add_library(${PROJECT_NAME} SHARED ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.cpp" "${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.hpp")
-target_include_directories(${PROJECT_NAME} PRIVATE src)
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/embedder")
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
-set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.cpp" PROPERTIES GENERATED TRUE)
+add_custom_target(invoke_builder ALL
+        # OUTPUT ${GENERATED_IMPORTS} "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Resource.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Signature.cpp"
+        COMMAND "${Python3_EXECUTABLE}" "-m" "builder" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+        # DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}"
+        COMMENT "Invoking build scripts"
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        VERBATIM
+)
+
+add_dependencies(${PROJECT_NAME} invoke_builder)
+
+target_include_directories(${PROJECT_NAME} PRIVATE src)
+
+# set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/embedder/Resource.cpp" PROPERTIES GENERATED TRUE)
 
 set(IS_MSVC "$<CXX_COMPILER_ID:MSVC>")
 set(IS_CLANG "$<CXX_COMPILER_ID:Clang>")
@@ -71,6 +73,9 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
     $<$<NOT:${IS_RELEASE}>:DEBUG_MODE>
     $<$<CONFIG:Release>:_HAS_EXCEPTIONS=0>
+
+    $<$<BOOL:${IS_DEBUG}>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG>
+    $<$<NOT:$<BOOL:${IS_DEBUG}>>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
 )
 
 # Include vendored nlohmann/json
@@ -124,19 +129,21 @@ CPMAddPackage(
         "KIERO_BUILD_EXAMPLES OFF"
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT::EnTT kawa_core imgui Dbghelp nlohmann_json spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat::libhat safetyhook::safetyhook kiero::kiero EnTT kawa_core imgui Dbghelp nlohmann_json spdlog::spdlog)
 
 add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib
-    COMMAND lib /DEF:${GENERATED_IMPORTS} /OUT:${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib /MACHINE:x64
+    OUTPUT ${FAKE_IMPORTS_LIB_PATH}
+    COMMAND lib /DEF:${GENERATED_IMPORTS} /OUT:${FAKE_IMPORTS_LIB_PATH} /MACHINE:x64
     DEPENDS ${GENERATED_IMPORTS}
 )
 
-add_custom_target(RefLibGen DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib)
+add_custom_target(RefLibGen DEPENDS ${FAKE_IMPORTS_LIB_PATH})
 add_library(RefLib UNKNOWN IMPORTED)
-set_property(TARGET RefLib PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/mcapi.lib)
+set_property(TARGET RefLib PROPERTY IMPORTED_LOCATION ${FAKE_IMPORTS_LIB_PATH})
 add_dependencies(RefLib RefLibGen)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE RefLib)
 
 target_link_options(${PROJECT_NAME} PRIVATE "/DELAYLOAD:${MCAPI_DLL_NAME}")
+
+# "Platform_GameCore": "48 89 05 ? ? ? ? 48 8B 3D ? ? ? ? 48 89 1D ? ? ? ? 48 85 FF 74 ? 41 8B C4",

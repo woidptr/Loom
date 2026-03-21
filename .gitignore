@@ -367,8 +367,7 @@ FodyWeavers.xsd
 .cpmcache/
 
 # wip things
-signatures.embed.json
-settings.json
+signatures.json
 
 # Rust related things
 target/

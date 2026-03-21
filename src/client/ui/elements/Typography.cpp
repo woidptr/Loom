@@ -2,9 +2,9 @@
 
 namespace UI::Elements::Typography {
     void DrawGradientText(ImDrawList *draw_list, ImVec2 pos, const char *text, ImU32 col_left, ImU32 col_right) {
-        int vtx_start = draw_list->VtxBuffer.Size;
+        const int vtx_start = draw_list->VtxBuffer.Size;
         draw_list->AddText(pos, IM_COL32_WHITE, text);
-        int vtx_end = draw_list->VtxBuffer.Size;
+        const int vtx_end = draw_list->VtxBuffer.Size;
 
         ImVec2 text_size = ImGui::CalcTextSize(text);
         float min_x = pos.x;
@@ -21,10 +21,10 @@ namespace UI::Elements::Typography {
             if (t < 0.0f) t = 0.0f;
             if (t > 1.0f) t = 1.0f;
 
-            float r = c_left.x + (c_right.x - c_left.x) * t;
-            float g = c_left.y + (c_right.y - c_left.y) * t;
-            float b = c_left.z + (c_right.z - c_left.z) * t;
-            float a = c_left.w + (c_right.w - c_left.w) * t;
+            const float r = c_left.x + (c_right.x - c_left.x) * t;
+            const float g = c_left.y + (c_right.y - c_left.y) * t;
+            const float b = c_left.z + (c_right.z - c_left.z) * t;
+            const float a = c_left.w + (c_right.w - c_left.w) * t;
 
             vert.col = ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
         }

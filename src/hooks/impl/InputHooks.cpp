@@ -8,6 +8,8 @@
 #include <events/input/MouseEvent.hpp>
 #include <GameInput.h>
 
+#include "events/input/WindowProcessEvent.hpp"
+
 typedef HRESULT(WINAPI* PFN_GAME_INPUT_CREATE)(IGameInput** gameInput);
 
 // Typedef for the function we want to hook (GetCurrentReading)
@@ -54,22 +56,34 @@ namespace InputHooks {
         }
     }
 
-    InlineHook<HRESULT(HWND, UINT, WPARAM, LPARAM)> _window_process_hook;
-    HRESULT _window_process_detour(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-        if (msg == WM_KEYUP) {
-            UINT vk = static_cast<UINT>(wParam);
+    LONG_PTR _wnd_proc_hook;
+    // InlineHook<HRESULT(HWND, UINT, WPARAM, LPARAM)> _window_process_hook;
+    LRESULT _wnd_proc_detour(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        // if (msg == WM_KEYUP) {
+        //     UINT vk = static_cast<UINT>(wParam);
+        //
+        //     if (vk == VK_TAB) {
+        //         KeyboardEvent event{
+        //             .key = VK_TAB,
+        //             .isDown = false,
+        //         };
+        //
+        //         EventHandler::emit(event);
+        //     }
+        // }
 
-            if (vk == VK_TAB) {
-                KeyboardEvent event{
-                    .key = VK_TAB,
-                    .isDown = false,
-                };
+        WindowProcessEvent event{
+            .hWnd = hwnd,
+            .msg = msg,
+            .wParam = wParam,
+            .lParam = lParam,
+        };
 
-                EventHandler::emit(event);
-            }
-        }
+        EventHandler::emit(event);
 
-        return _window_process_hook.call(hwnd, msg, wParam, lParam);
+        return CallWindowProc(reinterpret_cast<WNDPROC>(_wnd_proc_hook), hwnd, msg, wParam, lParam);
+
+        // return _window_process_hook.call(hwnd, msg, wParam, lParam);
     }
 
     InlineHook<HRESULT(IGameInput*, GameInputKind, IGameInputDevice*, IGameInputReading**)> _reading_hook;
@@ -115,9 +129,12 @@ namespace InputHooks {
 
         dummyInput->Release();
 
-        HookManager::createInlineHook(_mouse_device_feed_hook.getHook(), (void*)$get_address("MouseDevice::feed"), &_mouse_device_feed_detour);
+        // HookManager::createInlineHook(_mouse_device_feed_hook.getHook(), (void*)$get_address("MouseDevice::feed"), &_mouse_device_feed_detour);
         // HookManager::createInlineHook(_keyboard_feed_hook.getHook(), (void*)$get_address("Keyboard::feed"), &_keyboard_feed_detour);
-        HookManager::createInlineHook(_window_process_hook.getHook(), (void*)$get_address("MainWindow::_windowProc"), &_window_process_detour);
+        // HookManager::createInlineHook(_window_process_hook.getHook(), (void*)$get_address("MainWindow::_windowProc"), &_window_process_detour);
+
+        _wnd_proc_hook = SetWindowLongPtrA(FindWindowA("Bedrock", "Minecraft"), GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&_wnd_proc_detour));
+
         HookManager::createInlineHook(_reading_hook.getHook(), pGetCurrentReading, &_reading_detour);
     }
 }

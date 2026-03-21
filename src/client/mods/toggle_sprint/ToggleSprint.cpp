@@ -2,7 +2,7 @@
 #include <core/Logger.hpp>
 #include <sdk/GameContext.hpp>
 #include <sdk/mc/deps/renderer/TexturePtr.hpp>
-#include <core/Signatures.hpp>
+#include <core/AddressResolver.hpp>
 #include <client/ui/impl/ImGuiImplMC.hpp>
 #include <sdk/mc/entity/components/MoveInputComponent.hpp>
 #include <events/render/SetupAndRenderEvent.hpp>
@@ -10,7 +10,7 @@
 ToggleSprint::ToggleSprint() : Module("Toggle Sprint", "toggle_sprint") {
     listeners.reserve(2);
 
-    enabled.setCallback([&](bool isEnabled) -> void {
+    enabled.setCallback([&](const bool& isEnabled) -> void {
         if (isEnabled) {
             $add_listener(SetupAndRenderEvent, &ToggleSprint::onRender);
             $add_listener(KeyboardEvent, &ToggleSprint::onKey);
@@ -30,42 +30,6 @@ void ToggleSprint::toggle() {
 }
 
 void ToggleSprint::onRender(SetupAndRenderEvent* event) {
-    void** vtable = *(void***)event->renderCtx;
-    uintptr_t staticVtable = reinterpret_cast<uintptr_t>(vtable) - reinterpret_cast<uintptr_t>(GetModuleHandle(NULL));
-    // Logger::info(std::format("MinecraftUIRenderContext vtable address: 0x{:X}", staticVtable));
-    // Logger::info(std::format("Text alpha: {}", renderCtx->getTextAlpha()));
-    static bool initTest = false;
-    if (!initTest) {
-        uintptr_t* vtable = *(uintptr_t**)event->renderCtx->mClient;
-        uintptr_t funcRuntimeAddr = vtable[$get_index("IClientInstance$$getSceneFactory")];
-        uintptr_t moduleBase = (uintptr_t)GetModuleHandle(nullptr);
-        uintptr_t funcAddr = funcRuntimeAddr - moduleBase;
-        uintptr_t standardImageBase = 0x140000000;
-        uintptr_t idaAddr = standardImageBase + funcAddr;
-
-        // $log_debug("IDA address for IClientInstance::getLocalPlayer: {}");
-        $log_debug("IDA address for IClientInstance::getSceneFactory: 0x{:X}", idaAddr);
-        // uintptr_t ci_staticVtable = reinterpret_cast<uintptr_t>(ci_vtable) - reinterpret_cast<uintptr_t>(GetModuleHandle(NULL));
-
-        // $log_debug("ClientInstance vtable address: 0x{:X}", ci_staticVtable);
-        // $log_debug("ClientInstance::getLocalPlayer dynamic address: {:P}", ci_vtable[31]);
-        // $logDebug("ClientInstance::getLocalPlayer static address: {:P}", ((void*)ci_staticVtable)[31]);
-
-        // $log_debug("GuiData runtime address: 0x{:X}", (uintptr_t)renderCtx->screenContext->guiData);
-
-        // $logDebug("LocalPlayer runtime address: 0x{:X}", (uintptr_t)renderCtx->clientInstance->getLocalPlayer());
-        // $logDebug("ScreenView->tessellator offset: 0x{:X}", *(int32_t*)$getSignatureAddr("ScreenContext->tessellator"));
-
-        // ImGui::CreateContext();
-        // ImGui_ImplMC_Init(renderCtx);
-
-        initTest = true;
-    }
-
-    if (!enabled) {
-        return;
-    }
-
     if (LocalPlayer* lp = event->renderCtx->mClient->getLocalPlayer()) {
         MoveInputComponent* mic = lp->mEntityContext.tryGetComponent<MoveInputComponent>();
 

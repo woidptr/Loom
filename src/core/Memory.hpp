@@ -3,17 +3,11 @@
 #include <cstddef>
 #include <type_traits>
 #include <Windows.h>
-#include <DbgHelp.h>
 #include <libhat/access.hpp>
-#include <core/Signatures.hpp>
+#include <core/AddressResolver.hpp>
+#include <DbgHelp.h>
 #include <kawa/core/meta.h>
 #include <Zydis/Zydis.h>
-
-#define $get_signature(signature) SignatureRegistry::getSignature(signature)
-
-#define $get_address(signature) SignatureRegistry::getSignature(signature)->getAddress()
-#define $get_offset(signature) Memory::GetOffset($get_address(signature))
-#define $get_index(signature) $get_offset(signature) / 8
 
 #define $_concat_impl(a, b) a##b
 
@@ -42,8 +36,18 @@ ret name args { \
 	return Memory::CallVFunc<decltype(&CI::name)>(31, *this); \
 }
 
-template <typename T, typename Owner, size_t offset>
-class property {
+template <typename Owner, typename T, size_t offset>
+struct property {
+	operator T() {
+		Owner* owner = reinterpret_cast<Owner*>(this);
+		return hat::member_at<T>(owner, offset);
+	}
+
+	property& operator=(const T& value) {
+		Owner* owner = reinterpret_cast<Owner*>(this);
+		hat::member_at<T>(owner, offset) = value;
+		return *this;
+	}
 public:
 	/*operator T() const {
 		int32_t offset = $get_offset(std::string(kawa::meta::type_name<std::remove_reference_t<decltype(*Owner)>>()) + "->" + Name.str());
@@ -137,17 +141,6 @@ namespace Memory {
 	uintptr_t GetFuncAddress(T memberPtr) {
 		return std::bit_cast<uintptr_t>(memberPtr);
 	}
-
-	class AddressResolver {
-	private:
-		std::unordered_map<std::string, uintptr_t> addressMap;
-		ZydisDecoder* decoder = nullptr;
-	public:
-		AddressResolver();
-
-		uintptr_t getAddress(const std::string& id);
-		int32_t getPointer(const std::string& id);
-	};
 
 	int32_t GetOffset(uintptr_t addr);
 	uintptr_t ResolveInstructionTarget(uintptr_t addr);

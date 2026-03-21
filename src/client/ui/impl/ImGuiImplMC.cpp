@@ -8,7 +8,7 @@ static mce::TexturePtr texturePtr;
 static Tessellator* tessellator;
 
 IMGUI_IMPL_API bool ImGui_ImplMC_Init(MinecraftUIRenderContext* renderCtx) {
-    tessellator = renderCtx->screenContext->tessellator;
+    tessellator = renderCtx->screenContext->tessellator();
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.AntiAliasedLines = false;

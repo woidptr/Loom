@@ -1,28 +1,23 @@
 #pragma once
-#include <unordered_map>
-#include <memory>
+#include <optional>
+#include <cstdint>
 #include <libhat/scanner.hpp>
-#include <json.hpp>
-#include <Resource.hpp>
-#include <core/Logger.hpp>
+#include <core/utils/hash.hpp>
 
-using json = nlohmann::json;
+namespace sigs {
+    enum class AddressType : uint8_t {
+        Direct = 0,
+        Field = 1,
+        VtableIndex = 2,
+        VtablePtr = 3,
+    };
 
-class Signature {
-private:
-    uintptr_t address = 0;
-public:
-    Signature(std::string signature);
+    struct EmbeddedSignature {
+        const char* name;
+        uint64_t hash;
+        hat::signature_view view;
+        AddressType type;
+    };
 
-    uintptr_t getAddress();
-};
-
-class SignatureRegistry {
-private:
-    static inline std::unordered_map<std::string, std::unique_ptr<Signature>> signatures;
-    static inline bool healthy = true;
-public:
-    static void registerSignatures();
-    static bool performHealthCheck();
-    static Signature* getSignature(std::string name);
-};
+    std::span<const EmbeddedSignature> get_all() noexcept;
+}

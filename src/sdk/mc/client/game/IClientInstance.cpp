@@ -6,7 +6,7 @@ LocalPlayer* IClientInstance::getLocalPlayer() {
 }
 
 SceneFactory* IClientInstance::getSceneFactory() {
-    return Memory::CallVirtual<decltype(&IClientInstance::getSceneFactory)>($get_index("IClientInstance$$getSceneFactory"), *this);
+    return Memory::CallVirtual<decltype(&IClientInstance::getSceneFactory)>(AddressResolver::get("IClientInstance::getSceneFactory"), *this);
 }
 
 NotNullNonOwnerPtr<ISceneStack> IClientInstance::getClientSceneStack() {
@@ -14,7 +14,7 @@ NotNullNonOwnerPtr<ISceneStack> IClientInstance::getClientSceneStack() {
     Memory::CallVFunc<NotNullNonOwnerPtr<ISceneStack>*, NotNullNonOwnerPtr<ISceneStack>*>(234, this, &result);
     return result.value;*/
 
-    return Memory::CallVirtual<decltype(&IClientInstance::getClientSceneStack)>($get_index("IClientInstance$$getClientSceneStack"), *this);
+    return Memory::CallVirtual<decltype(&IClientInstance::getClientSceneStack)>(AddressResolver::get("IClientInstance::getClientSceneStack"), *this);
 }
 
 std::string IClientInstance::getTopScreenName() {

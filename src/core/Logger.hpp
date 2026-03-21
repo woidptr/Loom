@@ -4,11 +4,11 @@
 #include <spdlog/spdlog.h>
 #include "FileManager.hpp"
 
-#define $log_debug(msg, ...)    spdlog::debug(msg, ##__VA_ARGS__);
-#define $log_info(msg, ...)     spdlog::info(msg, ##__VA_ARGS__);
-#define $log_warning(msg, ...)  spdlog::warn(msg, ##__VA_ARGS__);
-#define $log_error(msg, ...)    spdlog::error(msg, ##__VA_ARGS__);
-#define $log_critical(msg, ...) spdlog::critical(msg, ##__VA_ARGS__);
+#define $log_debug(...)    SPDLOG_DEBUG(__VA_ARGS__)
+#define $log_info(...)     SPDLOG_INFO(__VA_ARGS__)
+#define $log_warning(...)  SPDLOG_WARN(__VA_ARGS__)
+#define $log_error(...)    SPDLOG_ERROR(__VA_ARGS__)
+#define $log_critical(...) SPDLOG_CRITICAL(__VA_ARGS__)
 
 class Logger {
 public:

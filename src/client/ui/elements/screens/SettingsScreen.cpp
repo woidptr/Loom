@@ -72,24 +72,31 @@ namespace UI::Elements::SettingsScreen {
         );
 
         ImGui::SetCursorScreenPos(ImVec2(p_min.x, p_max.y));
-
-        ImGui::Dummy(ImVec2(0.f, 0.f));
     }
 
     void DrawNavBar(const ImGuiWindow* window, ImDrawList* draw_list) {
-        const float navbar_height = window->Size.y * 0.08f;
-        const float padding_x = window->Pos.x * 0.02f;
-        const float search_width = window->Size.x * 0.30f;
+        const float navbar_height = window->Size.y * 0.07f;
+        const float padding_x = window->Size.x * 0.02f;
+        const float search_width = window->Size.x * 0.25f;
 
         ImVec2 start_pos = ImGui::GetCursorScreenPos();
         ImVec2 end_pos = ImVec2(start_pos.x + window->Size.x, start_pos.y + navbar_height);
 
-        draw_list->AddRectFilled(start_pos, end_pos, IM_COL32(2, 6, 23, 250));
+        // draw_list->AddRectFilled(start_pos, end_pos, IM_COL32(2, 6, 23, 250));
         // draw_list->AddLine(ImVec2(start_pos.x, end_pos.y), ImVec2(end_pos.x, end_pos.y), IM_COL32(30, 41, 59, 255));
 
         // ImGui::SetCursorScreenPos(ImVec2(start_pos.x + 16.0f, start_pos.y + 10.0f));
 
-        const float center_y = start_pos.y + (navbar_height - ImGui::GetFrameHeight()) * 0.5f;
+        const float target_input_height = navbar_height * 0.60f;
+        const float target_font_height = target_input_height * 0.65f;
+        const float font_scale = std::min(1.f, target_font_height / ImGui::GetTextLineHeight());
+
+        ImGui::SetWindowFontScale(font_scale);
+
+        const float required_padding_y = std::max(
+            0.f, (target_input_height - ImGui::GetTextLineHeight()) * 0.5f
+        );
+        const float center_y = start_pos.y + (navbar_height - target_input_height) * 0.5f;
 
         ImGui::SetCursorScreenPos(ImVec2(
             start_pos.x + window->Size.x - padding_x - search_width,
@@ -98,12 +105,18 @@ namespace UI::Elements::SettingsScreen {
 
         ImGui::PushItemWidth(search_width);
 
+        ImVec2 current_padding = ImGui::GetStyle().FramePadding;
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(current_padding.x, required_padding_y));
+
         static char searchBuf[128] = "";
         ImGui::InputTextWithHint("##search", "Search...", searchBuf, sizeof(searchBuf));
 
         ImGui::SetCursorScreenPos(ImVec2(start_pos.x, end_pos.y));
 
+        ImGui::PopStyleVar();
         ImGui::PopItemWidth();
+
+        ImGui::SetWindowFontScale(1.f);
 
         ImGui::Dummy(ImVec2(0.f, 0.f));
     }

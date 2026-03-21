@@ -1,4 +1,13 @@
 #include "FakeImports.hpp"
+#include <cstdint>
+#include <cstddef>
+#include <bit>
+#include <mutex>
+#include <functional>
+#include <wtypes.h>
+#include <Windows.h>
+#include <libhat/memory_protector.hpp>
+#include <libhat/process.hpp>
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 

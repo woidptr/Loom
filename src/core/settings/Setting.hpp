@@ -71,7 +71,7 @@ template <hat::fixed_string Name, hat::fixed_string Group = "">
 using ColorSetting = Setting<Name, ImColor, Group>;
 
 inline void to_json(nlohmann::json& j, const ImVec2& v) {
-    j = json::array({v.x, v.y});
+    j = nlohmann::json::array({v.x, v.y});
 }
 
 inline void from_json(const nlohmann::json& j, ImVec2& v) {

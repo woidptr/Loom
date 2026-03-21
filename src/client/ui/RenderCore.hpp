@@ -8,7 +8,6 @@
 #include <events/input/WindowProcessEvent.hpp>
 #include <events/input/KeyboardEvent.hpp>
 #include <events/input/MouseEvent.hpp>
-#include <Resource.hpp>
 #include <mutex>
 #include <imgui.h>
 

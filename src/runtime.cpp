@@ -2,9 +2,8 @@
 
 bool Runtime::performStartupSequence() {
     Logger::construct();
-    SignatureRegistry::registerSignatures();
 
-    if (!SignatureRegistry::performHealthCheck()) {
+    if (!AddressResolver::construct()) {
         $log_critical("Signature healthcheck failed, silently ejecting...");
         return false;
     }

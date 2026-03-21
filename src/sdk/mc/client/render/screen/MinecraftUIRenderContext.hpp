@@ -5,7 +5,7 @@
 #include <sdk/mc/deps/renderer/TexturePtr.hpp>
 #include <libhat/access.hpp>
 #include <core/Logger.hpp>
-#include <core/Signatures.hpp>
+#include <core/AddressResolver.hpp>
 
 class IClientInstance;
 class ScreenContext;

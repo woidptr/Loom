@@ -3,7 +3,7 @@
 Replay::Replay() : Module("Replay", "replay") {
     listeners.reserve(1);
 
-    enabled.setCallback([&](bool isEnabled) -> void {
+    enabled.setCallback([&](const bool& isEnabled) -> void {
         if (isEnabled) {
             $add_listener(IncomingPacketEvent, &Replay::onPacketReceived);
         } else {

@@ -6,7 +6,7 @@ public:
     std::string& mBuffer;
 public:
     BinaryStream() : ReadOnlyBinaryStream({}, true), mBuffer(mOwnedBuffer) {
-        this->vtable = $get_address("BinaryStream::$vftable");
+        // this->vtable = $get_address("BinaryStream::$vftable");
     }
     // BinaryStream(std::string& buffer) : ReadOnlyBinaryStream(buffer, false), mBuffer(buffer) {}
 

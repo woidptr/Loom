@@ -53,26 +53,6 @@ uintptr_t Memory::ResolveAddress(const char* mangledName) {
 
 	UnDecorateSymbolName(mangledName, buffer, sizeof(buffer), flags);
 
-	return $get_address(std::string(buffer));
-}
-
-namespace Memory {
-	AddressResolver::AddressResolver() {
-		ZydisDecoderInit(this->decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64);
-	}
-
-	uintptr_t AddressResolver::getAddress(const std::string &id) {
-		auto item = addressMap.find(id);
-		if (item != addressMap.end()) {
-			uintptr_t address = item->second;
-
-			return address;
-		}
-
-		return 0;
-	}
-
-	int32_t AddressResolver::getPointer(const std::string &id) {
-
-	}
+	return AddressResolver::get(buffer);
+	// return $get_address(std::string(buffer));
 }
